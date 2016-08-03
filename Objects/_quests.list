@@ -1,0 +1,7 @@
+[0001]
+quest_name = Tutorial
+quest_text = "Take this key and goto the storage room!"
+quest_req = GrisKeyRing
+quest_req_loc = 2
+quest_reward = QuestSword
+

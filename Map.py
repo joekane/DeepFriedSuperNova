@@ -12,6 +12,7 @@ map = None
 objects = None
 stairs = None
 
+
 def current_map():
     return map
 
@@ -25,7 +26,6 @@ class Tile:
         # by default, if a tile is blocked, it also blocks sight
         if block_sight is None: block_sight = blocked
         self.block_sight = block_sight
-
 
 
 class Rect:
@@ -73,7 +73,7 @@ def load_diner_map():
                 #print(str(x) + " " + str(y))
                 map[x][y].blocked = False
                 map[x][y].block_sight = False
-            if c == '+':
+            if c == 'D':
                 #print(str(x) + "+" + str(y))
                 map[x][y].blocked = False
                 map[x][y].block_sight = True
@@ -100,20 +100,19 @@ def load_diner_map():
                     map[x][y].blocked = False
                     map[x][y].block_sight = False
                     spawn_npc_at(x, y, 'QuestGuy')
+            if c == '+':
+                    #print(str(x) + "|" + str(y))
+                    map[x][y].blocked = True
+                    map[x][y].block_sight = True
+                    spawn_npc_at(x, y, 'UnlockedDoor')
             if c == 's':
                 #print(str(x) + "|" + str(y))
                 map[x][y].blocked = False
                 map[x][y].block_sight = False
                 stairs = Entity.Entity(x, y, '<', 'stairs', libtcod.white, always_visible=True)
                 objects.append(stairs)
-            x+=1
-        y+=1
-
-
-
-
-
-
+            x += 1
+        y += 1
 
 
 def make_map():
@@ -314,8 +313,6 @@ def traverse_node(node, dat):
     return True
 
 
-
-
 def vline(map, x, y1, y2):
     if y1 > y2:
         y1, y2 = y2, y1
@@ -451,10 +448,6 @@ def place_objects(room):
         spawn_item_at(x,y, choice)
 
 
-
-
-
-
 def number_of_adjacent_objects(obj):
     num = 0
     for object in objects:
@@ -464,7 +457,6 @@ def number_of_adjacent_objects(obj):
             # print(object.name + " X:" + str(difx) + " Y:" + str(dify))
             num += 1
     return num
-
 
 
 def spawn_npc_at(x, y, npc):
@@ -522,7 +514,6 @@ def closest_monster(max_range):
     return closest_enemy
 
 
-
 def is_explored(x,y):
     # first test the map tile
     if map[x][y].explored:
@@ -534,11 +525,13 @@ def is_explored(x,y):
 def is_blocked(x, y):
     # first test the map tile
     if map[x][y].blocked:
+        # print "Blocked By Map!"
         return True
 
     # now check for any blocking objects
     for object in objects:
         if object.blocks and object.x == x and object.y == y:
+            # print "Blocked by Object!"
             return True
 
     return False
@@ -598,10 +591,9 @@ def target_monster(max_range=None):
             return None
 
         # return the first clicked monster, otherwise continue looping
-        for obj in objects:
-            if obj.x == x and obj.y == y and obj.fighter and obj != player:
+        for obj in get_objects():
+            if obj.x == x and obj.y == y and obj.fighter and obj != GameState.get_player():
                 return obj
-
 
 
 def get_objects():
@@ -631,6 +623,68 @@ def player_move_or_interact(dx, dy):
             print "Reward!!!! .... ??"
             object.ai.talk()
             return
+        if object.blocks:
+            if isinstance(object.ai, Components.Door) and object.x == x and object.y == y:
+                object.ai.interact()
+                return
 
     player.move(dx, dy)
     Fov.require_recompute()
+
+
+def get_open_tiles():
+    global map
+
+    open_nodes = []
+
+    for y in range(Constants.MAP_HEIGHT):
+        for x in range(Constants.MAP_WIDTH):
+            if not map[x][y].blocked:
+                open_nodes.append(map[x][y])
+
+    return open_nodes
+
+
+def has_cross_blocked(x,y):
+    if map[x-1][y].blocked and map[x+1][y].blocked:
+        return True
+    elif map[x][y-1].blocked and map[x][y+1].blocked:
+        return True
+    return False
+
+def get_total_blocked_corners(x,y):
+    count = 0
+    if map[x-1][y-1].blocked:
+        count += 1
+    if map[x+1][y-1].blocked:
+        count += 1
+    if map[x-1][y+1].blocked:
+        count += 1
+    if map[x+1][y+1].blocked:
+        count += 1
+    return count
+
+
+
+
+def spawn_doors():
+
+    valid_nodes = []
+
+    for y in range(Constants.MAP_HEIGHT):
+        for x in range(Constants.MAP_WIDTH):
+            if not map[x][y].blocked and has_cross_blocked(x,y):
+                count = get_total_blocked_corners(x,y)
+                chance = libtcod.random_get_int(0, 0, 100)
+                if count == 0 and chance <= 50:
+                    Fov.fov_change(x, y, True, True)
+                    spawn_npc_at(x,y, 'Door')
+                elif count == 1 and chance <= 40:
+                    Fov.fov_change(x, y, True, True)
+                    spawn_npc_at(x,y, 'Door')
+                elif count == 2 and chance <= 30:
+                    Fov.fov_change(x, y, True, True)
+                    spawn_npc_at(x,y, 'Door')
+                elif count == 3 and chance <= 2:
+                    Fov.fov_change(x, y, True, True)
+                    spawn_npc_at(x,y, 'Door')

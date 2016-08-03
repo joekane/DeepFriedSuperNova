@@ -176,3 +176,8 @@ def render_hoz_line(x, y, length, color, target):
     libtcod.console_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
+def render_all():
+    map()
+    objects()
+    ui()
+    update()

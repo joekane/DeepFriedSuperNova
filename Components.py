@@ -140,10 +140,52 @@ class BasicMonster:
                 monster.fighter.attack(player)
 
 
+
+class Door:
+    def __init__(self, door_status=None):
+
+        if door_status is None:
+            chance = libtcod.random_get_int(0, 0, 100)
+            if chance <= 5:
+                self.status = 'locked'
+            else:
+                self.status = 'closed'
+        else:
+            self.status = door_status
+
+    def take_turn(self):
+        if self.status is 'closed':
+            self.owner.blocks = True
+            Fov.fov_change(self.owner.x, self.owner.y, True, True)
+            Map.map[self.owner.x][self.owner.y].blocked = True
+            Map.map[self.owner.x][self.owner.y].block_sight = True
+            self.owner.char = '+'
+        if self.status is 'open':
+            self.owner.blocks = False
+            Fov.fov_change(self.owner.x, self.owner.y, False, False)
+            Map.map[self.owner.x][self.owner.y].blocked = False
+            Map.map[self.owner.x][self.owner.y].block_sight = False
+
+            self.owner.char = '_'
+
+
+    def interact(self):
+        # print "interact!"
+        if self.status == 'closed':
+            self.status = 'open'
+        if self.status == 'open':
+            pass
+        else:
+            Utils.message("Locked!", libtcod.dark_red)
+
+
+
+
 class BasicRangedMonster:
     # AI for a basic monster.
     def __init__(self, attack_range=5):
         self.attack_range = attack_range
+        self.reload = 0
 
     def take_turn(self):
         # a basic monster takes its turn. If you can see it, it can see you
@@ -153,9 +195,16 @@ class BasicRangedMonster:
             # move towards player if far away
             if monster.distance_to(player) > self.attack_range:
                 monster.move_astar(player)
+                self.reload -= 1
             # close enough, attack! (if the player is still alive.)
-            elif player.fighter.hp > 0:
+            elif player.fighter.hp > 0 and self.reload <= 0:
+                Animate.follow_line(self.owner, player)
                 monster.fighter.attack(player)
+                self.reload = 3
+            else:
+                self.reload -= 1
+                pass
+
 
 
 class SpawningMonster:
@@ -166,6 +215,7 @@ class SpawningMonster:
     def take_turn(self):
         # a basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
+        player = GameState.get_player()
         if Fov.is_visible(obj=monster):
             # TO-DO: Randomize location of spawn
             #       Randomize how often spawn occurs
@@ -190,7 +240,8 @@ class SpawningMonster:
             if 'fighter_component' in GameState.imported_npc_list[self.new_monster]:
                 fighter_component = Fighter(hp=int(GameState.imported_npc_list[self.new_monster]['hp']),
                                             defense=int(GameState.imported_npc_list[self.new_monster]['defense']),
-                                            power=int(GameState.imported_npc_list[self.new_monster]['xp']),
+                                            power=int(GameState.imported_npc_list[self.new_monster]['power']),
+                                            xp=int(GameState.imported_npc_list[self.new_monster]['xp']),
                                             death_function=eval(GameState.imported_npc_list[self.new_monster]['death_function']))
 
             if 'ai_component' in GameState.imported_npc_list[self.new_monster]:
@@ -315,7 +366,8 @@ class Ranged:
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
                 return 'cancelled'
 
-        Animate.follow_line(source, target)
+        # Animate.follow_line(source, target)
+        Animate.explosion(target)
 
         # zap it!
         Utils.message('A shot rings out and ' + target.name + ' takes an arrow to the knee! The damage is ' + str(

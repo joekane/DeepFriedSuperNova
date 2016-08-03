@@ -10,10 +10,11 @@ import Render
 class Entity:
     # this is a generic object: the player, a monster, an item, the stairs...
     # it's always represented by a character on screen.
-    def __init__(self, x, y, char, name, color, blocks=False, fighter=None, always_visible=False, ai=None, item=None,
+    def __init__(self, x, y, char, name, color, blocks=False, transparent=True, fighter=None, always_visible=False, ai=None, item=None,
                  equipment=None, ranged=None):
         self.name = name
         self.blocks = blocks
+        self.transparent = transparent
         self.x = x
         self.y = y
         self.char = char
@@ -128,7 +129,8 @@ class Entity:
             return
 
 
-        fov_recompute = True
+        Fov.require_recompute()
+        map = Map.current_map()
 
         # Scan the current map each turn and set all the walls as unwalkable
         for y1 in range(Constants.MAP_HEIGHT):
@@ -138,7 +140,7 @@ class Entity:
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
         # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        for obj in objects:
+        for obj in Map.get_objects():
             if obj.blocks and obj != self:
                 # Set the tile as a wall so it must be navigated around
                 libtcod.map_set_properties(fov, obj.x, obj.y, True, False)

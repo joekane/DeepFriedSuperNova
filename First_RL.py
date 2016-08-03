@@ -166,11 +166,11 @@ def handle_keys():
                         break
             elif key_char == 'i':
                 # show the inventory; if an item is selected, use it
-                img = libtcod.image_load('orc.png')
-                libtcod.image_blit_2x(img, 0, 0, 0)
+                # img = libtcod.image_load('orc.png')
+                # libtcod.image_blit_2x(img, 0, 0, 0)
 
-                img2 = libtcod.image_load('orc_80.png')
-                libtcod.image_blit_2x(img2, 0, 40, 0)
+                # img2 = libtcod.image_load('orc_80.png')
+                # libtcod.image_blit_2x(img2, 0, 40, 0)
 
                 chosen_item = inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
 
@@ -209,6 +209,8 @@ def handle_keys():
                     '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(player.fighter.max_hp) +
                     '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense),
                     Constants.CHARACTER_SCREEN_WIDTH)
+            elif key_char == 'p':
+                Map.spawn_doors()
 
             return 'didnt-take-turn'
 
@@ -249,8 +251,10 @@ def next_level():
 
     GameState.add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
     GameState.dungeon_level += 1
-    Map.make_map()  # create a fresh new level!
+    # Map.make_map()  # create a fresh new level!
+    Map.make_bsp()
     Fov.initialize()
+    Map.spawn_doors()
 
 
 def play_game():
@@ -259,14 +263,23 @@ def play_game():
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        (x, y) = (mouse.cx, mouse.cy)
 
         # render the screen
         # render_all()
 
         Render.map()
-        Render.objects()
         Render.ui()
+        Render.objects()
         Render.update()
+
+        obj = [obj for obj in Map.get_objects() if obj.x == x and obj.y == y]
+        if len(obj) == 0:
+            pass
+        else:
+            Animate.inspect_banner(x, y, obj[0].name)
+
+
 
         libtcod.console_flush()
 
@@ -280,14 +293,20 @@ def play_game():
             save_game()
             break
         # let monsters take their turn
+
         if game_state == 'playing' and player_action != 'didnt-take-turn':
             for object in Map.get_objects():
                 if object.ai:
                     object.ai.take_turn()
         else:
-            (x, y) = (mouse.cx, mouse.cy)
             if (mouse.lbutton_pressed and Map.is_explored(x,y)):
-                player.move_astar_xy(x,y)
+                GameState.get_player().move_astar_xy(x,y)
+
+
+
+
+
+
 
 
 def main_menu():

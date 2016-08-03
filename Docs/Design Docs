@@ -1,0 +1,30 @@
+DEEP FRIED SUPERNOVA!
+
+WORLD STRUCTURE:
+
+HUB WORLD (Diner)
+- Pre-Made Map :DONE!:
+- Gris (Main Quest Giver) :temp:
+- Kitchen (Slop Prep)
+- Vending Machines (skills, items)
+- Storage Door (Levels) :temp:
+
+
+WORLD GEN:
+==> TO DO
+- Scrolling Maps
+- Themes (matching Tags)
+- FOV tweaks
+
+
+
+Combat:
+- Damage Dice + Bonus
+- No To-Hot Roll
+- Enemy has Dodge / Parry / Block (ex: 13.25%)
+- Only uses best roll
+- Damage Reduction (DR) applaied after failed save
+- Crits are separate chance roll (2% crit chance)
+- Crits are DMG + CRIT DMG BONUS % (ex: 110%)
+
+
