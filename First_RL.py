@@ -59,7 +59,7 @@ def menu(header, options, width):
     # blit the contents of "window" to the root console
     x = Constants.SCREEN_WIDTH / 2 - width / 2
     y = Constants.SCREEN_HEIGHT / 2 - height / 2
-    libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+    libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.5)
 
     # compute x and y offsets to convert console position to menu position
     x_offset = x  # x is the left edge of the menu
@@ -121,7 +121,7 @@ def inventory_menu(header):
 
 def handle_keys():
     global fov_recompute
-    global key
+    global key,char_cycle
 
     player = GameState.get_player()
 
@@ -210,7 +210,11 @@ def handle_keys():
                     '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense),
                     Constants.CHARACTER_SCREEN_WIDTH)
             elif key_char == 'p':
-                Map.spawn_doors()
+
+                libtcod.console_put_char_ex(0, 0 , 0, chr(char_cycle), libtcod.red, libtcod.BKGND_NONE)
+                libtcod.console_print_ex(0, 0, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(char_cycle))
+                libtcod.console_flush()
+                char_cycle += 1
 
             return 'didnt-take-turn'
 
@@ -418,5 +422,7 @@ side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_WIDTH, C
 mouse = libtcod.Mouse()
 key = libtcod.Key()
 Fov.require_recompute()
+
+char_cycle = 1
 
 main_menu()

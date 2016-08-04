@@ -472,10 +472,16 @@ def spawn_npc_at(x, y, npc):
     if 'ai_component' in GameState.imported_npc_list[npc]:
         ai_component = eval('Components.' + GameState.imported_npc_list[npc]['ai_component'])
 
+    if 'always_visible' in GameState.imported_npc_list[npc]:
+        vis = GameState.imported_npc_list[npc]['color']
+    else:
+        vis = False
+
     monster = Entity.Entity(x, y,
                             GameState.imported_npc_list[npc]['char'],
                             GameState.imported_npc_list[npc]['name'],
                             eval(GameState.imported_npc_list[npc]['color']),
+                            always_visible=vis,
                             blocks=True,
                             fighter=fighter_component,
                             ai=ai_component)

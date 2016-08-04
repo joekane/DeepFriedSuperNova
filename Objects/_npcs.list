@@ -3,6 +3,7 @@ ai_component = Door()
 char = +
 name = door
 color = libtcod.darker_yellow
+always_visible=False
 freq = 0:0
 
 [UnlockedDoor]
@@ -10,6 +11,7 @@ ai_component = Door(door_status='closed')
 char = +
 name = door
 color = libtcod.darker_yellow
+always_visible=False
 freq = 0:0
 
 
