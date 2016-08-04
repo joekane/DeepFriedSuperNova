@@ -1,23 +1,12 @@
 # -*- coding: utf-8 -*-
 import libtcodpy as libtcod
-import math
-import textwrap
-import shelve
-import random
-import random
-import Combat
-import time
 import Utils
-import Animate
 import Render
 import Fov
 import Map
 import GameState
 import Constants
-from copy import deepcopy
-
-import ConfigParser
-
+# import shelve
 
 color_dark_wall = libtcod.Color(30, 30, 30)
 color_dark_ground = libtcod.Color(40, 40, 40)
@@ -25,14 +14,13 @@ color_dark_ground = libtcod.Color(40, 40, 40)
 color_light_wall = libtcod.dark_amber
 color_light_ground = libtcod.lighter_grey
 
-
-
-
 """ GUI """
+
 
 def menu(header, options, width):
     global key, mouse
-    if len(options) > 26: raise ValueError('Cannot have a menu with more than 26 options.')
+    if len(options) > 26:
+        raise ValueError('Cannot have a menu with more than 26 options.')
 
     # calculate total height for the header (after auto-wrap) and one line per option
     header_height = libtcod.console_get_height_rect(con, 0, 0, width, Constants.SCREEN_HEIGHT, header)
@@ -70,10 +58,10 @@ def menu(header, options, width):
         libtcod.console_flush()
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
-        if (mouse.lbutton_pressed):
+        if mouse.lbutton_pressed:
             (menu_x, menu_y) = (mouse.cx - x_offset, mouse.cy - y_offset)
             # check if click is within the menu and on a choice
-            if menu_x >= 0 and menu_x < width and menu_y >= 0 and menu_y < height - header_height:
+            if 0 <= menu_x < width and 0 <= menu_y < height - header_height:
                 return menu_y
 
         if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
@@ -85,9 +73,11 @@ def menu(header, options, width):
 
         # convert the ASCII code to an index; if it corresponds to an option, return it
         index = key.c - ord('a')
-        if index >= 0 and index < len(options): return index
+        if 0 <= index < len(options):
+            return index
         # if they pressed a letter that is not an option, return None
-        if index >= 0 and index <= 26: return
+        if 0 <= index <= 26:
+            return
 
 
 def msgbox(text, width=50):
@@ -110,18 +100,16 @@ def inventory_menu(header):
     index = menu(header, options, Constants.INVENTORY_WIDTH)
 
     # if an item was chosen, return it
-    if index is None or len(GameState.inventory) == 0: return None
+    if index is None or len(GameState.inventory) == 0:
+        return None
     return GameState.inventory[index].item
-
-
-
 
 
 """ I/O """
 
+
 def handle_keys():
-    global fov_recompute
-    global key,char_cycle
+    global key, char_cycle
 
     player = GameState.get_player()
 
@@ -181,7 +169,6 @@ def handle_keys():
                 # show the inventory; if an item is selected, drop it
                 chosen_item = inventory_menu('Press the key next to an item to drop it, or any other to cancel.\n')
 
-
                 if chosen_item is not None:
                     chosen_item.drop()
             elif key_char == 'f':
@@ -191,7 +178,7 @@ def handle_keys():
                         return 'fired_ranged'
                 Utils.message("No ranged weapon equipped!", libtcod.light_amber)
             elif key_char == 'h':
-                for obj in inventory:
+                for obj in GameState.get_inventory():
                     if obj.name == 'healing potion':
                         obj.item.use()
                         return 'used_item'
@@ -211,7 +198,7 @@ def handle_keys():
                     Constants.CHARACTER_SCREEN_WIDTH)
             elif key_char == 'p':
 
-                libtcod.console_put_char_ex(0, 0 , 0, chr(char_cycle), libtcod.red, libtcod.BKGND_NONE)
+                libtcod.console_put_char_ex(0, 0, 0, chr(char_cycle), libtcod.red, libtcod.BKGND_NONE)
                 libtcod.console_print_ex(0, 0, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(char_cycle))
                 libtcod.console_flush()
                 char_cycle += 1
@@ -229,23 +216,11 @@ def new_game():
 
     Render.initialize(con, panel, side_panel)
 
-    # generate map (at this point it's not drawn to the screen)
-    # make_map()
-    #make_bsp()
     Map.load_diner_map()
-
-    #initialize_fov()
     Fov.initialize()
 
     # States
     game_state = 'playing'
-    # inventory = []
-
-    # create the list of game messages and their colors, starts empty
-    # game_msgs = []
-
-    # a warm welcoming message!
-    # message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', libtcod.red)
 
 
 def next_level():
@@ -272,61 +247,40 @@ def play_game():
         # render the screen
         # render_all()
 
-        Render.map()
-        Render.ui()
-        Render.objects()
-        Render.update()
-
-        obj = [obj for obj in Map.get_objects() if obj.x == x and obj.y == y]
-        if len(obj) == 0:
-            pass
-        else:
-            Animate.inspect_banner(x, y, obj[0].name)
-
-
-
+        Render.render_all()
+        Utils.inspect_tile(x, y)
         libtcod.console_flush()
 
         # erase all objects at their old locations, before they move
-        for object in Map.get_objects():
-            object.clear()
+        for obj in Map.get_objects():
+            obj.clear()
 
             # handle keys and exit game if needed
-        if not check_level_up(): player_action = handle_keys()
+        if not check_level_up():
+            player_action = handle_keys()
         if player_action == 'exit':
             save_game()
             break
         # let monsters take their turn
 
         if game_state == 'playing' and player_action != 'didnt-take-turn':
-            for object in Map.get_objects():
-                if object.ai:
-                    object.ai.take_turn()
+            for obj in Map.get_objects():
+                if obj.ai:
+                    obj.ai.take_turn()
         else:
-            if (mouse.lbutton_pressed and Map.is_explored(x,y)):
-                GameState.get_player().move_astar_xy(x,y)
-
-
-
-
-
-
+            if mouse.lbutton_pressed and Map.is_explored(x, y):
+                GameState.get_player().move_astar_xy(x, y)
 
 
 def main_menu():
-    #img = libtcod.image_load('menu_background.png')
     img = libtcod.image_load('diner.png')
-
-    # show the game's title, and some credits!
-
 
     while not libtcod.console_is_window_closed():
         # show the background image, at twice the regular console resolution
         libtcod.image_blit_2x(img, 0, 0, 0)
 
-        libtcod.console_set_default_foreground(0, libtcod.white)
-        #libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'DEEP FRIED SUPERNOVA')
-        libtcod.console_print_ex(0, Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.CENTER,
+        libtcod.console_print_ex(0, Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT - 2, libtcod.BKGND_NONE,
+                                 libtcod.CENTER,
                                  'By Tapeworm / N Gregory')
 
         # show options and wait for the player's choice
@@ -348,34 +302,35 @@ def main_menu():
 
 
 def save_game():
-    file = shelve.open('savegame', 'n')
-    file['map'] = map
-    file['objects'] = objects
-    file['player_index'] = objects.index(player)
-    file['inventory'] = inventory
-    file['game_msgs'] = game_msgs
-    file['game_state'] = game_state
-    file['stairs_index'] = objects.index(stairs)
-    file['dungeon_level'] = dungeon_level
-    file.close()
+    # file = shelve.open('savegame', 'n')
+    # file['map'] = map
+    # file['objects'] = objects
+    # file['player_index'] = objects.index(player)
+    # file['inventory'] = inventory
+    # file['game_msgs'] = game_msgs
+    # file['game_state'] = game_state
+    # file['stairs_index'] = objects.index(stairs)
+    # file['dungeon_level'] = dungeon_level
+    # file.close()
+    pass
 
 
 def load_game():
     # open the previously saved shelve and load the game data
-    global map, objects, player, inventory, game_msgs, game_state, dungeon_level, stairs
+    # global map, objects, player, inventory, game_msgs, game_state, dungeon_level, stairs
 
-    file = shelve.open('savegame', 'r')
-    map = file['map']
-    objects = file['objects']
-    player = objects[file['player_index']]  # get index of player in objects list and access it
-    inventory = file['inventory']
-    game_msgs = file['game_msgs']
-    game_state = file['game_state']
-    stairs = objects[file['stairs_index']]
-    dungeon_level = file['dungeon_level']
-    file.close()
-
-    Fov.initialize()
+    # file = shelve.open('savegame', 'r')
+    # map = file['map']
+    # objects = file['objects']
+    # player = objects[file['player_index']]  # get index of player in objects list and access it
+    # inventory = file['inventory']
+    # game_msgs = file['game_msgs']
+    # game_state = file['game_state']
+    # stairs = objects[file['stairs_index']]
+    # # dungeon_level = file['dungeon_level']
+    # file.close()
+    # Fov.initialize()
+    pass
 
 
 #############################################
@@ -393,11 +348,12 @@ def check_level_up():
         Utils.message('Your battle skills grow stronger! You reached level ' + str(player.level) + '!', libtcod.yellow)
 
         choice = None
-        while choice == None:  # keep asking until a choice is made
+        while choice is None:  # keep asking until a choice is made
             choice = menu('Level up! Choose a stat to raise:\n',
                           ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
                            'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
-                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'], Constants.LEVEL_SCREEN_WIDTH)
+                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
+                          Constants.LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
             player.fighter.base_max_hp += 20
@@ -417,12 +373,13 @@ libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 con = libtcod.console_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
-side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_WIDTH, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
+side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_WIDTH,
+                                 Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
 
 mouse = libtcod.Mouse()
 key = libtcod.Key()
 Fov.require_recompute()
-
+game_state = None
 char_cycle = 1
 
 main_menu()

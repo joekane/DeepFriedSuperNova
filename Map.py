@@ -8,13 +8,13 @@ import Utils
 import Components
 import Spells
 
-map = None
+level_map = None
 objects = None
 stairs = None
 
 
 def current_map():
-    return map
+    return level_map
 
 
 class Tile:
@@ -48,7 +48,7 @@ class Rect:
 
 
 def load_diner_map():
-    global objects, map, stairs
+    global objects, level_map, stairs
 
     player = GameState.get_player()
     objects = [player]
@@ -59,9 +59,9 @@ def load_diner_map():
     file = open('Levels\diner.map', 'r')
 
     # fill map with "blocked" tiles
-    map = [[Tile(True)
-            for y in range(Constants.MAP_HEIGHT)]
-                for x in range(Constants.MAP_WIDTH)]
+    level_map = [[Tile(True)
+                  for y in range(Constants.MAP_HEIGHT)]
+                 for x in range(Constants.MAP_WIDTH)]
 
     y = 0
 
@@ -71,44 +71,44 @@ def load_diner_map():
         for c in line:
             if c == ' ':
                 #print(str(x) + " " + str(y))
-                map[x][y].blocked = False
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = False
+                level_map[x][y].block_sight = False
             if c == 'D':
                 #print(str(x) + "+" + str(y))
-                map[x][y].blocked = False
-                map[x][y].block_sight = True
+                level_map[x][y].blocked = False
+                level_map[x][y].block_sight = True
             if c == '-':
                 #print(str(x) + "-" + str(y))
-                map[x][y].blocked = True
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = True
+                level_map[x][y].block_sight = False
             if c == '|':
                 #print(str(x) + "|" + str(y))
-                map[x][y].blocked = True
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = True
+                level_map[x][y].block_sight = False
             if c == '*':
                 #print(str(x) + "|" + str(y))
-                map[x][y].blocked = True
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = True
+                level_map[x][y].block_sight = False
             if c == 'p':
                     #print(str(x) + "|" + str(y))
-                    map[x][y].blocked = False
-                    map[x][y].block_sight = False
+                    level_map[x][y].blocked = False
+                    level_map[x][y].block_sight = False
                     player.x = x
                     player.y = y
             if c == 'Q':
                     #print(str(x) + "|" + str(y))
-                    map[x][y].blocked = False
-                    map[x][y].block_sight = False
+                    level_map[x][y].blocked = False
+                    level_map[x][y].block_sight = False
                     spawn_npc_at(x, y, 'QuestGuy')
             if c == '+':
                     #print(str(x) + "|" + str(y))
-                    map[x][y].blocked = True
-                    map[x][y].block_sight = True
+                    level_map[x][y].blocked = True
+                    level_map[x][y].block_sight = True
                     spawn_npc_at(x, y, 'UnlockedDoor')
             if c == 's':
                 #print(str(x) + "|" + str(y))
-                map[x][y].blocked = False
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = False
+                level_map[x][y].block_sight = False
                 stairs = Entity.Entity(x, y, '<', 'stairs', libtcod.white, always_visible=True)
                 objects.append(stairs)
             x += 1
@@ -116,16 +116,16 @@ def load_diner_map():
 
 
 def make_map():
-    global map, objects, stairs
+    global level_map, objects, stairs
 
     player = GameState.get_player()
 
     objects = [player]
 
     # fill map with "blocked" tiles
-    map = [[Tile(True)
-            for y in range(Constants.MAP_HEIGHT)]
-           for x in range(Constants.MAP_WIDTH)]
+    level_map = [[Tile(True)
+                  for y in range(Constants.MAP_HEIGHT)]
+                 for x in range(Constants.MAP_WIDTH)]
 
     rooms = []
     num_rooms = 0
@@ -194,13 +194,13 @@ def make_map():
 
 
 def make_bsp():
-    global map, objects, stairs, bsp_rooms
+    global level_map, objects, stairs, bsp_rooms
 
     player = GameState.get_player()
 
     objects = [player]
 
-    map = [[Tile(True) for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    level_map = [[Tile(True) for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     # Empty global list for storing room coordinates
     bsp_rooms = []
@@ -236,7 +236,7 @@ def make_bsp():
 
 
 def traverse_node(node, dat):
-    global map, bsp_rooms
+    global level_map, bsp_rooms
 
     # Create rooms
     if libtcod.bsp_is_leaf(node):
@@ -265,8 +265,8 @@ def traverse_node(node, dat):
         # Dig room
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
-                map[x][y].blocked = False
-                map[x][y].block_sight = False
+                level_map[x][y].blocked = False
+                level_map[x][y].block_sight = False
 
         # Add center coordinates to the list of rooms
         bsp_rooms.append(((minx + maxx) / 2, (miny + maxy) / 2))
@@ -284,31 +284,31 @@ def traverse_node(node, dat):
                 x1 = libtcod.random_get_int(None, left.x, left.x + left.w - 1)
                 x2 = libtcod.random_get_int(None, right.x, right.x + right.w - 1)
                 y = libtcod.random_get_int(None, left.y + left.h, right.y)
-                vline_up(map, x1, y - 1)
-                hline(map, x1, y, x2)
-                vline_down(map, x2, y + 1)
+                vline_up(level_map, x1, y - 1)
+                hline(level_map, x1, y, x2)
+                vline_down(level_map, x2, y + 1)
 
             else:
                 minx = max(left.x, right.x)
                 maxx = min(left.x + left.w - 1, right.x + right.w - 1)
                 x = libtcod.random_get_int(None, minx, maxx)
-                vline_down(map, x, right.y)
-                vline_up(map, x, right.y - 1)
+                vline_down(level_map, x, right.y)
+                vline_up(level_map, x, right.y - 1)
 
         else:
             if left.y + left.h - 1 < right.y or right.y + right.h - 1 < left.y:
                 y1 = libtcod.random_get_int(None, left.y, left.y + left.h - 1)
                 y2 = libtcod.random_get_int(None, right.y, right.y + right.h - 1)
                 x = libtcod.random_get_int(None, left.x + left.w, right.x)
-                hline_left(map, x - 1, y1)
-                vline(map, x, y1, y2)
-                hline_right(map, x + 1, y2)
+                hline_left(level_map, x - 1, y1)
+                vline(level_map, x, y1, y2)
+                hline_right(level_map, x + 1, y2)
             else:
                 miny = max(left.y, right.y)
                 maxy = min(left.y + left.h - 1, right.y + right.h - 1)
                 y = libtcod.random_get_int(None, miny, maxy)
-                hline_left(map, right.x - 1, y)
-                hline_right(map, right.x, y)
+                hline_left(level_map, right.x - 1, y)
+                hline_right(level_map, right.x, y)
 
     return True
 
@@ -359,27 +359,27 @@ def hline_right(map, x, y):
 
 
 def create_room(room):
-    global map
+    global level_map
     # go through the tiles in the rectangle and make them passable
     for x in range(room.x1 + 1, room.x2):
         for y in range(room.y1 + 1, room.y2):
-            map[x][y].blocked = False
-            map[x][y].block_sight = False
+            level_map[x][y].blocked = False
+            level_map[x][y].block_sight = False
 
 
 def create_v_tunnel(y1, y2, x):
-    global map
+    global level_map
     # vertical tunnel
     for y in range(min(y1, y2), max(y1, y2) + 1):
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        level_map[x][y].blocked = False
+        level_map[x][y].block_sight = False
 
 
 def create_h_tunnel(x1, x2, y):
-    global map
+    global level_map
     for x in range(min(x1, x2), max(x1, x2) + 1):
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        level_map[x][y].blocked = False
+        level_map[x][y].block_sight = False
 
 
 def place_objects(room):
@@ -493,7 +493,10 @@ def spawn_item_at(x,y, item_name):
     item_component = None
     equipment_component = None
     if 'item_component' in GameState.imported_items_list[item_name]:
-        item_component = Components.Item(use_function=eval('Spells.' + GameState.imported_items_list[item_name]['use_function']))
+        if 'use_function' in GameState.imported_items_list[item_name]:
+            item_component = Components.Item(use_function=eval('Spells.' + GameState.imported_items_list[item_name]['use_function']))
+        else:
+            item_component = Components.Item()
     if 'equipment_component' in GameState.imported_items_list[item_name]:
         equipment_component = Components.Equipment(slot=GameState.imported_items_list[item_name]['slot'],
                                                    defense_bonus=int(GameState.imported_items_list[item_name]['defense_bonus']),
@@ -522,7 +525,7 @@ def closest_monster(max_range):
 
 def is_explored(x,y):
     # first test the map tile
-    if map[x][y].explored:
+    if level_map[x][y].explored:
         return True
 
     return False
@@ -530,7 +533,7 @@ def is_explored(x,y):
 
 def is_blocked(x, y):
     # first test the map tile
-    if map[x][y].blocked:
+    if level_map[x][y].blocked:
         # print "Blocked By Map!"
         return True
 
@@ -572,18 +575,19 @@ def adjacent_open_tiles(obj):
 
 def target_tile(max_range=None):
     # return the position of a tile left-clicked in player's FOV (optionally in a range), or (None,None) if right-clicked.
-    global key, mouse
+    mouse = libtcod.Mouse()
+    key = libtcod.Key()
+
     while True:
         # render the screen. this erases the inventory and shows the names of objects under the mouse.
         libtcod.console_flush()
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
-
         (x, y) = (mouse.cx, mouse.cy)
 
         # accept the target if the player clicked in FOV, and in case a range is specified, if it's in that range
-        if (mouse.lbutton_pressed and libtcod.map_is_in_fov(fov_map, x, y) and
-                (max_range is None or player.distance(x, y) <= max_range)):
+        if (mouse.lbutton_pressed and Fov.is_visible(x, y) and
+                (max_range is None or GameState.get_player().distance(x, y) <= max_range)):
             return (x, y)
         if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
             return (None, None)  # cancel if the player right-clicked or pressed Escape
@@ -639,34 +643,34 @@ def player_move_or_interact(dx, dy):
 
 
 def get_open_tiles():
-    global map
+    global level_map
 
     open_nodes = []
 
     for y in range(Constants.MAP_HEIGHT):
         for x in range(Constants.MAP_WIDTH):
-            if not map[x][y].blocked:
-                open_nodes.append(map[x][y])
+            if not level_map[x][y].blocked:
+                open_nodes.append(level_map[x][y])
 
     return open_nodes
 
 
 def has_cross_blocked(x,y):
-    if map[x-1][y].blocked and map[x+1][y].blocked:
+    if level_map[x-1][y].blocked and level_map[x+1][y].blocked:
         return True
-    elif map[x][y-1].blocked and map[x][y+1].blocked:
+    elif level_map[x][y-1].blocked and level_map[x][y+1].blocked:
         return True
     return False
 
 def get_total_blocked_corners(x,y):
     count = 0
-    if map[x-1][y-1].blocked:
+    if level_map[x-1][y-1].blocked:
         count += 1
-    if map[x+1][y-1].blocked:
+    if level_map[x+1][y-1].blocked:
         count += 1
-    if map[x-1][y+1].blocked:
+    if level_map[x-1][y+1].blocked:
         count += 1
-    if map[x+1][y+1].blocked:
+    if level_map[x+1][y+1].blocked:
         count += 1
     return count
 
@@ -679,7 +683,7 @@ def spawn_doors():
 
     for y in range(Constants.MAP_HEIGHT):
         for x in range(Constants.MAP_WIDTH):
-            if not map[x][y].blocked and has_cross_blocked(x,y):
+            if not level_map[x][y].blocked and has_cross_blocked(x, y):
                 count = get_total_blocked_corners(x,y)
                 chance = libtcod.random_get_int(0, 0, 100)
                 if count == 0 and chance <= 50:

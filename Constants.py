@@ -37,12 +37,14 @@ CONFUSE_NUM_TURNS = 10
 FIREBALL_RADIUS = 3
 FIREBALL_DAMAGE = 25
 
-# experience and level-ups
-LEVEL_UP_BASE = 50
-LEVEL_UP_FACTOR = 50
+# experience and level-ups - TEMP
+LEVEL_UP_BASE = 5000
+LEVEL_UP_FACTOR = 5000
 
 FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
 TORCH_RADIUS = 10
 
 LIMIT_FPS = 20  # 20 frames-per-second maximum
+
+INSPECTION_DELAY = 0.5

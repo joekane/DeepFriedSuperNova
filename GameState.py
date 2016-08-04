@@ -12,8 +12,10 @@ inventory = []
 game_msgs = []
 dungeon_level = 0
 
+
 def initialize():
-    global imported_items_list, imported_npc_list, imported_quest_list, current_quests, player, inventory, game_msgs, dungeon_level
+    global imported_items_list, imported_npc_list, imported_quest_list
+    global current_quests, player, inventory, game_msgs, dungeon_level
 
     imported_items_list = {}
     imported_npc_list = {}
@@ -27,8 +29,14 @@ def initialize():
     read_external_quests()
 
     # create object representing the player
-    fighter_component = Components.Fighter(hp=10000, defense=1, power=2, xp=0, death_function=Components.player_death)
-    player = Entity.Entity(0, 0, '@', 'player', libtcod.white, blocks=True, fighter=fighter_component)
+    fighter_component = Components.Fighter(hp=10000,
+                                           defense=100,
+                                           power=200,
+                                           xp=0,
+                                           death_function=Components.player_death)
+    player = Entity.Entity(0, 0, '@', 'player', libtcod.white,
+                           blocks=True,
+                           fighter=fighter_component)
 
     starting_equipment()
 
@@ -47,7 +55,9 @@ def starting_equipment():
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
     ranged_component = Components.Ranged(10)
-    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky, equipment=equipment_component, ranged=ranged_component)
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
     inventory.append(obj)
     equipment_component.equip()
     obj.always_visible = True
@@ -144,5 +154,3 @@ def read_external_quests():
 
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
-
-

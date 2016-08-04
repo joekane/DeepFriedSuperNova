@@ -8,16 +8,19 @@ import Fov
 import Utils
 import Animate
 
+player = GameState.get_player()
+
 
 class Fighter:
     # combat-related properties and methods (monster, player, NPC).
-    def __init__(self, hp, defense, power, xp, death_function=None):
+    def __init__(self, hp, defense, power, xp, death_function=None, owner=None):
         self.xp = xp
         self.death_function = death_function
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense
         self.base_power = power
+        self.owner = owner
 
     @property
     def damage(self):
@@ -53,7 +56,7 @@ class Fighter:
 
     def take_damage(self, damage):
         # apply damage if possible
-        player = GameState.get_player()
+        # player = GameState.get_player()
         if damage > 0:
             self.hp -= damage
         # check for death. if there's a death function, call it
@@ -90,10 +93,12 @@ class Fighter:
         else:
             Utils.message(target.name + " evads your attack!", libtcod.light_yellow)
 
+
 class QuestNpc:
-    def __init__(self, quest_num="0001"):
+    def __init__(self, quest_num="0001", owner=None):
         self.given = False
         self.quest_num = quest_num
+        self.owner = owner
 
     def take_turn(self):
         pass
@@ -114,7 +119,6 @@ class QuestNpc:
             Utils.message(GameState.imported_quest_list[self.quest_num]['quest_text'], libtcod.blue)
             Map.spawn_item_at(self.owner.x, self.owner.y + 1, 'GrisKeyRing')
 
-
     def reward(self):
         if (not self.given):
             Utils.message("That was easy, wasn't it!")
@@ -125,6 +129,10 @@ class QuestNpc:
 
 
 class BasicMonster:
+    def __init__(self, owner=None):
+        self.given = False
+        self.owner = owner
+
     # AI for a basic monster.
     def take_turn(self):
         # a basic monster takes its turn. If you can see it, it can see you
@@ -140,13 +148,12 @@ class BasicMonster:
                 monster.fighter.attack(player)
 
 
-
 class Door:
-    def __init__(self, door_status=None):
-
+    def __init__(self, door_status=None, owner=None):
+        self.owner = owner
         if door_status is None:
             chance = libtcod.random_get_int(0, 0, 100)
-            if chance <= 5:
+            if chance <= 2:
                 self.status = 'locked'
             else:
                 self.status = 'closed'
@@ -157,17 +164,18 @@ class Door:
         if self.status is 'closed':
             self.owner.blocks = True
             Fov.fov_change(self.owner.x, self.owner.y, True, True)
-            Map.map[self.owner.x][self.owner.y].blocked = True
-            Map.map[self.owner.x][self.owner.y].block_sight = True
+            Map.level_map[self.owner.x][self.owner.y].blocked = True
+            Map.level_map[self.owner.x][self.owner.y].block_sight = True
             self.owner.char = '+'
         if self.status is 'open':
             self.owner.blocks = False
             Fov.fov_change(self.owner.x, self.owner.y, False, False)
-            Map.map[self.owner.x][self.owner.y].blocked = False
-            Map.map[self.owner.x][self.owner.y].block_sight = False
+            Map.level_map[self.owner.x][self.owner.y].blocked = False
+            Map.level_map[self.owner.x][self.owner.y].block_sight = False
 
             self.owner.char = '_'
-
+        if self.status is 'locked':
+            self.owner.name = 'locked door'
 
     def interact(self):
         # print "interact!"
@@ -179,11 +187,10 @@ class Door:
             Utils.message("Locked!", libtcod.dark_red)
 
 
-
-
 class BasicRangedMonster:
     # AI for a basic monster.
-    def __init__(self, attack_range=5):
+    def __init__(self, attack_range=5, owner=None):
+        self.owner = owner
         self.attack_range = attack_range
         self.reload = 0
 
@@ -206,11 +213,11 @@ class BasicRangedMonster:
                 pass
 
 
-
 class SpawningMonster:
     # AI for a basic monster.
-    def __init__(self, new_monster):
+    def __init__(self, new_monster, owner=None):
         self.new_monster = new_monster
+        self.owner = owner
 
     def take_turn(self):
         # a basic monster takes its turn. If you can see it, it can see you
@@ -222,7 +229,7 @@ class SpawningMonster:
             # move towards player if far away
             chance_to_spawn = libtcod.random_get_int(0, 0, 10)
 
-            if (chance_to_spawn >= 7):
+            if chance_to_spawn >= 7:
                 self.split()
             else:
                 if monster.distance_to(player) >= 2:
@@ -233,8 +240,10 @@ class SpawningMonster:
 
     def split(self):
         loc = Map.adjacent_open_tiles(self.owner)
-        # spawn = Object(loc[0], loc[1], self.new_monster.char, self.new_monster.name, self.new_monster.color, blocks=True, fighter=self.new_monster.fighter, ai=self.new_monster.ai)
-        if (loc != [None, None]):
+        # spawn = Object(loc[0], loc[1], self.new_monster.char, self.new_monster.name, self.new_monster.color,
+        # blocks=True, fighter=self.new_monster.fighter, ai=self.new_monster.ai)
+
+        if loc != [None, None]:
             fighter_component = None
             ai_component = None
             if 'fighter_component' in GameState.imported_npc_list[self.new_monster]:
@@ -242,7 +251,8 @@ class SpawningMonster:
                                             defense=int(GameState.imported_npc_list[self.new_monster]['defense']),
                                             power=int(GameState.imported_npc_list[self.new_monster]['power']),
                                             xp=int(GameState.imported_npc_list[self.new_monster]['xp']),
-                                            death_function=eval(GameState.imported_npc_list[self.new_monster]['death_function']))
+                                            death_function=eval(
+                                                GameState.imported_npc_list[self.new_monster]['death_function']))
 
             if 'ai_component' in GameState.imported_npc_list[self.new_monster]:
                 ai_component = eval(GameState.imported_npc_list[self.new_monster]['ai_component'])
@@ -259,9 +269,10 @@ class SpawningMonster:
 
 class ConfusedMonster:
     # AI for a confused monster.
-    def __init__(self, old_ai, num_turns=Constants.CONFUSE_NUM_TURNS):
+    def __init__(self, old_ai, num_turns=Constants.CONFUSE_NUM_TURNS, owner=None):
         self.old_ai = old_ai
         self.num_turns = num_turns
+        self.owner = owner
 
     def take_turn(self):
         if self.num_turns > 0:  # still confused...
@@ -275,8 +286,9 @@ class ConfusedMonster:
 
 
 class Item:
-    def __init__(self, use_function=None):
+    def __init__(self, use_function=None, owner=None):
         self.use_function = use_function
+        self.owner = owner
 
     # an item that can be picked up and used.
     def pick_up(self):
@@ -318,12 +330,13 @@ class Item:
 
 class Equipment:
     # an object that can be equipped, yielding bonuses. automatically adds the Item component.
-    def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0):
+    def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0, owner=None):
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
         self.slot = slot
         self.is_equipped = False
+        self.owner = owner
 
     def toggle_equip(self):  # toggle equip/dequip status
         if self.is_equipped:
@@ -351,16 +364,17 @@ class Equipment:
 class Ranged:
     global player
 
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0):
+    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
+        self.owner = owner
 
     def fire(self, source=None, target=None):
         # find closest enemy (inside a maximum range) and damage it
-        if source == None:
+        if source is None:
             source = GameState.get_player()
-        if target == None:
+        if target is None:
             target = Map.closest_monster(self.max_range)
             if target is None:  # no enemy found within maximum range
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
@@ -375,15 +389,8 @@ class Ranged:
         target.fighter.take_damage(self.owner.equipment.power_bonus)
 
 
-
-
-
 def player_death(player):
-    # the game ended!
-    # the game ended!
-    global game_state
     Utils.message('Dead dead deadski!', libtcod.dark_red)
-    game_state = 'dead'
 
     # for added effect, transform the player into a corpse!
     player.char = '%'
@@ -394,7 +401,7 @@ def monster_death(monster):
     # transform it into a nasty corpse! it doesn't block, can't be
     # attacked and doesn't move
     Utils.message('The ' + monster.name + ' is dead! You gain ' + str(monster.fighter.xp) + ' experience points.',
-            libtcod.orange)
+                  libtcod.orange)
     monster.char = '%'
     monster.color = libtcod.dark_red
     monster.blocks = False

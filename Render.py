@@ -43,34 +43,39 @@ def map():
 
             player = GameState.get_player()
 
-            vOffset = int(Utils.distance_between(x, y, player.x, player.y)) * 15
-            offset_color = libtcod.Color(vOffset, vOffset, vOffset)
+            offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * 15
+            offset_color = libtcod.Color(offset_value, offset_value, offset_value)
 
             if not visible:
                 # if it's not visible right now, the player can only see it if it's explored
                 if map[x][y].explored:
                     # it's out of the player's FOV
                     if wall:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey, libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
+                                                    libtcod.BKGND_SET)
                     elif glass:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(219), libtcod.darker_grey, libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(219), libtcod.darker_grey,
+                                                    libtcod.BKGND_SET)
                     elif box:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey, libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey,
+                                                    libtcod.BKGND_SET)
                     else:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09, libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
+                                                    libtcod.BKGND_SET)
             else:
                 # it's visible
-                # print(vOffset)
+                # print(offset_value)
                 if wall:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color, libtcod.BKGND_SET)
+                    libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color,
+                                                libtcod.BKGND_SET)
                 elif glass:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(178),
-                                                libtcod.Color(max(0, 10 - vOffset), max(0, 10 - vOffset),
-                                                              max(0, 100 - vOffset)), libtcod.BKGND_SET)
+                                                libtcod.Color(max(0, 10 - offset_value), max(0, 10 - offset_value),
+                                                              max(0, 100 - offset_value)), libtcod.BKGND_SET)
                 elif box:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, '~',
-                                                libtcod.Color(max(0, 100 - vOffset), max(0, 100 - vOffset),
-                                                              max(0, 130 - vOffset)), libtcod.BKGND_SET)
+                                                libtcod.Color(max(0, 100 - offset_value), max(0, 100 - offset_value),
+                                                              max(0, 130 - offset_value)), libtcod.BKGND_SET)
                 else:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char,
                                                 floor_color - offset_color, libtcod.BKGND_SET)
@@ -97,7 +102,8 @@ def ui():
 
     # display names of objects under the mouse
     libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.purple)
-    libtcod.console_print_ex(consoles['panel_console'], 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, Utils.get_names_under_mouse(objects))
+    libtcod.console_print_ex(consoles['panel_console'], 1, 1, libtcod.BKGND_NONE, libtcod.LEFT,
+                             Utils.get_names_under_mouse())
 
     # print the game messages, one line at a time
     y = 1
@@ -107,40 +113,53 @@ def ui():
         y += 1
 
     # show the player's stats
-    render_bar(1, 2, Constants.BAR_WIDTH, 'HP', GameState.get_player().fighter.hp, GameState.get_player().fighter.max_hp,
-               libtcod.light_red, libtcod.darker_red, consoles['panel_console'])
+    render_bar(1, 2, Constants.BAR_WIDTH, 'HP', GameState.get_player().fighter.hp,
+               GameState.get_player().fighter.max_hp,
+               libtcod.light_red,
+               libtcod.darker_red,
+               consoles['panel_console'])
 
-    render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 30), consoles['side_panel_console'])
+    render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 30),
+                     consoles['side_panel_console'])
 
-    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'Dungeon level ' + str(GameState.get_dungeon_level()))
-    libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' + str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
+    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'Dungeon level ' +
+                             str(GameState.get_dungeon_level()))
+    libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
+                             str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
 
-    tempY = 2
+    temp_y = 2
+
     for object in Map.get_objects():
         if object.fighter and Fov.is_visible(obj=object) and (object is not GameState.get_player()):
-            render_bar(1, tempY, 8, '', object.fighter.hp, object.fighter.max_hp, libtcod.dark_green,
+            render_bar(1, temp_y, 8, '', object.fighter.hp, object.fighter.max_hp, libtcod.dark_green,
                        libtcod.darker_red, consoles['side_panel_console'])
-            if object in Utils.get_fighters_under_mouse(objects):
+            if object in Utils.get_fighters_under_mouse():
                 libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.white)
             else:
                 libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
-            libtcod.console_print_ex(consoles['side_panel_console'], 1, tempY, libtcod.BKGND_NONE, libtcod.LEFT, object.name)
-            tempY += 1
+            libtcod.console_print_ex(consoles['side_panel_console'], 1, temp_y, libtcod.BKGND_NONE, libtcod.LEFT,
+                                     object.name)
+            temp_y += 1
 
 
 def update():
     # blit the contents of "panel" to the root console
     libtcod.console_blit(consoles['map_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0)
-    libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT, 0, 0, Constants.PANEL_Y)
+    libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT, 0, 0,
+                         Constants.PANEL_Y)
     libtcod.console_blit(consoles['side_panel_console'], 0, 0, 10, Constants.SCREEN_HEIGHT, 0, Constants.MAP_WIDTH, 0)
 
 
-def blank(x,y):
+def blank(x, y):
     libtcod.console_put_char(consoles['map_console'], x, y, ' ', libtcod.BKGND_NONE)
 
 
-def draw_object(obj):
-    libtcod.console_put_char_ex(consoles['map_console'], obj.x, obj.y, obj.char, obj.color, libtcod.BKGND_NONE)
+def draw_object(obj, visible=True):
+    if visible:
+        libtcod.console_put_char_ex(consoles['map_console'], obj.x, obj.y, obj.char, obj.color, libtcod.BKGND_NONE)
+    else:
+        libtcod.console_put_char_ex(consoles['map_console'], obj.x, obj.y, obj.char, libtcod.darker_gray,
+                                    libtcod.BKGND_NONE)
 
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):

@@ -3,6 +3,8 @@ import Constants
 import GameState
 import libtcodpy as libtcod
 import Map
+import time
+import Animate
 
 def message(new_msg, color=libtcod.white):
     import textwrap
@@ -91,7 +93,7 @@ def distance_between(x1, y1, x2, y2):
     return math.sqrt(dx ** 2 + dy ** 2)
 
 
-def get_names_under_mouse(objects):
+def get_names_under_mouse():
     import Fov
     mouse = libtcod.Mouse()
     # return a string with the names of all objects under the mouse
@@ -103,7 +105,7 @@ def get_names_under_mouse(objects):
     return names.capitalize()
 
 
-def get_fighters_under_mouse(objects):
+def get_fighters_under_mouse():
     import Fov
     mouse = libtcod.Mouse()
     # return a string with the names of all objects under the mouse
@@ -118,11 +120,10 @@ def get_fighters_under_mouse(objects):
 def from_dungeon_level(table):
     # returns a value that depends on level. the table specifies what value occaurs after each level, default is 0.
     for (value, level) in reversed(table):
-        #print "V: " + str(value) + " |L: " + str(level) + "   DL: " + str(dungeon_level)
+        # print "V: " + str(value) + " |L: " + str(level) + "   DL: " + str(dungeon_level)
         if GameState.dungeon_level >= int(level):
             return int(value)
     return 0
-
 
 
 def random_choice_index(chances):  # choose one option from list of chances, returning its index
@@ -148,3 +149,27 @@ def random_choice(chances_dict):
     strings = chances_dict.keys()
     print chances
     return strings[random_choice_index(chances)]
+
+
+def inspect_tile(x, y):
+    global delay, mouse_old_x, mouse_old_y
+
+    if 0 > x < Constants.MAP_WIDTH and 0 > y < Constants.MAP_HEIGHT:
+        # Mouse over Inspection
+        if x is mouse_old_x and y is mouse_old_y:
+            if time.time() - delay > Constants.INSPECTION_DELAY:
+                if Map.level_map[x][y].explored:
+                    obj = [obj for obj in Map.get_objects() if obj.x == x and obj.y == y]
+                    if len(obj) == 0:
+                        pass
+                    else:
+                        Animate.inspect_banner(x, y, obj[0].name)
+        else:
+            mouse_old_x = x
+            mouse_old_y = y
+            delay = time.time()
+
+
+delay = 0
+mouse_old_x = 0
+mouse_old_y = 0

@@ -10,7 +10,13 @@ import Render
 class Entity:
     # this is a generic object: the player, a monster, an item, the stairs...
     # it's always represented by a character on screen.
-    def __init__(self, x, y, char, name, color, blocks=False, transparent=True, fighter=None, always_visible=False, ai=None, item=None,
+    def __init__(self, x, y, char, name, color,
+                 blocks=False,
+                 transparent=True,
+                 fighter=None,
+                 always_visible=False,
+                 ai=None,
+                 item=None,
                  equipment=None, ranged=None):
         self.name = name
         self.blocks = blocks
@@ -103,8 +109,10 @@ class Entity:
         libtcod.path_compute(my_path, self.x, self.y, target.x, target.y)
 
         # Check if the path exists, and in this case, also the path is shorter than 25 tiles
-        # The path size matters if you want the monster to use alternative longer paths (for example through other rooms) if for example the player is in a corridor
-        # It makes sense to keep path size relatively low to keep the monsters from running around the map if there's an alternative path really far away
+        # The path size matters if you want the monster to use alternative longer paths (for example through other
+        # rooms) if for example the player is in a corridor
+        # It makes sense to keep path size relatively low to keep the monsters from running around the map if there's
+        # an alternative path really far away
         if not libtcod.path_is_empty(my_path) and libtcod.path_size(my_path) < 25:
             # Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
@@ -113,21 +121,20 @@ class Entity:
                 self.x = x
                 self.y = y
         else:
-            # Keep the old move function as a backup so that if there are no paths (for example another monster blocks a corridor)
+            # Keep the old move function as a backup so that if there are no paths (for example another monster blocks
+            # a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
             self.move_towards(target.x, target.y)
 
             # Delete the path to free memory
         libtcod.path_delete(my_path)
 
-    def move_astar_xy(self, targetX, targetY):
-        global fov_recompute
+    def move_astar_xy(self, target_x, target_y):
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
 
-        if self.x == targetX and self.y == targetY:
+        if self.x == target_x and self.y == target_y:
             return
-
 
         Fov.require_recompute()
         map = Map.current_map()
@@ -150,11 +157,13 @@ class Entity:
         my_path = libtcod.path_new_using_map(fov, 1.41)
 
         # Compute the path between self's coordinates and the target's coordinates
-        libtcod.path_compute(my_path, self.x, self.y, targetX, targetY)
+        libtcod.path_compute(my_path, self.x, self.y, target_x, target_y)
 
         # Check if the path exists, and in this case, also the path is shorter than 25 tiles
-        # The path size matters if you want the monster to use alternative longer paths (for example through other rooms) if for example the player is in a corridor
-        # It makes sense to keep path size relatively low to keep the monsters from running around the map if there's an alternative path really far away
+        # The path size matters if you want the monster to use alternative longer paths (for example through
+        # other rooms) if for example the player is in a corridor
+        # It makes sense to keep path size relatively low to keep the monsters from running around the map if
+        # there's an alternative path really far away
         if not libtcod.path_is_empty(my_path):
             # Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
@@ -163,9 +172,10 @@ class Entity:
                 self.x = x
                 self.y = y
         else:
-            # Keep the old move function as a backup so that if there are no paths (for example another monster blocks a corridor)
+            # Keep the old move function as a backup so that if there are no paths (for example another
+            # monster blocks a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
-            self.move_towards(targetX, targetY)
+            self.move_towards(target_x, target_y)
 
             # Delete the path to free memory
         libtcod.path_delete(my_path)
@@ -173,10 +183,11 @@ class Entity:
     def draw(self):
         # set the color and then draw the character that represents this object at its positionss
 
-        if Fov.is_visible(obj=self) or (self.always_visible and Map.is_explored(self.x,self.y)):
+        if Fov.is_visible(obj=self):
             Render.draw_object(self)
+        elif self.always_visible and Map.is_explored(self.x, self.y):
+            Render.draw_object(self, visible=False)
 
     def clear(self):
         # erase the character that represents this object
         Render.blank(self.x, self.y)
-

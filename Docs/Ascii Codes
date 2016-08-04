@@ -1,0 +1,69 @@
+=====================================
+ASCII constants
+=====================================
+
+libtcod.CHAR_HLINE=196
+libtcod.CHAR_VLINE=179
+libtcod.CHAR_NE=191
+libtcod.CHAR_NW=218
+libtcod.CHAR_SE=217
+libtcod.CHAR_SW=192
+
+Double lines walls :
+libtcod.CHAR_DHLINE=205
+libtcod.CHAR_DVLINE=186
+libtcod.CHAR_DNE=187
+libtcod.CHAR_DNW=201
+libtcod.CHAR_DSE=188
+libtcod.CHAR_DSW=200
+
+Single line vertical/horizontal junctions (T junctions)
+libtcod.CHAR_TEEW=180
+libtcod.CHAR_TEEE=195
+libtcod.CHAR_TEEN=193
+libtcod.CHAR_TEES=194
+
+Double line vertical/horizontal junctions (T junctions)
+libtcod.CHAR_DTEEW=185
+libtcod.CHAR_DTEEE=204
+libtcod.CHAR_DTEEN=202
+libtcod.CHAR_DTEES=203
+
+Block characters
+libtcod.CHAR_BLOCK1=176
+libtcod.CHAR_BLOCK2=177
+libtcod.CHAR_BLOCK3=178
+
+Cross-junction between two single line walls
+libtcod.CHAR_CROSS=197
+
+Arrows
+libtcod.CHAR_ARROW_N=24
+libtcod.CHAR_ARROW_S=25
+libtcod.CHAR_ARROW_E=26
+libtcod.CHAR_ARROW_W=27
+
+Arrows without tail
+libtcod.CHAR_ARROW2_N=30
+libtcod.CHAR_ARROW2_S=31
+libtcod.CHAR_ARROW2_E=16
+libtcod.CHAR_ARROW2_W=17
+
+Double arrows
+libtcod.CHAR_DARROW_H=29
+libtcod.CHAR_ARROW_V=18
+
+GUI stuff
+libtcod.CHAR_CHECKBOX_UNSET=224
+libtcod.CHAR_CHECKBOX_SET=225
+libtcod.CHAR_RADIO_UNSET=9
+libtcod.CHAR_RADIO_SET=10
+
+Sub-pixel resolution kit
+libtcod.CHAR_SUBP_NW=226
+libtcod.CHAR_SUBP_NE=227
+libtcod.CHAR_SUBP_N=228
+libtcod.CHAR_SUBP_SE=229
+libtcod.CHAR_SUBP_DIAG=230
+libtcod.CHAR_SUBP_E=231
+libtcod.CHAR_SUBP_SW=232

@@ -20,7 +20,6 @@ freq = 0:0
 
 [GrisKeyRing]
 item_component = True
-use_function = None
 char = +
 name = Gris's keyring
 color = libtcod.gold
