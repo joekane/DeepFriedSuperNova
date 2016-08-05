@@ -13,6 +13,7 @@ import libtcodpy as libtcod
 import Constants
 import Map
 import GameState
+import Render
 
 fov_recompute = True
 fov_map = None
@@ -46,9 +47,10 @@ def require_recompute():
 def recompute():
     if fov_recompute:
         libtcod.map_compute_fov(fov_map, player.x, player.y,
-                                Constants.TORCH_RADIUS + 5,
+                                Constants.TORCH_RADIUS,
                                 Constants.FOV_LIGHT_WALLS,
                                 Constants.FOV_ALGO)
+        Render.clear_map()
 
 
 def is_visible(pos = None, obj = None, ):

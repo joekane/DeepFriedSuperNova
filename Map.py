@@ -17,11 +17,19 @@ import random
 import Fov
 import Utils
 import Components
+import pygame
 import Spells
 
 level_map = None
 objects = None
 stairs = None
+camera_x = 0
+camera_y = 0
+
+
+pygame.init()
+pygame.mixer.init()
+sounda = pygame.mixer.Sound("test.wav")
 
 
 def current_map():
@@ -617,6 +625,54 @@ def target_monster(max_range=None):
                 return obj
 
 
+def get_camera():
+    return camera_x, camera_y
+
+
+def move_camera(target_x, target_y):
+    global camera_x, camera_y
+
+    # new camera coordinates (top-left corner of the screen relative to the map)
+    x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
+    y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
+
+    # make sure the camera doesn't see outside the map
+    if x < 0:
+        x = 0
+    if y < 0:
+        y = 0
+    if x > Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH - 1:
+        x = Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH - 1
+    if y > Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT - 1:
+        y = Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT - 1
+
+    if x != camera_x or y != camera_y:
+        Fov.require_recompute()
+
+    (camera_x, camera_y) = (x, y)
+
+
+def to_camera_coordinates(x, y):
+    # convert coordinates on the map to coordinates on the screen
+    (x, y) = (x - camera_x, y - camera_y)
+
+    if x < 0 or y < 0 or x >= Constants.MAP_CONSOLE_WIDTH or y >= Constants.MAP_CONSOLE_HEIGHT:
+        return None, None  # if it's outside the map, return nothing
+
+    return x, y
+
+
+def to_map_coordinates(x, y):
+    # convert coordinates on the map to coordinates on the screen
+    (x, y) = (x + camera_x, y + camera_y)
+
+    if x < 0 or y < 0 or x >= Constants.MAP_WIDTH or y >= Constants.MAP_HEIGHT:
+        return None, None  # if it's outside the map, return nothing
+
+    return x, y
+
+
+
 def get_objects():
     return objects
 
@@ -626,8 +682,8 @@ def get_stairs():
 
 
 def player_move_or_interact(dx, dy):
+    global sounda
     # the coordinates the player is moving to/interacting
-
 
     player = GameState.get_player()
     x = player.x + dx
@@ -639,6 +695,8 @@ def player_move_or_interact(dx, dy):
 
         if object.fighter and object.x == x and object.y == y:
             player.fighter.attack(object)
+
+            sounda.play()
             return
         if isinstance(object.ai, Components.QuestNpc) and object.x == x and object.y == y:
             print "Reward!!!! .... ??"

@@ -169,8 +169,10 @@ def inspect_tile(x, y):
         # Mouse over Inspection
         if x is mouse_old_x and y is mouse_old_y:
             if time.time() - delay > Constants.INSPECTION_DELAY:
-                if Map.level_map[x][y].explored:
-                    obj = [obj for obj in Map.get_objects() if obj.x == x and obj.y == y]
+                camera_x, camera_y = Map.get_camera()
+                map_x, map_y = (camera_x + x, camera_y + y)
+                if Map.level_map[map_x][map_y].explored:
+                    obj = [obj for obj in Map.get_objects() if obj.x == map_x and obj.y == map_y]
                     if len(obj) == 0:
                         pass
                     else:

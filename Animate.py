@@ -13,6 +13,7 @@ import libtcodpy as libtcod
 import Utils
 import time
 import Render
+import Map
 
 
 def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark_amber):
@@ -24,6 +25,9 @@ def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark
 
         Render.render_all()
 
+        x, y = Map.to_camera_coordinates(x, y)
+
+
         if (x, y) == line[-1]:
             libtcod.console_put_char_ex(0, x, y, end_tile, color, libtcod.BKGND_NONE)
         else:
@@ -34,27 +38,28 @@ def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark
 
 
 def explosion(target, radius=3):
+    x, y = Map.to_camera_coordinates(target.x, target.y)
     for r in range(0, radius):
         Render.render_all()
         if r >= 0:
-            libtcod.console_put_char_ex(0, target.x, target.y, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x, y, 'X', libtcod.red, libtcod.BKGND_NONE)
             print "1"
         if r >= 1:
-            libtcod.console_put_char_ex(0, target.x-1, target.y, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x+1, target.y, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x, target.y-1, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x, target.y+1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x-1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x+1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x, y-1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x, y+1, 'X', libtcod.red, libtcod.BKGND_NONE)
             print "2"
         if r >= 2:
-            libtcod.console_put_char_ex(0, target.x - 2, target.y, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x + 2, target.y, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x, target.y - 2, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x, target.y + 2, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x - 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x + 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x, y - 2, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x, y + 2, 'X', libtcod.red, libtcod.BKGND_NONE)
 
-            libtcod.console_put_char_ex(0, target.x+1, target.y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x-1, target.y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x+1, target.y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-            libtcod.console_put_char_ex(0, target.x-1, target.y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x+1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x-1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x+1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+            libtcod.console_put_char_ex(0, x-1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
             print "3"
         libtcod.console_flush()
         print "sleep"

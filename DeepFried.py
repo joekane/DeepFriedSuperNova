@@ -18,6 +18,9 @@ import Map
 import time
 import GameState
 import Constants
+import SoundEffects
+
+
 # import shelve
 
 color_dark_wall = libtcod.Color(30, 30, 30)
@@ -35,7 +38,7 @@ def menu(header, options, width):
         raise ValueError('Cannot have a menu with more than 26 options.')
 
     # calculate total height for the header (after auto-wrap) and one line per option
-    header_height = libtcod.console_get_height_rect(con, 0, 0, width, Constants.SCREEN_HEIGHT, header)
+    header_height = libtcod.console_get_height_rect(map_console, 0, 0, width, Constants.SCREEN_HEIGHT, header)
     if header == '':
         header_height = 0
     height = len(options) + header_height
@@ -122,20 +125,27 @@ def inventory_menu(header):
 
 def process_mouse_clicks():
     global mouse, continue_walking
-    (x, y) = (mouse.cx, mouse.cy)
+    # (x, y) = Map.to_camera_coordinates(mouse.cx, mouse.cy)
+    (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
 
     # walk to target tile
-    if mouse.lbutton_pressed and Map.is_explored(x, y):
-        print "Mouse Pressed!"
-        continue_walking = GameState.get_player().move_astar_xy(x, y)
+    if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
+        # print "Mouse Pressed!"
+        continue_walking = GameState.get_player().move_astar_xy(map_x, map_y)
         return True
 
 
 def process_mouse_hover():
     global mouse, continue_walking
-    (x, y) = (mouse.cx, mouse.cy)
-    if GameState.get_player().x != x and GameState.get_player().y != y:
-        Utils.inspect_tile(x, y)
+    player = GameState.get_player()
+    (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
+    if player.x == map_x and player.y == map_y:
+        pass
+    else:
+        Utils.inspect_tile(mouse.cx, mouse.cy)
+
 
 
 def handle_keys():
@@ -252,7 +262,7 @@ def new_game():
 
     GameState.initialize()
 
-    Render.initialize(con, panel, side_panel)
+    Render.initialize(map_console, panel, side_panel)
 
     Map.load_diner_map()
     Fov.initialize()
@@ -262,6 +272,8 @@ def new_game():
 
 
 def next_level():
+
+
     # advance to the next level
     GameState.add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
     GameState.get_player().fighter.heal(GameState.get_player().fighter.max_hp / 2)  # heal the player by 50%
@@ -272,6 +284,8 @@ def next_level():
     Map.make_bsp()
     Fov.initialize()
     Map.spawn_doors()
+
+    SoundEffects.play_music('SSA')
 
 
 def play_game():
@@ -310,9 +324,15 @@ def play_game():
 
 
 def main_menu():
+
     img = libtcod.image_load('diner.png')
 
     while not libtcod.console_is_window_closed():
+
+        SoundEffects.play_music('MAIN_MENU')
+
+
+
         # show the background image, at twice the regular console resolution
         libtcod.image_blit_2x(img, 0, 0, 0)
 
@@ -409,7 +429,7 @@ libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'pyth
 libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 
-con = libtcod.console_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
+map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
 side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_WIDTH,
                                  Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)

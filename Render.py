@@ -51,7 +51,7 @@ def render_tile(x, y):
 
     player = GameState.get_player()
 
-    offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * 15
+    offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * Constants.TORCH_RADIUS
     offset_color = libtcod.Color(offset_value, offset_value, offset_value)
 
     if not visible:
@@ -91,18 +91,28 @@ def render_tile(x, y):
 
 
 def full_map():
-
+    libtcod.console_clear(consoles['map_console'])
     Fov.recompute()
 
     map = Map.current_map()
+    player = GameState.get_player()
+
+    Map.move_camera(player.x, player.y)
+
+    camera_x, camera_y = Map.get_camera()
+    # print "cx: " + str(camera_x) + " | cy: " + str(camera_y)
 
     # go through all tiles, and set their background color
-    for y in range(Constants.MAP_HEIGHT):
-        for x in range(Constants.MAP_WIDTH):
-            visible = Fov.is_visible(pos=(x, y))
-            wall = map[x][y].block_sight and map[x][y].blocked
-            glass = not map[x][y].block_sight and map[x][y].blocked
-            box = map[x][y].block_sight and not map[x][y].blocked
+    for y in range(Constants.MAP_CONSOLE_HEIGHT):
+        for x in range(Constants.MAP_CONSOLE_WIDTH):
+            map_x, map_y = (camera_x + x, camera_y + y)
+
+            visible = Fov.is_visible(pos=(map_x, map_y))
+            # print x, y
+
+            wall = map[map_x][map_y].block_sight and map[map_x][map_y].blocked
+            glass = not map[map_x][map_y].block_sight and map[map_x][map_y].blocked
+            box = map[map_x][map_y].block_sight and not map[map_x][map_y].blocked
             wall_char = libtcod.CHAR_BLOCK1
 
             # floor_char = libtcod.CHAR_SUBP_DIAG
@@ -113,12 +123,11 @@ def full_map():
 
             player = GameState.get_player()
 
-            offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * 15
-            offset_color = libtcod.Color(offset_value, offset_value, offset_value)
+
 
             if not visible:
                 # if it's not visible right now, the player can only see it if it's explored
-                if map[x][y].explored:
+                if map[map_x][map_y].explored:
                     # it's out of the player's FOV
                     if wall:
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
@@ -134,6 +143,13 @@ def full_map():
                                                     libtcod.BKGND_SET)
             else:
                 # it's visible
+                dist = int(Utils.distance_between(map_x, map_y, player.x, player.y))
+                offset_value = int(float(dist) / Constants.TORCH_RADIUS * 255)
+                offset_value = max(0, min(offset_value, 255))
+
+                # print dist, offset_value
+
+                offset_color = libtcod.Color(offset_value, offset_value, offset_value)
                 # print(offset_value)
                 if wall:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color,
@@ -149,7 +165,7 @@ def full_map():
                 else:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char,
                                                 floor_color - offset_color, libtcod.BKGND_SET)
-                map[x][y].explored = True
+                map[map_x][map_y].explored = True
 
 
 def objects():
@@ -225,10 +241,12 @@ def blank(x, y):
 
 
 def draw_object(obj, visible=True):
+    x, y = Map.to_camera_coordinates(obj.x, obj.y)
+
     if visible:
-        libtcod.console_put_char_ex(consoles['map_console'], obj.x, obj.y, obj.char, obj.color, libtcod.BKGND_NONE)
+        libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
     else:
-        libtcod.console_put_char_ex(consoles['map_console'], obj.x, obj.y, obj.char, libtcod.darker_gray,
+        libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, libtcod.darker_gray,
                                     libtcod.BKGND_NONE)
 
 
