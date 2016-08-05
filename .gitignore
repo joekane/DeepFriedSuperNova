@@ -217,4 +217,3 @@ pip-log.txt
 .mr.developer.cfg
 *.pyc
 *.pyc
-GameState.pyc
