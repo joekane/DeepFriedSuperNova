@@ -616,13 +616,13 @@ def get_stairs():
 
 def player_move_or_interact(dx, dy):
     # the coordinates the player is moving to/interacting
+
+
     player = GameState.get_player()
     x = player.x + dx
     y = player.y + dy
 
     # try to find an interactable object there
-
-
 
     for object in get_objects():
 
@@ -640,6 +640,7 @@ def player_move_or_interact(dx, dy):
 
     player.move(dx, dy)
     Fov.require_recompute()
+
 
 
 def get_open_tiles():

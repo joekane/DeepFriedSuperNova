@@ -2,7 +2,7 @@
 
 # actual size of the window
 SCREEN_WIDTH = 120
-SCREEN_HEIGHT = 75
+SCREEN_HEIGHT = 60
 
 # size of the map
 MAP_WIDTH = SCREEN_WIDTH - 20
@@ -45,6 +45,6 @@ FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
 TORCH_RADIUS = 10
 
-LIMIT_FPS = 20  # 20 frames-per-second maximum
+LIMIT_FPS = 0  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5

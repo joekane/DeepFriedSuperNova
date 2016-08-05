@@ -152,9 +152,9 @@ def random_choice(chances_dict):
 
 
 def inspect_tile(x, y):
-    global delay, mouse_old_x, mouse_old_y
+    global delay, mouse_old_x, mouse_old_y, new_animation
 
-    if 0 > x < Constants.MAP_WIDTH and 0 > y < Constants.MAP_HEIGHT:
+    if 0 < x < Constants.MAP_WIDTH and 0 < y < Constants.MAP_HEIGHT:
         # Mouse over Inspection
         if x is mouse_old_x and y is mouse_old_y:
             if time.time() - delay > Constants.INSPECTION_DELAY:
@@ -163,13 +163,16 @@ def inspect_tile(x, y):
                     if len(obj) == 0:
                         pass
                     else:
-                        Animate.inspect_banner(x, y, obj[0].name)
+                        Animate.inspect_banner(x, y, obj[0].name, new_animation)
+                        new_animation = False
         else:
+            new_animation = True
             mouse_old_x = x
             mouse_old_y = y
             delay = time.time()
 
 
 delay = 0
+new_animation = True
 mouse_old_x = 0
 mouse_old_y = 0

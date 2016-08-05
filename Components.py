@@ -8,8 +8,6 @@ import Fov
 import Utils
 import Animate
 
-player = GameState.get_player()
-
 
 class Fighter:
     # combat-related properties and methods (monster, player, NPC).
@@ -56,7 +54,7 @@ class Fighter:
 
     def take_damage(self, damage):
         # apply damage if possible
-        # player = GameState.get_player()
+        player = GameState.get_player()
         if damage > 0:
             self.hp -= damage
         # check for death. if there's a death function, call it
@@ -101,7 +99,7 @@ class QuestNpc:
         self.owner = owner
 
     def take_turn(self):
-        pass
+        return False
 
     def talk(self):
         global inventory
@@ -146,6 +144,8 @@ class BasicMonster:
             # close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
                 monster.fighter.attack(player)
+        else:
+            return False
 
 
 class Door:
@@ -176,6 +176,7 @@ class Door:
             self.owner.char = '_'
         if self.status is 'locked':
             self.owner.name = 'locked door'
+        return False
 
     def interact(self):
         # print "interact!"
@@ -211,6 +212,8 @@ class BasicRangedMonster:
             else:
                 self.reload -= 1
                 pass
+        else:
+            return False
 
 
 class SpawningMonster:
@@ -237,6 +240,8 @@ class SpawningMonster:
                 # close enough, attack! (if the player is 8still alive.)
                 elif player.fighter.hp > 0:
                     monster.fighter.attack(player)
+        else:
+            return False
 
     def split(self):
         loc = Map.adjacent_open_tiles(self.owner)
@@ -283,6 +288,7 @@ class ConfusedMonster:
         else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
             self.owner.ai = self.old_ai
             Utils.message('The ' + self.owner.name + ' is no longer confused!', libtcod.red)
+        return False
 
 
 class Item:
@@ -362,8 +368,6 @@ class Equipment:
 
 
 class Ranged:
-    global player
-
     def __init__(self, max_range, ammo_type=0, ammo_consumed=0, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
@@ -380,8 +384,8 @@ class Ranged:
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
                 return 'cancelled'
 
-        # Animate.follow_line(source, target)
-        Animate.explosion(target)
+        Animate.follow_line(source, target)
+        # Animate.explosion(target)
 
         # zap it!
         Utils.message('A shot rings out and ' + target.name + ' takes an arrow to the knee! The damage is ' + str(

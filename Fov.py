@@ -22,8 +22,10 @@ def initialize():
         for x in range(Constants.MAP_WIDTH):
             libtcod.map_set_properties(fov_map, x, y, not map[x][y].block_sight, not map[x][y].blocked)
 
+
 def fov_change(x,y, block, sight):
     libtcod.map_set_properties(fov_map, x, y, not sight, not block)
+
 
 def require_recompute():
     global fov_recompute
@@ -32,7 +34,10 @@ def require_recompute():
 
 def recompute():
     if fov_recompute:
-        libtcod.map_compute_fov(fov_map, player.x, player.y, Constants.TORCH_RADIUS + 5, Constants.FOV_LIGHT_WALLS, Constants.FOV_ALGO)
+        libtcod.map_compute_fov(fov_map, player.x, player.y,
+                                Constants.TORCH_RADIUS + 5,
+                                Constants.FOV_LIGHT_WALLS,
+                                Constants.FOV_ALGO)
 
 
 def is_visible(pos = None, obj = None, ):

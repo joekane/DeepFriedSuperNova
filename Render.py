@@ -20,7 +20,66 @@ def clear_map():
     libtcod.console_clear(consoles['map_console'])
 
 
-def map():
+def render_tile(x, y):
+    # NOT SURE IF WORKS!?!?!
+    Fov.recompute()
+
+    map = Map.current_map()
+
+    # go through all tiles, and set their background color
+
+    visible = Fov.is_visible(pos=(x, y))
+    wall = map[x][y].block_sight and map[x][y].blocked
+    glass = not map[x][y].block_sight and map[x][y].blocked
+    box = map[x][y].block_sight and not map[x][y].blocked
+    wall_char = libtcod.CHAR_BLOCK1
+    # floor_char = libtcod.CHAR_SUBP_DIAG
+    floor_char = '.'
+    wall_color = libtcod.red
+    floor_color = libtcod.white
+
+    player = GameState.get_player()
+
+    offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * 15
+    offset_color = libtcod.Color(offset_value, offset_value, offset_value)
+
+    if not visible:
+        # if it's not visible right now, the player can only see it if it's explored
+        if map[x][y].explored:
+        # it's out of the player's FOV
+            if wall:
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
+                                            libtcod.BKGND_SET)
+            elif glass:
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(219), libtcod.darker_grey,
+                                            libtcod.BKGND_SET)
+            elif box:
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey,
+                                            libtcod.BKGND_SET)
+            else:
+                 libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
+                                             libtcod.BKGND_SET)
+    else:
+                # it's visible
+                # print(offset_value)
+        if wall:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color,
+                                        libtcod.BKGND_SET)
+        elif glass:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(178),
+                                        libtcod.Color(max(0, 10 - offset_value), max(0, 10 - offset_value),
+                                                      max(0, 100 - offset_value)), libtcod.BKGND_SET)
+        elif box:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, '~',
+                                        libtcod.Color(max(0, 100 - offset_value), max(0, 100 - offset_value),
+                                                      max(0, 130 - offset_value)), libtcod.BKGND_SET)
+        else:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char,
+                                        floor_color - offset_color, libtcod.BKGND_SET)
+        map[x][y].explored = True
+
+
+def full_map():
 
     Fov.recompute()
 
@@ -122,8 +181,8 @@ def ui():
     render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 30),
                      consoles['side_panel_console'])
 
-    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'Dungeon level ' +
-                             str(GameState.get_dungeon_level()))
+    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'FPS ' +
+                             str(libtcod.sys_get_fps()))
     libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
                              str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
 
@@ -196,7 +255,7 @@ def render_hoz_line(x, y, length, color, target):
 
 
 def render_all():
-    map()
+    full_map()
     objects()
     ui()
     update()
