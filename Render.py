@@ -1,3 +1,14 @@
+'''
+/*******************************************************
+ * Copyright (C) 2016-2017 Joe Kane
+ *
+ * This file is part of 'Deep Fried Supernova"
+ *
+ * Deep Fried Supernova can not be copied and/or distributed without the express
+ * permission of Joe Kane
+ *******************************************************/
+'''
+
 import libtcodpy as libtcod
 import Constants
 import Utils
@@ -46,7 +57,7 @@ def render_tile(x, y):
     if not visible:
         # if it's not visible right now, the player can only see it if it's explored
         if map[x][y].explored:
-        # it's out of the player's FOV
+            # it's out of the player's FOV
             if wall:
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
                                             libtcod.BKGND_SET)
@@ -57,7 +68,7 @@ def render_tile(x, y):
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey,
                                             libtcod.BKGND_SET)
             else:
-                 libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
                                              libtcod.BKGND_SET)
     else:
                 # it's visible
