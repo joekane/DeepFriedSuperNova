@@ -165,7 +165,7 @@ def random_choice(chances_dict):
 def inspect_tile(x, y):
     global delay, mouse_old_x, mouse_old_y, new_animation
 
-    if 0 < x < Constants.MAP_WIDTH and 0 < y < Constants.MAP_HEIGHT:
+    if 0 < x < Constants.MAP_CONSOLE_WIDTH and 0 < y < Constants.MAP_CONSOLE_HEIGHT:
         # Mouse over Inspection
         if x is mouse_old_x and y is mouse_old_y:
             if time.time() - delay > Constants.INSPECTION_DELAY:

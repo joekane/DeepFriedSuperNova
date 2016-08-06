@@ -18,6 +18,7 @@ import Fov
 import Utils
 import Components
 import pygame
+import Themes
 import Spells
 
 level_map = None
@@ -38,12 +39,16 @@ def current_map():
 
 class Tile:
     # a tile of the map and its properties
-    def __init__(self, blocked, block_sight=None):
+    def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black ):
         self.blocked = blocked
         self.explored = False
+        self.char = char
+        self.f_color = f_color
+        self.b_color = b_color
 
         # by default, if a tile is blocked, it also blocks sight
-        if block_sight is None: block_sight = blocked
+        if block_sight is None:
+            block_sight = blocked
         self.block_sight = block_sight
 
 
@@ -219,7 +224,8 @@ def make_bsp():
 
     objects = [player]
 
-    level_map = [[Tile(True) for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    level_map = [[Tile(True, block_sight=True, char=libtcod.CHAR_BLOCK1, f_color=libtcod.red, b_color=libtcod.black )
+                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     # Empty global list for storing room coordinates
     bsp_rooms = []
@@ -270,7 +276,7 @@ def traverse_node(node, dat):
             maxy -= 1
 
         # If it's False the rooms sizes are random, else the rooms are filled to the node's size
-        if Constants.FULL_ROOMS == False:
+        if Constants.FULL_ROOMS is False:
             minx = libtcod.random_get_int(None, minx, maxx - Constants.MIN_SIZE + 1)
             miny = libtcod.random_get_int(None, miny, maxy - Constants.MIN_SIZE + 1)
             maxx = libtcod.random_get_int(None, minx + Constants.MIN_SIZE - 2, maxx)
@@ -284,8 +290,11 @@ def traverse_node(node, dat):
         # Dig room
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
-                level_map[x][y].blocked = False
-                level_map[x][y].block_sight = False
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=libtcod.black)
 
         # Add center coordinates to the list of rooms
         bsp_rooms.append(((minx + maxx) / 2, (miny + maxy) / 2))
@@ -337,21 +346,31 @@ def vline(map, x, y1, y2):
         y1, y2 = y2, y1
 
     for y in range(y1, y2 + 1):
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color()(),
+                         b_color=libtcod.black)
 
 
 def vline_up(map, x, y):
     while y >= 0 and map[x][y].blocked == True:
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color(),
+                         b_color=libtcod.black)
+
         y -= 1
 
 
 def vline_down(map, x, y):
     while y < Constants.MAP_HEIGHT and map[x][y].blocked == True:
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color(),
+                         b_color=libtcod.black)
         y += 1
 
 
@@ -359,21 +378,31 @@ def hline(map, x1, y, x2):
     if x1 > x2:
         x1, x2 = x2, x1
     for x in range(x1, x2 + 1):
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color(),
+                         b_color=libtcod.black)
 
 
 def hline_left(map, x, y):
     while x >= 0 and map[x][y].blocked == True:
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color(),
+                         b_color=libtcod.black)
+
         x -= 1
 
 
 def hline_right(map, x, y):
     while x < Constants.MAP_WIDTH and map[x][y].blocked == True:
-        map[x][y].blocked = False
-        map[x][y].block_sight = False
+        map[x][y] = Tile(False,
+                         block_sight=False,
+                         char=Themes.ground_char(),
+                         f_color=Themes.ground_color(),
+                         b_color=libtcod.black)
         x += 1
 
 
@@ -382,23 +411,32 @@ def create_room(room):
     # go through the tiles in the rectangle and make them passable
     for x in range(room.x1 + 1, room.x2):
         for y in range(room.y1 + 1, room.y2):
-            level_map[x][y].blocked = False
-            level_map[x][y].block_sight = False
+            level_map[x][y] = Tile(False,
+                                   block_sight=False,
+                                   char=Themes.ground_char(),
+                                   f_color=Themes.ground_color(),
+                                   b_color=libtcod.black)
 
 
 def create_v_tunnel(y1, y2, x):
     global level_map
     # vertical tunnel
     for y in range(min(y1, y2), max(y1, y2) + 1):
-        level_map[x][y].blocked = False
-        level_map[x][y].block_sight = False
+        level_map[x][y] = Tile(False,
+                               block_sight=False,
+                               char=Themes.ground_char(),
+                               f_color=Themes.ground_color(),
+                               b_color=libtcod.black)
 
 
 def create_h_tunnel(x1, x2, y):
     global level_map
     for x in range(min(x1, x2), max(x1, x2) + 1):
-        level_map[x][y].blocked = False
-        level_map[x][y].block_sight = False
+        level_map[x][y] = Tile(False,
+                               block_sight=False,
+                               char=Themes.ground_char(),
+                               f_color=Themes.ground_color(),
+                               b_color=libtcod.black)
 
 
 def place_objects(room):
@@ -421,9 +459,6 @@ def place_objects(room):
 
         monster_chances[key] = Utils.from_dungeon_level(s_list)
         #print item_chances
-
-
-
 
     '''ITEMS'''
     # maximum number of items per room
@@ -751,8 +786,8 @@ def spawn_doors():
 
     valid_nodes = []
 
-    for y in range(Constants.MAP_HEIGHT):
-        for x in range(Constants.MAP_WIDTH):
+    for y in range(1,Constants.MAP_HEIGHT-1):
+        for x in range(1,Constants.MAP_WIDTH-1):
             if not level_map[x][y].blocked and has_cross_blocked(x, y):
                 count = get_total_blocked_corners(x,y)
                 chance = libtcod.random_get_int(0, 0, 100)

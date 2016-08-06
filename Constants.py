@@ -55,8 +55,8 @@ LEVEL_UP_FACTOR = 5000
 
 FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
-TORCH_RADIUS = 25  # 15 Def
+TORCH_RADIUS = 15  # 15 Def
 
-LIMIT_FPS = 60  # 20 frames-per-second maximum
+LIMIT_FPS = 0  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5

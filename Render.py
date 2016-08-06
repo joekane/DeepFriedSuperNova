@@ -15,6 +15,7 @@ import Utils
 import Fov
 import GameState
 import Map
+import Themes
 
 consoles = {}
 gameState = None
@@ -40,54 +41,23 @@ def render_tile(x, y):
     # go through all tiles, and set their background color
 
     visible = Fov.is_visible(pos=(x, y))
-    wall = map[x][y].block_sight and map[x][y].blocked
-    glass = not map[x][y].block_sight and map[x][y].blocked
-    box = map[x][y].block_sight and not map[x][y].blocked
-    wall_char = libtcod.CHAR_BLOCK1
-    # floor_char = libtcod.CHAR_SUBP_DIAG
-    floor_char = '.'
-    wall_color = libtcod.red
-    floor_color = libtcod.white
 
     player = GameState.get_player()
 
     offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * Constants.TORCH_RADIUS
     offset_color = libtcod.Color(offset_value, offset_value, offset_value)
 
+    tile = map[x][y]
+
     if not visible:
         # if it's not visible right now, the player can only see it if it's explored
-        if map[x][y].explored:
-            # it's out of the player's FOV
-            if wall:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
-                                            libtcod.BKGND_SET)
-            elif glass:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(219), libtcod.darker_grey,
-                                            libtcod.BKGND_SET)
-            elif box:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey,
-                                            libtcod.BKGND_SET)
-            else:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
-                                             libtcod.BKGND_SET)
+        if tile.explored:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                        Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
     else:
-                # it's visible
-                # print(offset_value)
-        if wall:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color,
-                                        libtcod.BKGND_SET)
-        elif glass:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(178),
-                                        libtcod.Color(max(0, 10 - offset_value), max(0, 10 - offset_value),
-                                                      max(0, 100 - offset_value)), libtcod.BKGND_SET)
-        elif box:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, '~',
-                                        libtcod.Color(max(0, 100 - offset_value), max(0, 100 - offset_value),
-                                                      max(0, 130 - offset_value)), libtcod.BKGND_SET)
-        else:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char,
-                                        floor_color - offset_color, libtcod.BKGND_SET)
-        map[x][y].explored = True
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                        tile.f_color - offset_color, libtcod.BKGND_SET)
+            tile.explored = True
 
 
 def full_map():
@@ -124,48 +94,22 @@ def full_map():
             player = GameState.get_player()
 
 
+            tile = map[map_x][map_y]
 
             if not visible:
                 # if it's not visible right now, the player can only see it if it's explored
-                if map[map_x][map_y].explored:
-                    # it's out of the player's FOV
-                    if wall:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, libtcod.darker_grey,
-                                                    libtcod.BKGND_SET)
-                    elif glass:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(219), libtcod.darker_grey,
-                                                    libtcod.BKGND_SET)
-                    elif box:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '~', libtcod.darker_grey,
-                                                    libtcod.BKGND_SET)
-                    else:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char, floor_color * .09,
-                                                    libtcod.BKGND_SET)
+                if tile.explored:
+                    libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                                Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
             else:
-                # it's visible
                 dist = int(Utils.distance_between(map_x, map_y, player.x, player.y))
                 offset_value = int(float(dist) / Constants.TORCH_RADIUS * 255)
                 offset_value = max(0, min(offset_value, 255))
-
-                # print dist, offset_value
-
                 offset_color = libtcod.Color(offset_value, offset_value, offset_value)
-                # print(offset_value)
-                if wall:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, wall_char, wall_color - offset_color,
-                                                libtcod.BKGND_SET)
-                elif glass:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, chr(178),
-                                                libtcod.Color(max(0, 10 - offset_value), max(0, 10 - offset_value),
-                                                              max(0, 100 - offset_value)), libtcod.BKGND_SET)
-                elif box:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, '~',
-                                                libtcod.Color(max(0, 100 - offset_value), max(0, 100 - offset_value),
-                                                              max(0, 130 - offset_value)), libtcod.BKGND_SET)
-                else:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, floor_char,
-                                                floor_color - offset_color, libtcod.BKGND_SET)
-                map[map_x][map_y].explored = True
+
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                            tile.f_color - offset_color, libtcod.BKGND_SET)
+                tile.explored = True
 
 
 def objects():
