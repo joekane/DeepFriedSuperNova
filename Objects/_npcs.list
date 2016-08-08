@@ -1,3 +1,11 @@
+[OpenDoor]
+ai_component = Door(door_status='open')
+char = +
+name = door
+color = libtcod.darker_yellow
+always_visible=False
+freq = 0:0
+
 [Door]
 ai_component = Door()
 char = +

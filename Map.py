@@ -129,6 +129,11 @@ def load_diner_map():
                     level_map[x][y].blocked = True
                     level_map[x][y].block_sight = True
                     spawn_npc_at(x, y, 'UnlockedDoor')
+            if c == '_':
+                    #print(str(x) + "|" + str(y))
+                    level_map[x][y].blocked = True
+                    level_map[x][y].block_sight = True
+                    spawn_npc_at(x, y, 'OpenDoor')
             if c == 's':
                 #print(str(x) + "|" + str(y))
                 level_map[x][y].blocked = False
@@ -224,7 +229,14 @@ def make_bsp():
 
     objects = [player]
 
-    level_map = [[Tile(True, block_sight=True, char=libtcod.CHAR_BLOCK1, f_color=libtcod.red, b_color=libtcod.black )
+    # Themes.apply_ssa_theme()
+    Themes.apply_forrest_theme()
+
+    level_map = [[Tile(True,
+                       block_sight=True,
+                       char=Themes.wall_char(),
+                       f_color=Themes.wall_color(),
+                       b_color=Themes.wall_bcolor() )
                   for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     # Empty global list for storing room coordinates
@@ -294,7 +306,7 @@ def traverse_node(node, dat):
                                        block_sight=False,
                                        char=Themes.ground_char(),
                                        f_color=Themes.ground_color(),
-                                       b_color=libtcod.black)
+                                       b_color=Themes.ground_bcolor())
 
         # Add center coordinates to the list of rooms
         bsp_rooms.append(((minx + maxx) / 2, (miny + maxy) / 2))
@@ -350,8 +362,7 @@ def vline(map, x, y1, y2):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color()(),
-                         b_color=libtcod.black)
-
+                         b_color=Themes.ground_bcolor())
 
 def vline_up(map, x, y):
     while y >= 0 and map[x][y].blocked == True:
@@ -359,8 +370,7 @@ def vline_up(map, x, y):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color(),
-                         b_color=libtcod.black)
-
+                         b_color=Themes.ground_bcolor())
         y -= 1
 
 
@@ -370,7 +380,7 @@ def vline_down(map, x, y):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color(),
-                         b_color=libtcod.black)
+                         b_color=Themes.ground_bcolor())
         y += 1
 
 
@@ -382,8 +392,7 @@ def hline(map, x1, y, x2):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color(),
-                         b_color=libtcod.black)
-
+                         b_color=Themes.ground_bcolor())
 
 def hline_left(map, x, y):
     while x >= 0 and map[x][y].blocked == True:
@@ -391,8 +400,7 @@ def hline_left(map, x, y):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color(),
-                         b_color=libtcod.black)
-
+                         b_color=Themes.ground_bcolor())
         x -= 1
 
 
@@ -402,7 +410,7 @@ def hline_right(map, x, y):
                          block_sight=False,
                          char=Themes.ground_char(),
                          f_color=Themes.ground_color(),
-                         b_color=libtcod.black)
+                         b_color=Themes.ground_bcolor())
         x += 1
 
 
@@ -415,8 +423,7 @@ def create_room(room):
                                    block_sight=False,
                                    char=Themes.ground_char(),
                                    f_color=Themes.ground_color(),
-                                   b_color=libtcod.black)
-
+                                   b_color=Themes.ground_bcolor())
 
 def create_v_tunnel(y1, y2, x):
     global level_map
@@ -426,8 +433,7 @@ def create_v_tunnel(y1, y2, x):
                                block_sight=False,
                                char=Themes.ground_char(),
                                f_color=Themes.ground_color(),
-                               b_color=libtcod.black)
-
+                               b_color=Themes.ground_bcolor())
 
 def create_h_tunnel(x1, x2, y):
     global level_map
@@ -436,8 +442,7 @@ def create_h_tunnel(x1, x2, y):
                                block_sight=False,
                                char=Themes.ground_char(),
                                f_color=Themes.ground_color(),
-                               b_color=libtcod.black)
-
+                               b_color=Themes.ground_bcolor())
 
 def place_objects(room):
     # this is where we decide the chance of each monster or item appearing.
@@ -446,7 +451,7 @@ def place_objects(room):
     '''MONSTERS'''
 
     # maximum number of monsters per room
-    max_monsters = Utils.from_dungeon_level([[2, 1], [3, 4], [5, 6]])
+    max_monsters = Utils.from_dungeon_level([[20, 1], [30, 4], [50, 6]])
 
     # chance of each monster
     monster_chances = {}

@@ -100,16 +100,22 @@ def full_map():
                 # if it's not visible right now, the player can only see it if it's explored
                 if tile.explored:
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                                Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
+                                                libtcod.Color(55, 55, 55), libtcod.BKGND_SET)
+
             else:
                 dist = int(Utils.distance_between(map_x, map_y, player.x, player.y))
-                offset_value = int(float(dist) / Constants.TORCH_RADIUS * 255)
-                offset_value = max(0, min(offset_value, 255))
+
+                offset_value = int((float(dist) / (Constants.TORCH_RADIUS + 2)  ) * 255)
+                offset_value = max(0, min(offset_value, 64))
                 offset_color = libtcod.Color(offset_value, offset_value, offset_value)
 
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                             tile.f_color - offset_color, libtcod.BKGND_SET)
+                libtcod.console_set_char_background(consoles['map_console'], x, y,
+                                                    tile.b_color - offset_color, flag=libtcod.BKGND_SET)
+
                 tile.explored = True
+
 
 
 def objects():

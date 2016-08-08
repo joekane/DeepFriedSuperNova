@@ -128,7 +128,6 @@ def process_mouse_clicks():
     # (x, y) = Map.to_camera_coordinates(mouse.cx, mouse.cy)
     (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
 
-
     # walk to target tile
     if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
         # print "Mouse Pressed!"
@@ -317,9 +316,10 @@ def play_game():
         if game_state == 'playing' and player_action != 'didnt-take-turn':
             for obj in Map.get_objects():
                 if obj.ai:
-                    if obj.ai.take_turn() is not False:
-                        # print "attemp to stop walking"
-                        continue_walking = False
+                    pass
+                    # if obj.ai.take_turn() is not False:
+                    #    # print "attemp to stop walking"
+                    #    continue_walking = False
 
 
 

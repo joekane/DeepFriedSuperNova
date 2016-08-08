@@ -4,100 +4,120 @@ import random
 
 GROUND_CHAR = ['.', ',', ';']
 GROUND_COLOR = [libtcod.green, libtcod.light_green, libtcod.dark_green]
+GROUND_BCOLOR = None
 
 WALL_CHAR = [libtcod.CHAR_BLOCK1]
 WALL_COLOR = [libtcod.grey]
+WALL_BCOLOR = None
 
 DOOR_CLOSED_CHAR = ['+']
 DOOR_OPEN_CHAR = ['_']
 DOOR_COLOR = [libtcod.darkest_yellow]
+DOOR_BCOLOR = None
 
 GLASS_CHAR = [libtcod.CHAR_BLOCK1]
 GLASS_COLOR = [libtcod.lightest_blue]
+GLASS_BCOLOR = None
 
 BOX_CHAR = [libtcod.CHAR_BLOCK1]
 BOX_COLOR = [libtcod.lightest_blue]
+BOX_BCOLOR = None
 
 OUT_OF_FOV_COLOR = libtcod.dark_gray
 
 
 def apply_default_theme():
-    global GROUND_CHAR, GROUND_COLOR
-    global WALL_CHAR, WALL_COLOR
-    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR
-    global GLASS_CHAR, GLASS_COLOR
-    global BOX_CHAR, BOX_COLOR
+    global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
+    global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
+    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
+    global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
+    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
     global OUT_OF_FOV_COLOR
 
     GROUND_CHAR = ['.']
     GROUND_COLOR = [libtcod.white]
+    GROUND_BCOLOR = None
 
     WALL_CHAR = [libtcod.CHAR_BLOCK1]
     WALL_COLOR = [libtcod.grey]
+    WALL_BCOLOR = None
 
     DOOR_CLOSED_CHAR = ['+']
     DOOR_OPEN_CHAR = ['_']
     DOOR_COLOR = [libtcod.darkest_yellow]
+    DOOR_BCOLOR = None
 
     GLASS_CHAR = [libtcod.CHAR_BLOCK1]
     GLASS_COLOR = [libtcod.lightest_blue]
+    GLASS_BCOLOR = None
 
     BOX_CHAR = ['#']
     BOX_COLOR = libtcod.light_orange
+    BOX_BCOLOR = None
+
     OUT_OF_FOV_COLOR = libtcod.dark_gray
 
 
 def apply_forrest_theme():
-    global GROUND_CHAR, GROUND_COLOR
-    global WALL_CHAR, WALL_COLOR
-    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR
-    global GLASS_CHAR, GLASS_COLOR
-    global BOX_CHAR, BOX_COLOR
+    global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
+    global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
+    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
+    global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
+    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
     global OUT_OF_FOV_COLOR
 
-    GROUND_CHAR = ['.', ',', ';']
+    GROUND_CHAR = ['.', ',', '"']
     GROUND_COLOR = [libtcod.green, libtcod.light_green, libtcod.dark_green]
+    GROUND_BCOLOR = [libtcod.darkest_sepia]
 
     WALL_CHAR = [libtcod.CHAR_ARROW2_N]
-    WALL_COLOR = [libtcod.darker_sepia]
+    WALL_COLOR = [libtcod.sepia]
+    WALL_BCOLOR = [libtcod.darkest_green]
 
     DOOR_CLOSED_CHAR = ['X']
     DOOR_OPEN_CHAR = ['|']
     DOOR_COLOR = [libtcod.darkest_yellow]
+    DOOR_BCOLOR = [libtcod.dark_sepia]
 
     GLASS_CHAR = [libtcod.CHAR_BLOCK1]
     GLASS_COLOR = [libtcod.lightest_blue]
+    GLASS_BCOLOR = [libtcod.black]
 
     BOX_CHAR = [libtcod.CHAR_BLOCK1]
     BOX_COLOR = [libtcod.lightest_blue]
+    BOX_BCOLOR = [libtcod.black]
 
     OUT_OF_FOV_COLOR = libtcod.dark_gray
 
 
-
 def apply_ssa_theme():
-    global GROUND_CHAR, GROUND_COLOR
-    global WALL_CHAR, WALL_COLOR
-    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR
-    global GLASS_CHAR, GLASS_COLOR
-    global BOX_CHAR, BOX_COLOR
+    global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
+    global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
+    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
+    global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
+    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
     global OUT_OF_FOV_COLOR
 
-    GROUND_CHAR = [libtcod.CHAR_CHECKBOX_UNSET]
-    GROUND_COLOR = [libtcod.white]
+    GROUND_CHAR = [libtcod.CHAR_SE]
+    GROUND_COLOR = [libtcod.light_grey]
+    GROUND_BCOLOR = [libtcod.grey]
 
-    WALL_CHAR = [libtcod.CHAR_BLOCK3]
-    WALL_COLOR = [libtcod.darker_red]
+    WALL_CHAR = [libtcod.CHAR_CHECKBOX_UNSET]
+    WALL_COLOR = [libtcod.blue]
+    WALL_BCOLOR = [libtcod.dark_crimson]
 
     DOOR_CLOSED_CHAR = ['#']
     DOOR_OPEN_CHAR = ['_']
     DOOR_COLOR = [libtcod.lighter_grey]
+    DOOR_BCOLOR = [libtcod.black]
 
     GLASS_CHAR = [libtcod.CHAR_BLOCK1]
     GLASS_COLOR = [libtcod.lightest_blue]
+    GLASS_BCOLOR = [libtcod.black]
 
     BOX_CHAR = [libtcod.CHAR_BLOCK1]
     BOX_COLOR = [libtcod.lightest_blue]
+    BOX_BCOLOR = [libtcod.black]
 
     OUT_OF_FOV_COLOR = libtcod.dark_gray
 
@@ -109,11 +129,20 @@ def ground_char():
 def ground_color():
     return random.choice(GROUND_COLOR)
 
+
+def ground_bcolor():
+    return random.choice(GROUND_BCOLOR)
+
+
 def wall_char():
-    pass
+    return random.choice(WALL_CHAR)
 
 def wall_color():
-    pass
+    return random.choice(WALL_COLOR)
+
+def wall_bcolor():
+    return random.choice(WALL_BCOLOR)
+
 
 def glass_char():
     pass

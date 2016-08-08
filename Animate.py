@@ -17,7 +17,6 @@ import Map
 
 
 def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark_amber):
-
     line = Utils.get_line((source.x, source.y), (target.x, target.y))
 
     for loc in line:
@@ -26,7 +25,6 @@ def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark
         Render.render_all()
 
         x, y = Map.to_camera_coordinates(x, y)
-
 
         if (x, y) == line[-1]:
             libtcod.console_put_char_ex(0, x, y, end_tile, color, libtcod.BKGND_NONE)
