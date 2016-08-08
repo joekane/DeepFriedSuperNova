@@ -110,7 +110,7 @@ def get_names_under_mouse():
     # return a string with the names of all objects under the mouse
     (x, y) = (mouse.cx, mouse.cy)
     # create a list with the names of all objects at the mouse's coordinates and in FOV
-    names = [obj.name for obj in Map.get_objects()
+    names = [obj.name for obj in Map.get_all_objects()
              if obj.x == x and obj.y == y and Fov.is_visible(obj)]
     names = ', '.join(names)  # join the names, separated by commas
     return names.capitalize()
@@ -122,7 +122,7 @@ def get_fighters_under_mouse():
     # return a string with the names of all objects under the mouse
     (x, y) = (mouse.cx, mouse.cy)
     # create a list with the names of all objects at the mouse's coordinates and in FOV
-    fighters = [obj for obj in Map.get_objects()
+    fighters = [obj for obj in Map.get_all_objects()
                 if obj.x == x and obj.y == y and Fov.is_visible(obj)]
 
     return fighters
@@ -172,7 +172,7 @@ def inspect_tile(x, y):
                 camera_x, camera_y = Map.get_camera()
                 map_x, map_y = (camera_x + x, camera_y + y)
                 if Map.level_map[map_x][map_y].explored:
-                    obj = [obj for obj in Map.get_objects() if obj.x == map_x and obj.y == map_y]
+                    obj = [obj for obj in Map.get_all_objects() if obj.x == map_x and obj.y == map_y]
                     if len(obj) == 0:
                         pass
                     else:

@@ -95,5 +95,5 @@ ai_component = SpawningMonster('Fly')
 char = B
 name = blob
 color = libtcod.dark_green
-freq = 3:4,15:6
+freq = 3:5,15:6
 

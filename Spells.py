@@ -65,7 +65,7 @@ def cast_fireball():
     GameState.add_msg('The fireball explodes, burning everything within ' + str(Constants.FIREBALL_RADIUS) + ' tiles!',
                       libtcod.orange)
 
-    for obj in Map.get_objects():  # damage every fighter in range, including the player
+    for obj in Map.get_all_objects():  # damage every fighter in range, including the player
         if obj.distance(x, y) <= Constants.FIREBALL_RADIUS and obj.fighter:
             GameState.add_msg('The ' + obj.name + ' gets burned for ' + str(Constants.FIREBALL_DAMAGE) + ' hit points.',
                               libtcod.orange)

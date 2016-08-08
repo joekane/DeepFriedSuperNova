@@ -190,7 +190,7 @@ def handle_keys():
 
             if key_char == 'g':
                 # pick up an item
-                for object in Map.get_objects():  # look for an item in the player's tile
+                for object in Map.get_all_objects():  # look for an item in the player's tile
                     if object.x == player.x and object.y == player.y and object.item:
                         object.item.pick_up()
                         break
@@ -300,7 +300,7 @@ def play_game():
         libtcod.console_flush()
 
         # erase all objects at their old locations, before they move
-        for obj in Map.get_objects():
+        for obj in Map.get_all_objects():
             obj.clear()
 
         # handle keys and exit game if needed
@@ -314,12 +314,11 @@ def play_game():
         # let monsters take their turn
 
         if game_state == 'playing' and player_action != 'didnt-take-turn':
-            for obj in Map.get_objects():
+            for obj in Map.get_all_objects():
                 if obj.ai:
-                    pass
-                    # if obj.ai.take_turn() is not False:
-                    #    # print "attemp to stop walking"
-                    #    continue_walking = False
+                    if obj.ai.take_turn() is not False:
+                       # print "attemp to stop walking"
+                        continue_walking = False
 
 
 
@@ -431,8 +430,10 @@ libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
-side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_WIDTH,
+side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_CONSOLE_WIDTH,
                                  Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
+
+SoundEffects.initilize()
 
 mouse = libtcod.Mouse()
 key = libtcod.Key()

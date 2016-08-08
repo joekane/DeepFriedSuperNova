@@ -93,33 +93,29 @@ def full_map():
 
             player = GameState.get_player()
 
-
             tile = map[map_x][map_y]
 
             if not visible:
                 # if it's not visible right now, the player can only see it if it's explored
                 if tile.explored:
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                                libtcod.Color(55, 55, 55), libtcod.BKGND_SET)
+                    if tile.blocked:
+                        char = '#'
+                    else:
+                        char = '.'
+                    libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
+                                                Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
 
             else:
-                dist = int(Utils.distance_between(map_x, map_y, player.x, player.y))
-
-                offset_value = int((float(dist) / (Constants.TORCH_RADIUS + 2)  ) * 255)
-                offset_value = max(0, min(offset_value, 64))
-                offset_color = libtcod.Color(offset_value, offset_value, offset_value)
-
+                offset_color = get_offset_color(map_x, map_y)
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                             tile.f_color - offset_color, libtcod.BKGND_SET)
                 libtcod.console_set_char_background(consoles['map_console'], x, y,
                                                     tile.b_color - offset_color, flag=libtcod.BKGND_SET)
-
                 tile.explored = True
 
 
-
 def objects():
-    for object in Map.get_objects():
+    for object in Map.get_all_objects():
         if object != GameState.get_player():
             object.draw()
     GameState.get_player().draw()
@@ -155,7 +151,7 @@ def ui():
                libtcod.darker_red,
                consoles['panel_console'])
 
-    render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 30),
+    render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 100),
                      consoles['side_panel_console'])
 
     libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'FPS ' +
@@ -165,7 +161,7 @@ def ui():
 
     temp_y = 2
 
-    for object in Map.get_objects():
+    for object in Map.get_all_objects():
         if object.fighter and Fov.is_visible(obj=object) and (object is not GameState.get_player()):
             render_bar(1, temp_y, 8, '', object.fighter.hp, object.fighter.max_hp, libtcod.dark_green,
                        libtcod.darker_red, consoles['side_panel_console'])
@@ -181,20 +177,33 @@ def ui():
 def update():
     # blit the contents of "panel" to the root console
     libtcod.console_blit(consoles['map_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0)
-    libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT, 0, 0,
+    libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH,
+                         Constants.PANEL_HEIGHT, 0, 0,
                          Constants.PANEL_Y)
-    libtcod.console_blit(consoles['side_panel_console'], 0, 0, 10, Constants.SCREEN_HEIGHT, 0, Constants.MAP_WIDTH, 0)
+    libtcod.console_blit(consoles['side_panel_console'], 0, 0, 10,
+                         Constants.SCREEN_HEIGHT, 0,
+                         Constants.MAP_CONSOLE_WIDTH, 0)
 
 
 def blank(x, y):
     libtcod.console_put_char(consoles['map_console'], x, y, ' ', libtcod.BKGND_NONE)
 
 
+def get_offset_color(map_x, map_y):
+    dist = int(Utils.distance_between(map_x, map_y, GameState.player.x, GameState.player.y))
+    offset_value = int((float(dist) / Constants.TORCH_RADIUS) * 255)
+    offset_value = max(0, min(offset_value, 255)) / 2
+    offset_color = libtcod.Color(offset_value, offset_value, offset_value)
+    return offset_color
+
+
 def draw_object(obj, visible=True):
     x, y = Map.to_camera_coordinates(obj.x, obj.y)
 
     if visible:
+
         libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
+        libtcod.console_set_char_background(consoles['map_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
     else:
         libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, libtcod.darker_gray,
                                     libtcod.BKGND_NONE)

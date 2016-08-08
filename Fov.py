@@ -45,7 +45,11 @@ def require_recompute():
 
 
 def recompute():
+    global fov_recompute
     if fov_recompute:
+        fov_recompute = False
+        Map.visible_objects = None
+        print "COMPUTING FOV!!!"
         libtcod.map_compute_fov(fov_map, player.x, player.y,
                                 Constants.TORCH_RADIUS,
                                 Constants.FOV_LIGHT_WALLS,

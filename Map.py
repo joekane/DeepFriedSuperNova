@@ -23,14 +23,12 @@ import Spells
 
 level_map = None
 objects = None
+visible_objects = None
 stairs = None
 camera_x = 0
 camera_y = 0
 
 
-pygame.init()
-pygame.mixer.init()
-sounda = pygame.mixer.Sound("test.wav")
 
 
 def current_map():
@@ -82,10 +80,15 @@ def load_diner_map():
 
     file = open('Levels\diner.map', 'r')
 
+    Themes.apply_diner_theme()
+
     # fill map with "blocked" tiles
-    level_map = [[Tile(True)
-                  for y in range(Constants.MAP_HEIGHT)]
-                 for x in range(Constants.MAP_WIDTH)]
+    level_map = [[Tile(True,
+                       block_sight=True,
+                       char=Themes.wall_char(),
+                       f_color=Themes.wall_color(),
+                       b_color=Themes.wall_bcolor())
+                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     y = 0
 
@@ -95,8 +98,11 @@ def load_diner_map():
         for c in line:
             if c == ' ':
                 #print(str(x) + " " + str(y))
-                level_map[x][y].blocked = False
-                level_map[x][y].block_sight = False
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
             if c == 'D':
                 #print(str(x) + "+" + str(y))
                 level_map[x][y].blocked = False
@@ -361,8 +367,9 @@ def vline(map, x, y1, y2):
         map[x][y] = Tile(False,
                          block_sight=False,
                          char=Themes.ground_char(),
-                         f_color=Themes.ground_color()(),
+                         f_color=Themes.ground_color(),
                          b_color=Themes.ground_bcolor())
+
 
 def vline_up(map, x, y):
     while y >= 0 and map[x][y].blocked == True:
@@ -451,7 +458,7 @@ def place_objects(room):
     '''MONSTERS'''
 
     # maximum number of monsters per room
-    max_monsters = Utils.from_dungeon_level([[20, 1], [30, 4], [50, 6]])
+    max_monsters = Utils.from_dungeon_level([[2, 1], [3, 4], [5, 6]])
 
     # chance of each monster
     monster_chances = {}
@@ -509,7 +516,7 @@ def place_objects(room):
 
 def number_of_adjacent_objects(obj):
     num = 0
-    for object in objects:
+    for object in get_visible_objects():
         difx = abs(object.x - obj.x)
         dify = abs(object.y - obj.y)
         if object.fighter and (difx <= 1 and dify <= 1) and object is not obj:
@@ -553,15 +560,20 @@ def spawn_item_at(x,y, item_name):
     equipment_component = None
     if 'item_component' in GameState.imported_items_list[item_name]:
         if 'use_function' in GameState.imported_items_list[item_name]:
-            item_component = Components.Item(use_function=eval('Spells.' + GameState.imported_items_list[item_name]['use_function']))
+            item_component = \
+                Components.Item(use_function=eval('Spells.' + GameState.imported_items_list[item_name]['use_function']))
         else:
             item_component = Components.Item()
     if 'equipment_component' in GameState.imported_items_list[item_name]:
-        equipment_component = Components.Equipment(slot=GameState.imported_items_list[item_name]['slot'],
-                                                   defense_bonus=int(GameState.imported_items_list[item_name]['defense_bonus']),
-                                                   power_bonus=int(GameState.imported_items_list[item_name]['power_bonus']))
-    item = Entity.Entity(x, y, GameState.imported_items_list[item_name]['char'], GameState.imported_items_list[item_name]['name'],
-                  eval(GameState.imported_items_list[item_name]['color']), item=item_component, equipment=equipment_component)
+        equipment_component = \
+            Components.Equipment(slot=GameState.imported_items_list[item_name]['slot'],
+                                 defense_bonus=int(GameState.imported_items_list[item_name]['defense_bonus']),
+                                 power_bonus=int(GameState.imported_items_list[item_name]['power_bonus']))
+    item = Entity.Entity(x, y, GameState.imported_items_list[item_name]['char'],
+                         GameState.imported_items_list[item_name]['name'],
+                         eval(GameState.imported_items_list[item_name]['color']),
+                         item=item_component,
+                         equipment=equipment_component)
     objects.append(item)
     item.send_to_back()  # items appear below other objects
     item.always_visible = True  # items are visible even out-of-FOV, if in an explored area
@@ -572,7 +584,7 @@ def closest_monster(max_range):
     closest_enemy = None
     closest_dist = max_range + 1  # start with (slightly more than) maximum range
     player = GameState.get_player()
-    for object in objects:
+    for object in get_visible_objects():
         if object.fighter and not object == player and Fov.is_visible(obj=object):
             # calculate distance between this object and the player
             dist = player.distance_to(object)
@@ -597,7 +609,7 @@ def is_blocked(x, y):
         return True
 
     # now check for any blocking objects
-    for object in objects:
+    for object in get_visible_objects():
         if object.blocks and object.x == x and object.y == y:
             # print "Blocked by Object!"
             return True
@@ -660,7 +672,7 @@ def target_monster(max_range=None):
             return None
 
         # return the first clicked monster, otherwise continue looping
-        for obj in get_objects():
+        for obj in get_visible_objects():
             if obj.x == x and obj.y == y and obj.fighter and obj != GameState.get_player():
                 return obj
 
@@ -712,9 +724,21 @@ def to_map_coordinates(x, y):
     return x, y
 
 
-
-def get_objects():
+def get_all_objects():
     return objects
+
+
+def get_visible_objects():
+    global visible_objects
+    if visible_objects is None:
+        visible_objects = [obj for obj in objects if Fov.is_visible(obj=obj)]
+        if visible_objects is None:
+            return objects
+        else:
+            return visible_objects
+    else:
+        return visible_objects
+
 
 
 def get_stairs():
@@ -722,7 +746,6 @@ def get_stairs():
 
 
 def player_move_or_interact(dx, dy):
-    global sounda
     # the coordinates the player is moving to/interacting
 
     player = GameState.get_player()
@@ -731,12 +754,14 @@ def player_move_or_interact(dx, dy):
 
     # try to find an interactable object there
 
-    for object in get_objects():
+    for object in get_visible_objects():
 
         if object.fighter and object.x == x and object.y == y:
             player.fighter.attack(object)
 
-            sounda.play()
+
+
+
             return
         if isinstance(object.ai, Components.QuestNpc) and object.x == x and object.y == y:
             print "Reward!!!! .... ??"
@@ -745,6 +770,7 @@ def player_move_or_interact(dx, dy):
         if object.blocks:
             if isinstance(object.ai, Components.Door) and object.x == x and object.y == y:
                 object.ai.interact()
+                Fov.require_recompute()
                 return
 
     player.move(dx, dy)
@@ -772,6 +798,7 @@ def has_cross_blocked(x,y):
         return True
     return False
 
+
 def get_total_blocked_corners(x,y):
     count = 0
     if level_map[x-1][y-1].blocked:
@@ -783,8 +810,6 @@ def get_total_blocked_corners(x,y):
     if level_map[x+1][y+1].blocked:
         count += 1
     return count
-
-
 
 
 def spawn_doors():

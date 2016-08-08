@@ -64,7 +64,7 @@ class Entity:
 
     def send_to_back(self):
         # make this object be drawn first, so all others appear above it if they're in the same tile.
-        objects = Map.get_objects()
+        objects = Map.get_all_objects()
         objects.remove(self)
         objects.insert(0, self)
 
@@ -101,17 +101,21 @@ class Entity:
         fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
         map = Map.current_map()
         # Scan the current map each turn and set all the walls as unwalkable
-        for y1 in range(Constants.MAP_HEIGHT):
-            for x1 in range(Constants.MAP_WIDTH):
-                libtcod.map_set_properties(fov, x1, y1, not map[x1][y1].block_sight, not map[x1][y1].blocked)
+
+        for y1 in range(Constants.MAP_CONSOLE_HEIGHT):
+            for x1 in range(Constants.MAP_CONSOLE_WIDTH):
+                x2, y2 = Map.to_map_coordinates(x1, y1)
+                libtcod.map_set_properties(fov, x1, y1, not map[x2][y2].block_sight, not map[x2][y2].blocked)
 
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
         # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        for obj in Map.get_objects():
+        print Map.get_visible_objects()
+        for obj in Map.get_visible_objects():
             if obj.blocks and obj != self and obj != target:
+                x2, y2 = Map.to_camera_coordinates(obj.x, obj.y)
                 # Set the tile as a wall so it must be navigated around
-                libtcod.map_set_properties(fov, obj.x, obj.y, True, False)
+                libtcod.map_set_properties(fov, x2, y2, True, False)
 
         # Allocate a A* path
         # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0 if diagonal moves are prohibited
@@ -159,7 +163,7 @@ class Entity:
             # Scan all the objects to see if there are objects that must be navigated around
             # Check also that the object isn't self or the target (so that the start and the end points are free)
             # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-            for obj in Map.get_objects():
+            for obj in Map.get_all_objects():
                 if obj.blocks and obj != self:
                     # Set the tile as a wall so it must be navigated around
                     libtcod.map_set_properties(fov, obj.x, obj.y, True, False)
@@ -205,8 +209,10 @@ class Entity:
                 self.x = x
                 self.y = y
                 # print "Path Walk"
+                Fov.require_recompute()
                 return True
             self.path = None
+
         return False
 
     def draw(self):

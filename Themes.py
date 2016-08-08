@@ -23,7 +23,7 @@ BOX_CHAR = [libtcod.CHAR_BLOCK1]
 BOX_COLOR = [libtcod.lightest_blue]
 BOX_BCOLOR = None
 
-OUT_OF_FOV_COLOR = libtcod.dark_gray
+OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 
 def apply_default_theme():
@@ -55,7 +55,7 @@ def apply_default_theme():
     BOX_COLOR = libtcod.light_orange
     BOX_BCOLOR = None
 
-    OUT_OF_FOV_COLOR = libtcod.dark_gray
+    OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 
 def apply_forrest_theme():
@@ -87,7 +87,7 @@ def apply_forrest_theme():
     BOX_COLOR = [libtcod.lightest_blue]
     BOX_BCOLOR = [libtcod.black]
 
-    OUT_OF_FOV_COLOR = libtcod.dark_gray
+    OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 
 def apply_ssa_theme():
@@ -103,8 +103,8 @@ def apply_ssa_theme():
     GROUND_BCOLOR = [libtcod.grey]
 
     WALL_CHAR = [libtcod.CHAR_CHECKBOX_UNSET]
-    WALL_COLOR = [libtcod.blue]
-    WALL_BCOLOR = [libtcod.dark_crimson]
+    WALL_COLOR = [libtcod.darker_flame]
+    WALL_BCOLOR = [libtcod.dark_red]
 
     DOOR_CLOSED_CHAR = ['#']
     DOOR_OPEN_CHAR = ['_']
@@ -119,7 +119,39 @@ def apply_ssa_theme():
     BOX_COLOR = [libtcod.lightest_blue]
     BOX_BCOLOR = [libtcod.black]
 
-    OUT_OF_FOV_COLOR = libtcod.dark_gray
+    OUT_OF_FOV_COLOR = libtcod.darker_gray
+
+
+def apply_diner_theme():
+    global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
+    global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
+    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
+    global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
+    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
+    global OUT_OF_FOV_COLOR
+
+    GROUND_CHAR = [libtcod.CHAR_SUBP_DIAG]
+    GROUND_COLOR = [libtcod.lighter_gray]
+    GROUND_BCOLOR = [libtcod.black]
+
+    WALL_CHAR = [libtcod.CHAR_BLOCK3]
+    WALL_COLOR = [libtcod.red]
+    WALL_BCOLOR = [libtcod.black]
+
+    DOOR_CLOSED_CHAR = ['#']
+    DOOR_OPEN_CHAR = ['_']
+    DOOR_COLOR = [libtcod.lighter_grey]
+    DOOR_BCOLOR = [libtcod.black]
+
+    GLASS_CHAR = [libtcod.CHAR_BLOCK1]
+    GLASS_COLOR = [libtcod.lightest_blue]
+    GLASS_BCOLOR = [libtcod.black]
+
+    BOX_CHAR = [libtcod.CHAR_BLOCK1]
+    BOX_COLOR = [libtcod.lightest_blue]
+    BOX_BCOLOR = [libtcod.black]
+
+    OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 
 def ground_char():

@@ -280,7 +280,7 @@ class SpawningMonster:
                                     fighter=fighter_component,
                                     ai=ai_component)
 
-            Map.get_objects().append(monster)
+            Map.get_all_objects().append(monster)
 
 
 class ConfusedMonster:
@@ -314,7 +314,7 @@ class Item:
             Utils.message('Your inventory is full, cannot pick up ' + self.owner.name + '.', libtcod.red)
         else:
             GameState.inventory.append(self.owner)
-            Map.get_objects().remove(self.owner)
+            Map.get_all_objects().remove(self.owner)
             Utils.message('You picked up a ' + self.owner.name + '!', libtcod.green)
             # special case: automatically equip, if the corresponding equipment slot is unused
             equipment = self.owner.equipment
@@ -334,7 +334,7 @@ class Item:
 
     def drop(self):
         # add to the map and remove from the player's inventory. also, place it at the player's coordinates
-        Map.get_objects().append(self.owner)
+        Map.get_all_objects().append(self.owner)
         GameState.inventory.remove(self.owner)
         player = GameState.get_player()
         self.owner.x = player.x
