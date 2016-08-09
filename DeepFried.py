@@ -134,6 +134,13 @@ def process_mouse_clicks():
         # print "Mouse Pressed!"
         continue_walking = GameState.get_player().move_astar_xy(map_x, map_y)
         return True
+    if mouse.rbutton_pressed:
+        # print "Mouse Pressed!"
+        x, y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+        GameState.get_player().x = x
+        GameState.get_player().y = y
+
+        return True
 
 
 def process_mouse_hover():

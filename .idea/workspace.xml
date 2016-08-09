@@ -3,10 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="12b9567f-49e9-4552-883c-81fda4002571" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CaveGen.py" afterPath="$PROJECT_DIR$/CaveGen.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Constants.py" afterPath="$PROJECT_DIR$/Constants.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DeepFried.py" afterPath="$PROJECT_DIR$/DeepFried.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Fov.py" afterPath="$PROJECT_DIR$/Fov.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entity.py" afterPath="$PROJECT_DIR$/Entity.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Map.py" afterPath="$PROJECT_DIR$/Map.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Utils.py" afterPath="$PROJECT_DIR$/Utils.py" />
     </list>
     <ignored path="DeepFriedSuperNova.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,37 +27,60 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Map.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Map.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Map.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="33" column="18" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
+            <state relative-caret-position="315">
+              <caret line="92" column="69" selection-start-line="92" selection-start-column="69" selection-end-line="92" selection-end-column="69" />
+              <folding>
+                <element signature="e#3059#6090#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CaveGen.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CaveGen.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="223" column="8" selection-start-line="223" selection-start-column="8" selection-end-line="223" selection-end-column="8" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+                <element signature="e#7686#8700#0" expanded="false" />
+                <element signature="e#8744#9204#0" expanded="false" />
+                <element signature="e#9472#9610#0" expanded="false" />
+                <element signature="e#9645#9718#0" expanded="false" />
+                <element signature="e#9751#9874#0" expanded="false" />
+                <element signature="e#9907#9989#0" expanded="false" />
+                <element signature="e#10026#10113#0" expanded="false" />
+                <element signature="e#10153#10292#0" expanded="false" />
+                <element signature="e#10337#10483#0" expanded="false" />
+                <element signature="e#10530#10947#0" expanded="false" />
+                <element signature="e#10992#11103#0" expanded="false" />
+                <element signature="e#11141#11202#0" expanded="false" />
+                <element signature="e#11232#11349#0" expanded="false" />
+                <marker date="1470778444073" expanded="false" signature="9234:9445" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="random.py" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/random.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="218">
+              <caret line="274" column="0" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CaveGen.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/CaveGen.py">
+      <file leaf-file-name="Entity.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Entity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4147">
-              <caret line="313" column="4" selection-start-line="313" selection-start-column="4" selection-end-line="313" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Animate.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Animate.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-              <folding>
-                <element signature="e#320#347#0" expanded="true" />
-                <marker date="1470707294270" expanded="true" signature="4099:4116" ph="..." />
-              </folding>
+            <state relative-caret-position="1302">
+              <caret line="109" column="0" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -64,20 +88,20 @@
       <file leaf-file-name="DeepFried.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DeepFried.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="268" column="0" selection-start-line="268" selection-start-column="0" selection-end-line="268" selection-end-column="0" />
+            <state relative-caret-position="245">
+              <caret line="136" column="29" selection-start-line="136" selection-start-column="29" selection-end-line="136" selection-end-column="29" />
               <folding>
-                <element signature="e#344#371#0" expanded="true" />
+                <marker date="1470773340065" expanded="true" signature="344:486" ph="import ..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Fov.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Fov.py">
+      <file leaf-file-name="Render.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Render.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="63" column="41" selection-start-line="63" selection-start-column="41" selection-end-line="63" selection-end-column="41" />
+            <state relative-caret-position="97">
+              <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -86,40 +110,8 @@
       <file leaf-file-name="Utils.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="113" column="55" selection-start-line="113" selection-start-column="50" selection-end-line="113" selection-end-column="60" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Themes.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Themes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2329">
-              <caret line="138" column="31" selection-start-line="138" selection-start-column="31" selection-end-line="138" selection-end-column="31" />
-              <folding>
-                <marker date="1470707294365" expanded="true" signature="4319:4324" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Constants.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Constants.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="52" column="10" selection-start-line="52" selection-start-column="10" selection-end-line="52" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Render.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Render.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="137" column="5" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
+            <state relative-caret-position="433">
+              <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -147,6 +139,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/CaveGen.py" root0="SKIP_INSPECTION" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -155,30 +150,31 @@
         <option value="$PROJECT_DIR$/First_RL.py" />
         <option value="$PROJECT_DIR$/Combat.py" />
         <option value="$PROJECT_DIR$/GameState.py" />
-        <option value="$PROJECT_DIR$/Spells.py" />
         <option value="$PROJECT_DIR$/Docs/Design Docs" />
         <option value="$PROJECT_DIR$/Themes/Themes.py" />
         <option value="$PROJECT_DIR$/SoundEffects.py" />
         <option value="$PROJECT_DIR$/Levels/diner.map" />
         <option value="$PROJECT_DIR$/Objects/_npcs.list" />
-        <option value="$PROJECT_DIR$/Entity.py" />
         <option value="$PROJECT_DIR$/Components.py" />
         <option value="$PROJECT_DIR$/Animate.py" />
         <option value="$PROJECT_DIR$/Themes.py" />
-        <option value="$PROJECT_DIR$/Constants.py" />
-        <option value="$PROJECT_DIR$/DeepFried.py" />
         <option value="$PROJECT_DIR$/Render.py" />
         <option value="$PROJECT_DIR$/Utils.py" />
         <option value="$PROJECT_DIR$/Fov.py" />
-        <option value="$PROJECT_DIR$/Map.py" />
+        <option value="$PROJECT_DIR$/Constants.py" />
+        <option value="$PROJECT_DIR$/Entity.py" />
+        <option value="$PROJECT_DIR$/Spells.py" />
+        <option value="$PROJECT_DIR$/DeepFried.py" />
         <option value="$PROJECT_DIR$/CaveGen.py" />
+        <option value="$PROJECT_DIR$/Map.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="953" />
-    <option name="width" value="964" />
-    <option name="height" value="1047" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -228,10 +224,27 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane />
-      </pane>
       <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DeepFriedSuperNova" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DeepFriedSuperNova" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DeepFriedSuperNova" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -442,16 +455,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="953" y="0" width="964" height="1047" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0984375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3276414" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3265306" sideWeight="0.5042373" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3265306" sideWeight="0.4957627" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26360726" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26293558" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -496,7 +509,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="6" />
+      <option name="time" value="7" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -505,7 +518,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1241">
           <caret line="73" column="0" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#3059#6090#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -521,7 +536,7 @@
         <state relative-caret-position="2465">
           <caret line="145" column="23" selection-start-line="145" selection-start-column="23" selection-end-line="145" selection-end-column="23" />
           <folding>
-            <element signature="e#344#371#0" expanded="true" />
+            <marker date="1470773340065" expanded="true" signature="344:486" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -546,15 +561,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2958">
           <caret line="180" column="25" selection-start-line="180" selection-start-column="25" selection-end-line="180" selection-end-column="25" />
-          <folding>
-            <marker date="1470707294308" expanded="true" signature="446:9502" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="865:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1731:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1925:2054" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9048:9069" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9090:9385" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9407:9502" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -584,7 +591,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4182">
           <caret line="474" column="33" selection-start-line="474" selection-start-column="33" selection-end-line="474" selection-end-column="33" />
-          <folding />
+          <folding>
+            <element signature="e#3059#6090#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -606,15 +615,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="12" column="114" selection-start-line="12" selection-start-column="94" selection-end-line="12" selection-end-column="114" />
-          <folding>
-            <marker date="1470707294308" expanded="true" signature="446:9502" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="865:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1731:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1925:2054" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9048:9069" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9090:9385" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9407:9502" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -646,7 +647,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#344#371#0" expanded="true" />
+            <marker date="1470773340065" expanded="true" signature="344:486" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -669,7 +670,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4488">
           <caret line="595" column="26" selection-start-line="593" selection-start-column="8" selection-end-line="595" selection-end-column="26" />
-          <folding />
+          <folding>
+            <element signature="e#3059#6090#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -691,15 +694,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2482">
           <caret line="152" column="71" selection-start-line="152" selection-start-column="71" selection-end-line="152" selection-end-column="71" />
-          <folding>
-            <marker date="1470707294308" expanded="true" signature="446:9502" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="865:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1731:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1925:2054" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9048:9069" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9090:9385" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9407:9502" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -731,7 +726,7 @@
         <state relative-caret-position="2635">
           <caret line="172" column="44" selection-start-line="172" selection-start-column="44" selection-end-line="172" selection-end-column="44" />
           <folding>
-            <element signature="e#344#371#0" expanded="true" />
+            <marker date="1470773340065" expanded="true" signature="344:486" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -752,13 +747,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Combat.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="3" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Spells.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="9" column="3" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="3" />
@@ -792,14 +780,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/random.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4539">
-          <caret line="274" column="0" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Objects/_npcs.list">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -811,7 +791,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="442">
           <caret line="26" column="20" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -819,27 +798,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6664">
           <caret line="400" column="17" selection-start-line="400" selection-start-column="17" selection-end-line="400" selection-end-column="17" />
-          <folding>
-            <marker date="1470707294283" expanded="true" signature="7955:10644" ph="..." />
-            <marker date="1470707294283" expanded="true" signature="8936:10644" ph="..." />
-            <marker date="1470707294283" expanded="true" signature="9211:10644" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Entity.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3672">
-          <caret line="228" column="0" selection-start-line="228" selection-start-column="0" selection-end-line="228" selection-end-column="0" />
-          <folding>
-            <marker date="1470707294308" expanded="true" signature="446:9502" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="865:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1731:1896" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="1925:2054" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9048:9069" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9090:9385" ph="..." />
-            <marker date="1470707294308" expanded="true" signature="9407:9502" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -853,11 +811,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Animate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
+        <state relative-caret-position="391">
           <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding>
-            <element signature="e#320#347#0" expanded="true" />
-            <marker date="1470707294270" expanded="true" signature="4099:4116" ph="..." />
+            <element signature="e#320#347#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -866,68 +823,106 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2329">
           <caret line="138" column="31" selection-start-line="138" selection-start-column="31" selection-end-line="138" selection-end-column="31" />
-          <folding>
-            <marker date="1470707294365" expanded="true" signature="4319:4324" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Constants.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="52" column="10" selection-start-line="52" selection-start-column="10" selection-end-line="52" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DeepFried.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="268" column="0" selection-start-line="268" selection-start-column="0" selection-end-line="268" selection-end-column="0" />
-          <folding>
-            <element signature="e#344#371#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Render.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="137" column="5" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="113" column="55" selection-start-line="113" selection-start-column="50" selection-end-line="113" selection-end-column="60" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Fov.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
+        <state relative-caret-position="1003">
           <caret line="63" column="41" selection-start-line="63" selection-start-column="41" selection-end-line="63" selection-end-column="41" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Map.py">
+    <entry file="file://$PROJECT_DIR$/Constants.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="33" column="18" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
+        <state relative-caret-position="459">
+          <caret line="27" column="14" selection-start-line="27" selection-start-column="14" selection-end-line="27" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Entity.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1302">
+          <caret line="109" column="0" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Spells.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="46" column="44" selection-start-line="46" selection-start-column="44" selection-end-line="46" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DeepFried.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="136" column="29" selection-start-line="136" selection-start-column="29" selection-end-line="136" selection-end-column="29" />
+          <folding>
+            <marker date="1470773340065" expanded="true" signature="344:486" ph="import ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Render.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/random.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="274" column="0" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CaveGen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4147">
-          <caret line="313" column="4" selection-start-line="313" selection-start-column="4" selection-end-line="313" selection-end-column="4" />
+        <state relative-caret-position="432">
+          <caret line="223" column="8" selection-start-line="223" selection-start-column="8" selection-end-line="223" selection-end-column="8" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#7686#8700#0" expanded="false" />
+            <element signature="e#8744#9204#0" expanded="false" />
+            <element signature="e#9472#9610#0" expanded="false" />
+            <element signature="e#9645#9718#0" expanded="false" />
+            <element signature="e#9751#9874#0" expanded="false" />
+            <element signature="e#9907#9989#0" expanded="false" />
+            <element signature="e#10026#10113#0" expanded="false" />
+            <element signature="e#10153#10292#0" expanded="false" />
+            <element signature="e#10337#10483#0" expanded="false" />
+            <element signature="e#10530#10947#0" expanded="false" />
+            <element signature="e#10992#11103#0" expanded="false" />
+            <element signature="e#11141#11202#0" expanded="false" />
+            <element signature="e#11232#11349#0" expanded="false" />
+            <marker date="1470778444073" expanded="false" signature="9234:9445" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Map.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="92" column="69" selection-start-line="92" selection-start-column="69" selection-end-line="92" selection-end-column="69" />
+          <folding>
+            <element signature="e#3059#6090#0" expanded="false" />
           </folding>
         </state>
       </provider>

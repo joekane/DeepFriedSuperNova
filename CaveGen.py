@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 import random
 import Constants
-
+import Utils
 
 # reference
 # http://www.evilscience.co.uk/a-c-algorithm-to-build-roguelike-cave-systems-part-1/
@@ -37,15 +37,13 @@ pLocation = None
 
 
 
-rnd = random.seed(123456)
+rnd = random.seed(123)
 Neighbours = 4
-Interations = 50000
-CloseCellProb = 45
+Interations = 20000   #
+CloseCellProb = 65  # How full cave is ( 40 = Giant Cave, 60 = Lots of tiny caves)
 
 LowerLimit = 16
 UpperLimit = 500
-
-MapSize = (100, 100)
 
 EmptyNeighbours = 3
 EmptyCellNeighbours = 4
@@ -61,35 +59,43 @@ break_out = 100000
 
 
 def build():
-    buildCaves()
+    build_caves()
     getCaves()
+    # connectCaves()
+    connectCaves_new()
+
     return len(caves)
+
 
 def get_level_data():
     return level_map
 
 
-def buildCaves():
+def build_caves():
     global level_map, Interations
     level_map = [[1 for y in range(Constants.MAP_HEIGHT)]
                  for x in range(Constants.MAP_WIDTH)]
 
-    for x in range(Constants.MAP_WIDTH):
-        for y in range(Constants.MAP_HEIGHT):
-            if random.randint(0,100) < CloseCellProb:
-                level_map[x][y] = 1
+    for x in range(1, Constants.MAP_WIDTH-2):
+        for y in range(1, Constants.MAP_HEIGHT-2):
+            cell = x, y
+            if random.randint(0, 100) < CloseCellProb:
+                set_point(cell, 1)
             else:
-                level_map[x][y] = 0
+                set_point(cell, 0)
 
     for loops in range(Interations):
-        cell = random.randint(0, Constants.MAP_WIDTH-1) , random.randint(0, Constants.MAP_HEIGHT-1)
+        cell = random.randint(1, Constants.MAP_WIDTH-3), random.randint(1, Constants.MAP_HEIGHT-3)
 
-        if get_num_of_closed_neighbours(cell) > Neighbours:
-            print "Closed!"
+        neighbors = get_full_closed_neighbours(cell)
+        # print neighbors
+        if len(neighbors) > Neighbours:
+            # print "Closed!"
             set_point(cell, 1)
         else:
-            print "Open"
+            # print "Open"
             set_point(cell, 0)
+
 
     # Smoothing
     for loops in range(5):
@@ -99,7 +105,16 @@ def buildCaves():
 
                 # print get_closed_neighbours(cell)
 
-                if get_point(cell) == 0 and get_closed_neighbours(cell) == EmptyCellNeighbours:
+                if get_point(cell) == 1 and len(get_open_neighbours(cell)) >= EmptyNeighbours:
+                    # print "Smoothing......."
+                    set_point(cell, 0)
+
+    for x in range(1,Constants.MAP_WIDTH-1):
+        for y in range(1,Constants.MAP_HEIGHT-1):
+            cell = x, y
+
+            if get_point(cell) == 0 and len(get_closed_neighbours(cell)) >= EmptyCellNeighbours:
+                    # print "Smoothing......."
                     set_point(cell, 1)
 
 
@@ -108,7 +123,7 @@ def getCaves():
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
-            cell = x,y
+            cell = x, y
 
             if get_point(cell) > 0 and cell not in caves:
                 cave = []
@@ -130,22 +145,22 @@ def getCaves():
 
 
 def caveGetEdge(cave):
-    global pCavePoint, pDirection
-    while(True):
+    global pCavePoint, pDirection, pCave
+    while True:
         pCavePoint = random.choice(cave)
         pDirection = random.choice(directions)
 
-        while(True):
-            pCavePoint = pCavePoint[0] + pDirection[0], pCavePoint[1], pDirection[1]
+        while True:
+            pCavePoint = offset(pCavePoint, pDirection)
 
             if not valid_check(pCavePoint):
                 break
-            else:
+            elif get_point(pCavePoint) == 0:
                 return
 
 
 def corridorGetEdge():
-    global pCavePoint, pDirection, pLocation
+    global pDirection, pLocation
 
     validdirections = []
 
@@ -154,10 +169,67 @@ def corridorGetEdge():
         pLocation = corridors[random.randint(1, len(corridors) - 1)]
 
         for dir in directions:
-            if valid_check( pLocation[0] + dir[0], pLocation[1], dir[1]  ):
-                if get_point(pLocation[0] + dir[0], pLocation[1], dir[1]  ) == 0:
+            if valid_check( offset(pLocation, dir)):
+                if get_point(offset(pLocation, dir)) == 0:
                     validdirections.append(dir)
         condition = len(validdirections) == 0
+
+    pDirection = random.choice(validdirections)
+    pLocation = offset(pLocation, pDirection)
+
+
+
+def connectCaves_new():
+    global caves
+
+    connected_caves = []
+    print "Awesome!"
+
+    while len(caves) > 1:
+
+        # if len(connected_caves) == 0:
+        current_cave = random.choice(caves)
+        connected_caves.append(current_cave)
+        del caves[caves.index(current_cave)]
+
+        target_cave = random.choice(caves)
+        print "Caves: " + str(len(caves))
+        print "Tunnel: " + str(current_cave[0]) + " > " + str(target_cave[0])
+        connect_two_caves(current_cave, target_cave )
+
+
+
+
+def connect_two_caves(cave1, cave2):
+
+    prev_x, prev_y = random.choice(cave1)
+    new_x, new_y = random.choice(cave2)
+
+    if libtcod.random_get_int(0, 0, 1) == 1:
+        # first move horizontally, then vertically
+        create_h_tunnel(prev_x, new_x, prev_y)
+        create_v_tunnel(prev_y, new_y, new_x)
+    else:
+        # first move vertically, then horizontally
+        create_v_tunnel(prev_y, new_y, prev_x)
+        create_h_tunnel(prev_x, new_x, new_y)
+
+
+
+
+def create_v_tunnel(y1, y2, x):
+    global level_map
+    # vertical tunnel
+    for y in range(min(y1, y2), max(y1, y2) + 1):
+        set_point( (x, y), 2)
+
+def create_h_tunnel(x1, x2, y):
+    global level_map
+    for x in range(min(x1, x2), max(x1, x2) + 1):
+        set_point( (x, y), 2)
+
+
+
 
 
 def connectCaves():
@@ -169,7 +241,15 @@ def connectCaves():
     current_cave = random.choice(caves)
     connected_caves = []
     connected_caves.append(current_cave)
-    del caves[current_cave]
+
+    # if current_cave in caves:
+    #    print "Cave in Caves!"
+    del caves[caves.index(current_cave)]
+    # if current_cave not in caves:
+    #    print "Cave removed from Caves!"
+
+
+
     potential_corridor = []
 
     breakouttr = 0
@@ -178,32 +258,51 @@ def connectCaves():
 
     while len(caves) > 0:
         if len(corridors) == 0:
+            #print "Cors = 0"
             current_cave = random.choice(connected_caves)
+            print "# of Connected Caves: " + str(len(connected_caves))
+            print "# of Caves:           " + str(len(caves))
             caveGetEdge(current_cave)
         else:
+            # print "Cors != 0"
             if random.randint(0,100) > 50:
+                print "from cave"
                 current_cave = random.choice(connected_caves)
                 caveGetEdge(current_cave)
             else:
+                print "from coor"
                 current_cave = None
                 corridorGetEdge()
 
+
         potential_corridor = corridor_attempt()
+        # print "pot:"
+        # print potential_corridor
+
+
+
 
         if potential_corridor is not None:
+            # print "PotCor!!!!"
             for c in caves:
                 if potential_corridor[-1] in c:
-                    if current_cave is None or current_cave != c:
-                        potential_corridor.remove(potential_corridor[-1])
-                        for tile in potential_corridor:
-                            corridors.append(tile)
-                            set_point(tile, 1)
+                    # print potential_corridor
+                    # if current_cave is None or current_cave != c:
+                    # print potential_corridor
+                    potential_corridor.remove(potential_corridor[-1])
+                    # print potential_corridor
+                    for tile in potential_corridor:
+                        print "Append!"
+                        corridors.append(tile)
+                        set_point(tile, 0)
 
                     connected_caves.append(c)
-                    del caves[c]
+                    # print connected_caves
+                    del caves[caves.index(c)]
                     break
         breakouttr += 1
         if breakouttr > break_out:
+            print "BREAK!!!!"
             return False
     for tile in connected_caves:
         caves.append(tile)
@@ -211,16 +310,14 @@ def connectCaves():
     return True
 
 
-
-
-
 def corridor_attempt():
-    global  pDirection
+    global pDirection
     lPotentialCorridor = []
     lPotentialCorridor.append(pCavePoint)
 
     corr_length = 0
-    pStart = (pDirection[0], pDirection[1])
+    startdirection = (pDirection[0], pDirection[1])
+    pStart = offset(pCavePoint, (0,0) )
 
     pturns = Corridor_MaxTurns
 
@@ -232,7 +329,8 @@ def corridor_attempt():
         while corr_length > 0:
             corr_length -= 1
 
-            pStart =(pStart[0] + pDirection[0], pStart[1] + pDirection[1] )
+            pStart = offset(pStart, pDirection)
+            # print pStart
 
             if valid_check(pStart) and get_point(pStart) == 1:
                 lPotentialCorridor.append(pStart)
@@ -240,37 +338,36 @@ def corridor_attempt():
 
             if not valid_check(pStart):
                 return None
-            elif not corridor_poit_test(pStart, pDirection):
+            elif not corridor_point_test(pStart, pDirection):
                 return None
 
             lPotentialCorridor.append(pStart)
 
         if pturns > 1:
             if not pPreventBackTrack:
-                pDirection = random.choice(directions)
+                pass
             else:
                 pDirection = random.choice(directions)
 
     return None
 
 
-def corridor_poit_test(point, dir):
+def corridor_point_test(point, dir):
     coor_list = [x for x in range(-CorridorSpace, CorridorSpace)]
 
     for r in coor_list:
         if dir[0] == 0:
-            if valid_check(point[0] + r, point[1]):
-                if get_point(point[0] + r, point[1]) != 0:
+            if valid_check(  (point[0] + r, point[1]) ):
+                if get_point( (point[0] + r, point[1] )) != 0:
                     return False
         elif dir[1] == 0:
-            if valid_check(point[0], point[1] + r):
-                if get_point(point[0], point[1] + r) != 0:
+            if valid_check(  (point[0], point[1] + r) ):
+                if get_point( (point[0], point[1] + r)   ) != 0:
                     return False
-
     return True
 
 
-def locateCave(cell, cave ):
+def locateCave(cell, cave):
     for tile in get_open_neighbours(cell):
         # print "NOT HERE!"
         if tile not in cave:
@@ -280,9 +377,11 @@ def locateCave(cell, cave ):
         return None
 
 
-def get_point(cell):
+def get_point(loc):
     global level_map
-    return level_map[cell[0]][cell[1]]
+    if 0 <= loc[0] < Constants.MAP_WIDTH and 0 <= loc[1] < Constants.MAP_HEIGHT:
+        return level_map[loc[0]][loc[1]]
+
 
 def set_point(cell, value):
     global level_map
@@ -302,33 +401,51 @@ def get_neighbours(tile):
     return [offset(tile, dir) for dir in directions if valid_check(offset(tile, dir))]
 
 
+def get_all_neighbours(tile):
+    return [offset(tile, dir) for dir in full_directions if valid_check(offset(tile, dir))]
+
+
 def get_closed_neighbours(tile):
     # print get_neightbours(tile)
-    new_list = [n for n in get_neighbours(tile) if get_map_value(n) == 1]
+    new_list = [n for n in get_neighbours(tile) if get_point(n) == 1]
     #print new_list
     return new_list
 
+
+def get_full_closed_neighbours(tile):
+    # print get_all_neighbours(tile)
+    new_list = [n for n in get_all_neighbours(tile) if get_point(n) == 1]
+    #print new_list
+    return new_list
+
+
 def get_num_of_closed_neighbours(tile):
     # print get_neightbours(tile)
-    new_list = [n for n in get_neighbours(tile) if get_map_value(n) == 1]
-    print new_list
-    return len(new_list)
+    neighbour_list = get_neighbours(tile)
+    # print neighbour_list
+
+    count = 0
+    for cell in neighbour_list:
+        # print cell
+        # print get_map_value(cell)
+        if get_point(cell) == 1:
+            count += 1
+    # print count
+    return count
+    #
+    # new_list = [n for n in neighbour_list if get_map_value(n) == 1]
+    # print new_list
+    # return len(new_list)
 
 
 def get_num_of_open_neighbours(tile):
-    new_list = [n for n in get_neighbours(tile) if get_map_value(n) == 0]
+    new_list = [n for n in get_neighbours(tile) if get_point(n) == 0]
     # print new_list
     return len(new_list)
 
 
 def get_open_neighbours(tile):
-    return [n for n in get_neighbours(tile) if get_map_value(n) == 0]
-
-
-def get_map_value(loc):
-    if 0 <= loc[0] < Constants.MAP_WIDTH and 0 <= loc[1] < Constants.MAP_HEIGHT:
-        return level_map[loc[0]][loc[1]]
-
+    return [n for n in get_neighbours(tile) if get_point(n) == 0]
 
 
 def valid_check(tile):

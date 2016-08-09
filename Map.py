@@ -29,8 +29,6 @@ camera_x = 0
 camera_y = 0
 
 
-
-
 def current_map():
     return level_map
 
@@ -72,10 +70,11 @@ class Rect:
 def translate_map_data():
     import CaveGen
     global objects, level_map, stairs
+
     data = CaveGen.get_level_data()
 
     player = GameState.get_player()
-    player.x , player.y = 15, 15
+    player.x , player.y = 87, 22
     objects = [player]
 
     level_map = [[Tile(True,
@@ -93,7 +92,13 @@ def translate_map_data():
                                        char=Themes.ground_char(),
                                        f_color=Themes.ground_color(),
                                        b_color=Themes.ground_bcolor())
-            level_map[x][y].explored = True
+            elif data[x][y] == 2:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='x',
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+            level_map[x][y].explored = False
 
 
 
@@ -266,8 +271,8 @@ def make_bsp():
 
     objects = [player]
 
-    # Themes.apply_ssa_theme()
-    Themes.apply_forrest_theme()
+    Themes.apply_ssa_theme()
+    # Themes.apply_forrest_theme()
 
     level_map = [[Tile(True,
                        block_sight=True,

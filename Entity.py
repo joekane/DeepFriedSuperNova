@@ -105,7 +105,8 @@ class Entity:
         for y1 in range(Constants.MAP_CONSOLE_HEIGHT):
             for x1 in range(Constants.MAP_CONSOLE_WIDTH):
                 x2, y2 = Map.to_map_coordinates(x1, y1)
-                libtcod.map_set_properties(fov, x1, y1, not map[x2][y2].block_sight, not map[x2][y2].blocked)
+                if x2 is not None and y2 is not None:
+                    libtcod.map_set_properties(fov, x1, y1, not map[x2][y2].block_sight, not map[x2][y2].blocked)
 
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
