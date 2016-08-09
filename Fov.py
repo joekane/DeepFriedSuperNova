@@ -57,7 +57,7 @@ def recompute():
         Render.clear_map()
 
 
-def is_visible(pos = None, obj = None, ):
+def is_visible(pos=None, obj=None, ):
     global fov_map
     if pos is None and obj is not None:
         return libtcod.map_is_in_fov(fov_map, obj.x, obj.y)

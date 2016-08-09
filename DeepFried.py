@@ -19,6 +19,7 @@ import time
 import GameState
 import Constants
 import SoundEffects
+import CaveGen
 
 
 # import shelve
@@ -263,7 +264,9 @@ def new_game():
 
     Render.initialize(map_console, panel, side_panel)
 
-    Map.load_diner_map()
+    # Map.load_diner_map()
+    Map.translate_map_data()
+
     Fov.initialize()
 
     # States
@@ -442,5 +445,8 @@ game_state = None
 char_cycle = 1
 
 continue_walking = True
+
+
+CaveGen.build()
 
 main_menu()

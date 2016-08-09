@@ -111,7 +111,7 @@ def get_names_under_mouse():
     (x, y) = (mouse.cx, mouse.cy)
     # create a list with the names of all objects at the mouse's coordinates and in FOV
     names = [obj.name for obj in Map.get_all_objects()
-             if obj.x == x and obj.y == y and Fov.is_visible(obj)]
+             if obj.x == x and obj.y == y and Fov.is_visible(obj=obj)]
     names = ', '.join(names)  # join the names, separated by commas
     return names.capitalize()
 

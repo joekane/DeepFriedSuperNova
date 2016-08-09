@@ -69,6 +69,37 @@ class Rect:
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
 
+def translate_map_data():
+    import CaveGen
+    global objects, level_map, stairs
+    data = CaveGen.get_level_data()
+
+    player = GameState.get_player()
+    player.x , player.y = 15, 15
+    objects = [player]
+
+    level_map = [[Tile(True,
+                       block_sight=True,
+                       char=Themes.wall_char(),
+                       f_color=Themes.wall_color(),
+                       b_color=Themes.wall_bcolor())
+                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+    for x in range(Constants.MAP_WIDTH):
+        for y in range(Constants.MAP_HEIGHT):
+            if data[x][y] == 0:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+            level_map[x][y].explored = True
+
+
+
+
+
+
 def load_diner_map():
     global objects, level_map, stairs
 
