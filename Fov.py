@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 import libtcodpy as libtcod
 import Constants
@@ -49,7 +48,7 @@ def recompute():
     if fov_recompute:
         fov_recompute = False
         Map.visible_objects = None
-        print "COMPUTING FOV!!!"
+        # print "COMPUTING FOV!!!"
         libtcod.map_compute_fov(fov_map, player.x, player.y,
                                 Constants.TORCH_RADIUS,
                                 Constants.FOV_LIGHT_WALLS,

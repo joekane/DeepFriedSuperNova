@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 #SOUND
 MUSIC_ON = False
@@ -25,7 +24,7 @@ MAP_CONSOLE_WIDTH = SCREEN_WIDTH - 20
 MAP_CONSOLE_HEIGHT = SCREEN_HEIGHT - 8
 
 MAP_WIDTH = 100 # MIN 70
-MAP_HEIGHT = 52 # MIN 40
+MAP_HEIGHT = 100 # MIN 40
 
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
@@ -43,7 +42,7 @@ ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
 MAX_ROOMS = 30
 
-DEPTH = 12
+DEPTH = 5
 MIN_SIZE = 10
 FULL_ROOMS = False
 
@@ -62,8 +61,8 @@ LEVEL_UP_FACTOR = 5000
 
 FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
-TORCH_RADIUS = 10  # 15 Def
+TORCH_RADIUS = 15  # 15 Def
 
-LIMIT_FPS = 35  # 20 frames-per-second maximum
+LIMIT_FPS = 45  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5

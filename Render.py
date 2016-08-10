@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 import libtcodpy as libtcod
 import Constants
@@ -76,24 +75,8 @@ def full_map():
     for y in range(Constants.MAP_CONSOLE_HEIGHT):
         for x in range(Constants.MAP_CONSOLE_WIDTH):
             map_x, map_y = (camera_x + x, camera_y + y)
-
-            visible = Fov.is_visible(pos=(map_x, map_y))
-            # print x, y
-
-            wall = map[map_x][map_y].block_sight and map[map_x][map_y].blocked
-            glass = not map[map_x][map_y].block_sight and map[map_x][map_y].blocked
-            box = map[map_x][map_y].block_sight and not map[map_x][map_y].blocked
-            wall_char = libtcod.CHAR_BLOCK1
-
-            # floor_char = libtcod.CHAR_SUBP_DIAG
-            floor_char = '.'
-
-            wall_color = libtcod.red
-            floor_color = libtcod.white
-
-            player = GameState.get_player()
-
             tile = map[map_x][map_y]
+            visible = Fov.is_visible(pos=(map_x, map_y))
 
             if not visible:
                 # if it's not visible right now, the player can only see it if it's explored

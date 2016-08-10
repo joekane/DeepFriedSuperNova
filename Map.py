@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 import libtcodpy as libtcod
 import Constants
@@ -73,8 +72,9 @@ def translate_map_data():
 
     data = CaveGen.get_level_data()
 
+    Themes.apply_forrest_theme()
+
     player = GameState.get_player()
-    player.x , player.y = 87, 22
     objects = [player]
 
     level_map = [[Tile(True,
@@ -86,7 +86,7 @@ def translate_map_data():
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
-            if data[x][y] == 0:
+            if data[x][y] != 1:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char=Themes.ground_char(),
@@ -98,7 +98,17 @@ def translate_map_data():
                                        char='x',
                                        f_color=Themes.ground_color(),
                                        b_color=Themes.ground_bcolor())
+            elif data[x][y] == 4:
+                player.x, player.y = x, y
+
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='c',
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
             level_map[x][y].explored = False
+
+    return level_map
 
 
 
@@ -186,17 +196,21 @@ def load_diner_map():
         y += 1
 
 
-def make_map():
+def make_map(map=None):
     global level_map, objects, stairs
 
     player = GameState.get_player()
 
     objects = [player]
 
-    # fill map with "blocked" tiles
-    level_map = [[Tile(True)
-                  for y in range(Constants.MAP_HEIGHT)]
-                 for x in range(Constants.MAP_WIDTH)]
+    if map is None:
+        # fill map with "blocked" tiles
+        level_map = [[Tile(True)
+                      for y in range(Constants.MAP_HEIGHT)]
+                     for x in range(Constants.MAP_WIDTH)]
+    else:
+        level_map = map
+
 
     rooms = []
     num_rooms = 0
@@ -262,9 +276,10 @@ def make_map():
     stairs = Entity.Entity(new_x, new_y, '<', 'stairs', libtcod.white, always_visible=True)
     objects.append(stairs)
     stairs.send_to_back()  # so it's drawn below the monsters
+    return level_map
 
 
-def make_bsp():
+def make_bsp(map=None):
     global level_map, objects, stairs, bsp_rooms
 
     player = GameState.get_player()
@@ -274,12 +289,18 @@ def make_bsp():
     Themes.apply_ssa_theme()
     # Themes.apply_forrest_theme()
 
-    level_map = [[Tile(True,
-                       block_sight=True,
-                       char=Themes.wall_char(),
-                       f_color=Themes.wall_color(),
-                       b_color=Themes.wall_bcolor() )
-                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    if map is None:
+        # fill map with "blocked" tiles
+        level_map = [[Tile(True,
+                           block_sight=True,
+                           char=Themes.wall_char(),
+                           f_color=Themes.wall_color(),
+                           b_color=Themes.wall_bcolor())
+                      for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    else:
+        level_map = map
+
+
 
     # Empty global list for storing room coordinates
     bsp_rooms = []
@@ -720,9 +741,13 @@ def get_camera():
 def move_camera(target_x, target_y):
     global camera_x, camera_y
 
+    try:
     # new camera coordinates (top-left corner of the screen relative to the map)
-    x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
-    y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
+        x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
+        y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
+    except:
+        x = camera_x
+        y = camera_y
 
     # make sure the camera doesn't see outside the map
     if x < 0:

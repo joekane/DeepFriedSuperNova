@@ -1,12 +1,25 @@
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
+
 import libtcodpy as libtcod
 import random
 import Constants
 import Utils
+import sys
+
+sys.setrecursionlimit((Constants.MAP_WIDTH * Constants.MAP_HEIGHT))
 
 # reference
 # http://www.evilscience.co.uk/a-c-algorithm-to-build-roguelike-cave-systems-part-1/
 
-Caves = []
+# Caves = []
 Corridors = []
 
 level_map = [[]]
@@ -35,12 +48,18 @@ pCavePoint = None
 pDirection = None
 pLocation = None
 
+recur_count = 0
+recur_max = 900
 
 
-rnd = random.seed(123)
-Neighbours = 4
-Interations = 20000   #
-CloseCellProb = 65  # How full cave is ( 40 = Giant Cave, 60 = Lots of tiny caves)
+rnd = random.seed(666)
+Neighbours = 4  # Openess 3 or 4
+Interations = 50000   #
+
+CloseCellProb = 45  # Lower Number (45) = Open, Higher = Constricted (75)
+CloseCellRange = 30 # variabliity
+
+Smoothing = 50
 
 LowerLimit = 16
 UpperLimit = 500
@@ -58,28 +77,31 @@ pPreventBackTrack = True
 break_out = 100000
 
 
-def build():
-    build_caves()
-    getCaves()
-    # connectCaves()
-    connectCaves_new()
+def build(map=None):
 
-    return len(caves)
+    build_caves(map)
+    getCaves()
+    connectCaves_new()
+    return
 
 
 def get_level_data():
     return level_map
 
 
-def build_caves():
+def build_caves(map):
     global level_map, Interations
-    level_map = [[1 for y in range(Constants.MAP_HEIGHT)]
-                 for x in range(Constants.MAP_WIDTH)]
+
+    if map is None:
+        level_map = [[1 for y in range(Constants.MAP_HEIGHT)]
+                     for x in range(Constants.MAP_WIDTH)]
+    else:
+        level_map = map
 
     for x in range(1, Constants.MAP_WIDTH-2):
         for y in range(1, Constants.MAP_HEIGHT-2):
             cell = x, y
-            if random.randint(0, 100) < CloseCellProb:
+            if random.randint(0, 100) < random.randint(CloseCellProb, CloseCellProb + CloseCellRange):
                 set_point(cell, 1)
             else:
                 set_point(cell, 0)
@@ -98,7 +120,7 @@ def build_caves():
 
 
     # Smoothing
-    for loops in range(5):
+    for loops in range(Smoothing):
         for x in range(Constants.MAP_WIDTH):
             for y in range(Constants.MAP_HEIGHT):
                 cell = x, y
@@ -117,34 +139,72 @@ def build_caves():
                     # print "Smoothing......."
                     set_point(cell, 1)
 
+def point_in_cave_check(cell):
+    global caves
+
+    # print cell
+    # print caves
+
+    for cave in caves:
+        if cell in cave:
+            return True
+    # print "Not in cave"
+    return False
 
 def getCaves():
-    global caves
+    global caves, recur_count
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
             cell = x, y
 
-            if get_point(cell) > 0 and cell not in caves:
-                cave = []
-
-                condition = True
-                while condition:
-                    temp_cell = locateCave(cell, cave)
-
-                    if temp_cell is None:
-                        condition = False
-                    else:
-                        cell = temp_cell
-
-                if LowerLimit <= len(cave) <= UpperLimit:
-                    caves.append(cave)
-                else:
-                    for tile in Caves:
-                        set_point(tile, 0)
+            # IF CELL IS OPEN
+            if get_point(cell) == 0:
+                # IF CELL IS NOT IN EXISITNG CAVE FLOOD FILL
+                if not point_in_cave_check(cell):
+                    cave = []
+                    floodfill(cell, cave)
+                    if LowerLimit <= len(cave) <= UpperLimit:
+                        caves.append(cave)
 
 
-def caveGetEdge(cave):
+def floodfill(cell, cave, fill=4):
+    global level_map
+
+    # print "Cell: " + str(cell)
+    x, y = cell
+
+    # assume surface is a 2D image and surface[x][y] is the color at x, y.
+    if level_map[x][y] == 1: # the base case
+        return
+    if level_map[x][y] == fill: # the base case
+        return
+    if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
+        cave.append(cell)
+        level_map[x][y] = fill
+        floodfill( (x + 1, y), cave) # right
+        floodfill( (x - 1, y), cave) # left
+        floodfill((x, y + 1), cave)
+        floodfill((x, y - 1), cave) # up
+
+
+
+def connected_points(source, target):
+    x, y = source
+
+    if source == target:
+        return True
+    # assume surface is a 2D image and surface[x][y] is the color at x, y.
+    if level_map[x][y] == 1:  # the base case
+        return False
+    connected_points((x + 1, y), target)
+    connected_points((x - 1, y), target)
+    connected_points((x, y + 1), target)
+    connected_points((x, y - 1), target)
+
+
+
+def caveXGetEdge(cave):
     global pCavePoint, pDirection, pCave
     while True:
         pCavePoint = random.choice(cave)
@@ -159,7 +219,7 @@ def caveGetEdge(cave):
                 return
 
 
-def corridorGetEdge():
+def corridorXGetEdge():
     global pDirection, pLocation
 
     validdirections = []
@@ -183,19 +243,19 @@ def connectCaves_new():
     global caves
 
     connected_caves = []
-    print "Awesome!"
 
     while len(caves) > 1:
 
         # if len(connected_caves) == 0:
-        current_cave = random.choice(caves)
-        connected_caves.append(current_cave)
+        current_cave = caves[0]
         del caves[caves.index(current_cave)]
+        target_cave = caves[0]
 
-        target_cave = random.choice(caves)
-        print "Caves: " + str(len(caves))
-        print "Tunnel: " + str(current_cave[0]) + " > " + str(target_cave[0])
-        connect_two_caves(current_cave, target_cave )
+        if Utils.connected_cells(current_cave[0], target_cave[0], level_map):
+            pass
+        else:
+            print "added connection...."
+            connect_two_caves(current_cave, target_cave )
 
 
 
@@ -368,13 +428,19 @@ def corridor_point_test(point, dir):
 
 
 def locateCave(cell, cave):
-    for tile in get_open_neighbours(cell):
-        # print "NOT HERE!"
-        if tile not in cave:
-            cave.append(tile)
-            # locateCave(tile, cave)
-            return tile
-        return None
+    global recur_count
+
+    if recur_count >= recur_max:
+        return None, cave
+    else:
+        recur_count += 1
+        for tile in get_open_neighbours(cell):
+            # print "NOT HERE!"
+            if tile not in cave:
+                cave.append(tile)
+                # locateCave(tile, cave)
+                locateCave(tile, cave)
+    return None, cave
 
 
 def get_point(loc):

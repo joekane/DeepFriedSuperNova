@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 # -*- coding: utf-8 -*-
 import libtcodpy as libtcod
@@ -271,8 +270,8 @@ def new_game():
 
     Render.initialize(map_console, panel, side_panel)
 
-    # Map.load_diner_map()
-    Map.translate_map_data()
+    Map.load_diner_map()
+    # Map.translate_map_data()
 
     Fov.initialize()
 
@@ -289,8 +288,27 @@ def next_level():
 
     GameState.add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
     GameState.dungeon_level += 1
-    # Map.make_map()  # create a fresh new level!
-    Map.make_bsp()
+
+
+    # CAVES ONLY
+    CaveGen.build()
+    # Map.translate_map_data()
+
+    # OG MAPS
+    #Map.make_map()
+
+    # BSP Maps
+    #Map.make_bsp()
+
+
+    # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
+    Map.make_bsp(map=Map.translate_map_data())
+
+
+    # Cannot MAP -> CA as CA map is not tiles[][]
+    # BORKED!
+    # CaveGen.build(Map.make_map())
+
     Fov.initialize()
     Map.spawn_doors()
 
@@ -454,6 +472,6 @@ char_cycle = 1
 continue_walking = True
 
 
-CaveGen.build()
+
 
 main_menu()

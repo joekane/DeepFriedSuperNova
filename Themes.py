@@ -67,7 +67,7 @@ def apply_forrest_theme():
     global OUT_OF_FOV_COLOR
 
     GROUND_CHAR = ['.', ',', '"']
-    GROUND_COLOR = [libtcod.green, libtcod.light_green, libtcod.dark_green]
+    GROUND_COLOR = [libtcod.dark_green, libtcod.darker_green, libtcod.darkest_green]
     GROUND_BCOLOR = [libtcod.darkest_sepia]
 
     WALL_CHAR = [libtcod.CHAR_ARROW2_N]

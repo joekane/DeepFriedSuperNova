@@ -1,13 +1,12 @@
-'''
-/*******************************************************
- * Copyright (C) 2016-2017 Joe Kane
- *
- * This file is part of 'Deep Fried Supernova"
- *
- * Deep Fried Supernova can not be copied and/or distributed without the express
- * permission of Joe Kane
- *******************************************************/
-'''
+# *******************************************************
+# * Copyright (C) 2016-2017 Joe Kane
+# *
+# * This file is part of 'Deep Fried Supernova"
+# *
+# * Deep Fried Supernova can not be copied and/or distributed without the express
+# * permission of Joe Kane
+# *******************************************************/
+
 
 import math
 import Constants
@@ -184,6 +183,27 @@ def inspect_tile(x, y):
             mouse_old_y = y
             delay = time.time()
 
+
+def connected_cells(source, target, map):
+    # Create a FOV map that has the dimensions of the map
+    fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
+
+    # Scan the current map each turn and set all the walls as unwalkable
+
+    for y1 in range(Constants.MAP_HEIGHT):
+        for x1 in range(Constants.MAP_WIDTH):
+            libtcod.map_set_properties(fov, x1, y1, not map[x1][y1] == 1, not map[x1][y1] == 1)
+
+    my_path = libtcod.path_new_using_map(fov, 1.41)
+
+    libtcod.path_compute(my_path, source[0], source[1], target[0], target[1])
+
+    if not libtcod.path_is_empty(my_path):
+        return True
+    else:
+        return False
+
+    libtcod.path_delete(my_path)
 
 delay = 0
 new_animation = True
