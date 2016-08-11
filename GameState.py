@@ -52,7 +52,7 @@ def initialize():
     starting_equipment()
 
     player.level = 1
-    dungeon_level = 1
+    dungeon_level = 0
 
 
 def starting_equipment():

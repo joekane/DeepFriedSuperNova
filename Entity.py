@@ -143,8 +143,8 @@ class Entity:
         # Delete the path to free memory
         libtcod.path_delete(my_path)
 
-    def move_astar_xy(self, target_x, target_y):
-        if self.path is None:
+    def move_astar_xy(self, target_x, target_y, force=False):
+        if self.path is None or force:
             # print "a* self.path is None"
             # Create a FOV map that has the dimensions of the map
             fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)

@@ -131,7 +131,7 @@ def process_mouse_clicks():
     # walk to target tile
     if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
         # print "Mouse Pressed!"
-        continue_walking = GameState.get_player().move_astar_xy(map_x, map_y)
+        continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
         return True
     if mouse.rbutton_pressed:
         # print "Mouse Pressed!"
@@ -247,10 +247,20 @@ def handle_keys():
                     Constants.CHARACTER_SCREEN_WIDTH)
             elif key_char == 'p':
 
-                libtcod.console_put_char_ex(0, 0, 0, chr(char_cycle), libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_print_ex(0, 0, 1, libtcod.BKGND_NONE, libtcod.LEFT, str(char_cycle))
-                libtcod.console_flush()
-                char_cycle += 1
+                title = "Shadow State Archives II"
+
+                text = '"The ambient phenomenon was an ancient engine, the wealthy machine. Crushing, pausing...\n' \
+                       ' a conceptual humming which attended to the numbers underneath the intervening, silver\n' \
+                       'sky." \n\n The towering massive ultragovernment concrete superstructure data library that\n' \
+                       'contains the largest digital collection of intergalactic personnel files ever assembled\n' \
+                       'in any known galaxy. Here dwell massive servers guarded by all manner of nanotechnology\n' \
+                       'powered droids, cipher enhanced biowardens, all seeing quantum lenses, and roaming alpha\n' \
+                       'turrets. This place is high alert.\n' \
+                       '\n' \
+                       'Keycard required.\n'
+
+                Render.pop_up(title=title, text=text)
+
             elif continue_walking:
                 continue_walking = GameState.get_player().walk_path()
                 return 'auto-walking'
@@ -291,18 +301,18 @@ def next_level():
 
 
     # CAVES ONLY
-    CaveGen.build()
+    # CaveGen.build()
     # Map.translate_map_data()
 
     # OG MAPS
     #Map.make_map()
 
     # BSP Maps
-    #Map.make_bsp()
+    Map.make_bsp()
 
 
     # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
-    Map.make_bsp(map=Map.translate_map_data())
+    # Map.make_bsp(map=Map.translate_map_data())
 
 
     # Cannot MAP -> CA as CA map is not tiles[][]
@@ -357,8 +367,6 @@ def main_menu():
     while not libtcod.console_is_window_closed():
 
         SoundEffects.play_music('MAIN_MENU')
-
-
 
         # show the background image, at twice the regular console resolution
         libtcod.image_blit_2x(img, 0, 0, 0)
@@ -458,7 +466,7 @@ libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
-side_panel = libtcod.console_new(Constants.SCREEN_WIDTH - Constants.MAP_CONSOLE_WIDTH,
+side_panel = libtcod.console_new(20,
                                  Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
 
 SoundEffects.initilize()
@@ -466,12 +474,10 @@ SoundEffects.initilize()
 mouse = libtcod.Mouse()
 key = libtcod.Key()
 Fov.require_recompute()
+
 game_state = None
 char_cycle = 1
 
 continue_walking = True
-
-
-
 
 main_menu()

@@ -1,0 +1,70 @@
+
+
+
+
+[Archer]
+fighter_component = True
+hp = 10
+defense = 3
+power = 10
+xp = 35
+death_function = monster_death
+ai_component = BasicRangedMonster()
+char = A
+name = archer
+color = libtcod.amber
+freq = 80:1
+
+[Orc]
+fighter_component = True
+hp = 10
+defense = 3
+power = 2
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = o
+name = orc
+color = libtcod.dark_green
+freq = 80:1
+
+[Troll]
+fighter_component = True
+hp = 30
+defense = 5
+power = 3
+xp = 70
+death_function = monster_death
+ai_component = BasicMonster()
+char = T
+name = troll
+color = libtcod.dark_green
+freq = 20:3,40:5,60:7
+
+
+[Fly]
+fighter_component = True
+hp = 5
+defense = 0
+power = 0
+xp = 0
+death_function = monster_death
+ai_component = BasicMonster()
+char = f
+name = fly
+color = libtcod.white
+freq = 0:0
+
+[Blob]
+fighter_component = True
+hp = 25
+defense = 2
+power = 2
+xp = 45
+death_function = monster_death
+ai_component = SpawningMonster('Fly')
+char = B
+name = blob
+color = libtcod.dark_green
+freq = 3:5,15:6
+

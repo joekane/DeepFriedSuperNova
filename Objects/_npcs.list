@@ -31,20 +31,53 @@ color = libtcod.dark_red
 freq = 0:0
 
 
-[Archer]
+[Auto-Stalker]
+tags=SSA
 fighter_component = True
 hp = 10
 defense = 3
-power = 10
+power = 2
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = a
+name = auto-stalker
+color = libtcod.dark_red
+lore='This is lore!!!'
+freq = 80:1
+
+[Nano-Moth]
+tags=SSA
+fighter_component = True
+hp = 10
+defense = 3
+power = 2
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = n
+name = nano-moth
+color = libtcod.dark_amber
+lore='This is lore!!!'
+freq = 80:1
+
+[Alpha Turret]
+tags=SSA
+fighter_component = True
+hp = 10
+defense = 3
+power = 2
 xp = 35
 death_function = monster_death
 ai_component = BasicRangedMonster()
-char = A
-name = archer
-color = libtcod.amber
-freq = 80:1
+char = t
+name = alpha turret
+color = libtcod.yellow
+lore='This is lore!!!'
+freq = 30:1
 
-[Orc]
+[Data Roach]
+tags=SSA
 fighter_component = True
 hp = 10
 defense = 3
@@ -52,48 +85,121 @@ power = 2
 xp = 35
 death_function = monster_death
 ai_component = BasicMonster()
-char = o
-name = orc
-color = libtcod.dark_green
-freq = 80:1
+char = r
+name = data roach
+color = libtcod.light_blue
+lore='This is lore!!!'
+freq = 30:1
 
-[Troll]
+[Augmented Rover]
+tags=SSA
+fighter_component = True
+hp = 10
+defense = 3
+power = 2
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = A
+name = augmented rover
+color = libtcod.dark_yellow
+lore='This is lore!!!'
+freq = 30:1
+
+
+[Cipher Warden]
+tags=SSA
+fighter_component = True
+hp = 20
+defense = 4
+power = 3
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = w
+name = cipher warden
+color = libtcod.pink
+lore='This is lore!!!'
+freq = 30:2
+
+
+
+[Jammer]
+tags=SSA
+fighter_component = True
+hp = 10
+defense = 3
+power = 2
+xp = 35
+death_function = monster_death
+ai_component = BasicMonster()
+char = j
+name = jammer
+color = libtcod.dark_azure
+lore='This is lore!!!'
+freq = 30:2
+
+
+[Electrodyne]
+tags=SSA
+fighter_component = True
+hp = 20
+defense = 3
+power = 4
+xp = 35
+death_function = monster_death
+ai_component = BasicRangedMonster()
+char = e
+name = electrodyne
+color = libtcod.light_yellow
+lore='This is lore!!!'
+freq = 30:2
+
+
+[Tera-Jock]
+tags=SSA
 fighter_component = True
 hp = 30
-defense = 5
-power = 3
-xp = 70
+defense = 1
+power = 5
+xp = 35
 death_function = monster_death
 ai_component = BasicMonster()
-char = T
-name = troll
-color = libtcod.dark_green
-freq = 20:3,40:5,60:7
+char = J
+name = tera-jock
+color = libtcod.purple
+lore='This is lore!!!'
+freq = 30:2
 
 
-[Fly]
+[Librarian Gigas]
+tags=SSA
 fighter_component = True
-hp = 5
-defense = 0
-power = 0
-xp = 0
-death_function = monster_death
-ai_component = BasicMonster()
-char = f
-name = fly
-color = libtcod.white
-freq = 0:0
-
-[Blob]
-fighter_component = True
-hp = 25
-defense = 2
+hp = 10
+defense = 3
 power = 2
-xp = 45
+xp = 35
 death_function = monster_death
-ai_component = SpawningMonster('Fly')
-char = B
-name = blob
-color = libtcod.dark_green
-freq = 3:5,15:6
+ai_component = BasicMonster()
+char = G
+name = librarian gigas
+color = libtcod.light_crimson
+lore='This is lore!!!'
+freq = 30:2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

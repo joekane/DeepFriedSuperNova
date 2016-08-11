@@ -6,7 +6,7 @@
 # * Deep Fried Supernova can not be copied and/or distributed without the express
 # * permission of Joe Kane
 # *******************************************************/
-
+import libtcodpy as libtcod
 
 #SOUND
 MUSIC_ON = False
@@ -16,23 +16,25 @@ SOUND_ON = False
 ANIMATE_ON = True
 
 # actual size of the window
-SCREEN_WIDTH = 120
-SCREEN_HEIGHT = 60
+SCREEN_WIDTH = 192 / 4 * 3
+SCREEN_HEIGHT = 108 / 4 * 3
+
+PANEL_HEIGHT = 12
+PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
 
 # size of the map
 MAP_CONSOLE_WIDTH = SCREEN_WIDTH - 20
-MAP_CONSOLE_HEIGHT = SCREEN_HEIGHT - 8
+MAP_CONSOLE_HEIGHT = SCREEN_HEIGHT - PANEL_HEIGHT
 
-MAP_WIDTH = 100 # MIN 70
-MAP_HEIGHT = 100 # MIN 40
+MAP_WIDTH = 150 # MIN 70
+MAP_HEIGHT = 75 # MIN 40
 
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
-PANEL_HEIGHT = 8
-PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
+
 MSG_X = BAR_WIDTH + 2
 MSG_WIDTH = SCREEN_WIDTH - BAR_WIDTH - 2
-MSG_HEIGHT = PANEL_HEIGHT - 1
+MSG_HEIGHT = PANEL_HEIGHT - 2
 INVENTORY_WIDTH = 50
 CHARACTER_SCREEN_WIDTH = 30
 LEVEL_SCREEN_WIDTH = 40
@@ -63,6 +65,12 @@ FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
 TORCH_RADIUS = 15  # 15 Def
 
-LIMIT_FPS = 45  # 20 frames-per-second maximum
+LIMIT_FPS = 60  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5
+
+# COLORS
+UI_Fore = libtcod.Color(0, 50, 90)
+UI_Back = libtcod.Color(0, 10, 25)
+UI_PopFore = libtcod.dark_azure
+UI_PopBack = libtcod.darkest_azure

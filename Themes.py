@@ -99,8 +99,8 @@ def apply_ssa_theme():
     global OUT_OF_FOV_COLOR
 
     GROUND_CHAR = [libtcod.CHAR_SE]
-    GROUND_COLOR = [libtcod.light_grey]
-    GROUND_BCOLOR = [libtcod.grey]
+    GROUND_COLOR = [libtcod.grey]
+    GROUND_BCOLOR = [libtcod.dark_grey]
 
     WALL_CHAR = [libtcod.CHAR_CHECKBOX_UNSET]
     WALL_COLOR = [libtcod.darker_flame]
