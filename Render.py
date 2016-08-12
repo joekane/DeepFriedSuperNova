@@ -15,6 +15,7 @@ import Fov
 import GameState
 import Map
 import Themes
+import UI
 
 consoles = {}
 gameState = None
@@ -90,7 +91,6 @@ def full_map():
 
             else:
                 offset_color = get_offset_color(map_x, map_y)
-                offset_color = libtcod.Color(0,0,0)
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                             tile.f_color - offset_color, libtcod.BKGND_SET)
                 libtcod.console_set_char_background(consoles['map_console'], x, y,
@@ -158,7 +158,6 @@ def ui():
                                 clear=True,
                                 flag=libtcod.BKGND_SET,
                                 fmt=None)
-
 
     libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'FPS ' +
                              str(libtcod.sys_get_fps()))
@@ -255,19 +254,14 @@ def pop_up(width=None, height=None, title=None, text=None):
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
-    libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-
     # calculate total height for the header (after auto-wrap) and one line per option
-
-    if width is None or height is None:
+    if width is None:
         width = Constants.MAP_CONSOLE_WIDTH - 30
-        height = Constants.MAP_CONSOLE_HEIGHT - 51
 
+    if height is None:
+        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
 
-
-    # create an off-screen console that represents the menu's window
     pop = libtcod.console_new(width, height)
-
     # print the header, with auto-wrap
     libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
     libtcod.console_set_default_background(pop, Constants.UI_PopBack)
@@ -276,44 +270,79 @@ def pop_up(width=None, height=None, title=None, text=None):
                                 flag=libtcod.BKGND_SET,
                                 fmt=title)
 
-    libtcod.console_print_ex(pop, 3, 3, libtcod.BKGND_NONE, libtcod.LEFT, text)
+    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
 
-
-    continue_text = '(click to continue)'
-
-
-
-    #libtcod.console_print_rect_ex(pop, 0, 0, width, height, libtcod.BKGND_ADD, libtcod.LEFT, 'Pop-Up!')
-    # libtcod.console_print_rect(pop, 0, 0, width, height, 'Hello')
 
     # blit the contents of "window" to the root console
     x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
     y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
 
 
+    button_text = '[ Click to Continue ]'
+    button = UI.Button(button_text,
+                       Map.Rect(width/2,height - 2, len(button_text), 1),
+                       Map.Rect(x,y,width, height),
+                       function=UI.close_window)
+
+    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
+
     while True:
 
+        libtcod.console_flush()
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+        if button.draw(key, mouse) == 'close':
+            return
+
+        if key.vk == libtcod.KEY_ENTER and key.lalt:
+            # Alt+Enter: toggle fullscreen
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
+            return
+
+
+def inventory(width=None, height=None, title=None, text=None):
+    # calculate total height for the header (after auto-wrap) and one line per option
+    if width is None:
+        width = Constants.MAP_CONSOLE_WIDTH - 30
+
+    if height is None:
+        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
+
+
+    # create an off-screen console that represents the menu's window
+    pop = libtcod.console_new(width, height)
+    # print the header, with auto-wrap
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+
+    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
+                                flag=libtcod.BKGND_SET,
+                                fmt=title)
+
+    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
+
+    # blit the contents of "window" to the root console
+    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
+    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
+
+    button_text = '[ X ]'
+    button = UI.Button(button_text,
+                       Map.Rect(width/2,height - 2, len(button_text), 1),
+                       Map.Rect(x,y,width, height),
+                       function=UI.close_window)
+
+    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
+
+    while True:
+        key = libtcod.Key()
+        mouse = libtcod.Mouse()
+        libtcod.console_flush()
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
         # present the root console to the player and check for input
 
-        min_x = x + (width / 2) - (len(continue_text) / 2) - 1
-        max_x = min_x + len(continue_text) + 1
-
-        if min_x < mouse.cx < max_x and y + height - 2 == mouse.cy:
-            libtcod.console_set_default_foreground(pop, libtcod.white)
-            libtcod.console_set_default_background(pop, libtcod.red)
-            if mouse.lbutton_pressed:
-                return
-        else:
-            libtcod.console_set_default_foreground(pop, libtcod.red)
-            libtcod.console_set_default_background(pop, libtcod.white)
-
-
-        libtcod.console_print_ex(pop, width / 2, height - 2, libtcod.BKGND_SET, libtcod.CENTER, continue_text)
-        libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
-        libtcod.console_flush()
-
-
+        if button.draw(key, mouse) == 'close':
+            return
 
 
         if key.vk == libtcod.KEY_ENTER and key.lalt:

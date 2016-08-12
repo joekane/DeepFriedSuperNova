@@ -72,5 +72,9 @@ INSPECTION_DELAY = 0.5
 # COLORS
 UI_Fore = libtcod.Color(0, 50, 90)
 UI_Back = libtcod.Color(0, 10, 25)
-UI_PopFore = libtcod.dark_azure
+
+UI_Button_Fore = libtcod.light_azure
+UI_Button_Back = libtcod.dark_azure
+
+UI_PopFore = libtcod.azure
 UI_PopBack = libtcod.darkest_azure

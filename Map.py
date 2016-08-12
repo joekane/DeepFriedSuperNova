@@ -65,6 +65,14 @@ class Rect:
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
+    @property
+    def width(self):
+        return self.x2 - self.x1
+
+    @property
+    def height(self):
+        return self.y2 - self.y1
+
 
 def translate_map_data():
     import CaveGen

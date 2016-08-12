@@ -249,15 +249,15 @@ def handle_keys():
 
                 title = "Shadow State Archives II"
 
-                text = '"The ambient phenomenon was an ancient engine, the wealthy machine. Crushing, pausing...\n' \
-                       ' a conceptual humming which attended to the numbers underneath the intervening, silver\n' \
-                       'sky." \n\n The towering massive ultragovernment concrete superstructure data library that\n' \
-                       'contains the largest digital collection of intergalactic personnel files ever assembled\n' \
-                       'in any known galaxy. Here dwell massive servers guarded by all manner of nanotechnology\n' \
-                       'powered droids, cipher enhanced biowardens, all seeing quantum lenses, and roaming alpha\n' \
+                text = '"The ambient phenomenon was an ancient engine, the wealthy machine. Crushing, pausing...' \
+                       ' a conceptual humming which attended to the numbers underneath the intervening, silver' \
+                       'sky." \n\n The towering massive ultragovernment concrete superstructure data library that' \
+                       'contains the largest digital collection of intergalactic personnel files ever assembled' \
+                       'in any known galaxy. Here dwell massive servers guarded by all manner of nanotechnology' \
+                       'powered droids, cipher enhanced biowardens, all seeing quantum lenses, and roaming alpha' \
                        'turrets. This place is high alert.\n' \
                        '\n' \
-                       'Keycard required.\n'
+                       'Keycard required.'
 
                 Render.pop_up(title=title, text=text)
 
