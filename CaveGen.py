@@ -54,10 +54,10 @@ recur_max = 900
 
 rnd = random.seed(666)
 Neighbours = 4  # Openess 3 or 4
-Interations = 50000   #
+Interations = 30000   #
 
-CloseCellProb = 65  # Lower Number (45) = Open, Higher = Constricted (75)
-CloseCellRange = 10 # variabliity
+CloseCellProb = 45  # Lower Number (45) = Open, Higher = Constricted (75)
+CloseCellRange = 0 # variabliity
 
 Smoothing = 50
 

@@ -174,30 +174,40 @@ def load_diner_map():
                 level_map[x][y].blocked = True
                 level_map[x][y].block_sight = False
             if c == 'p':
-                    #print(str(x) + "|" + str(y))
-                    level_map[x][y].blocked = False
-                    level_map[x][y].block_sight = False
-                    player.x = x
-                    player.y = y
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+                player.x = x
+                player.y = y
             if c == 'Q':
-                    #print(str(x) + "|" + str(y))
-                    level_map[x][y].blocked = False
-                    level_map[x][y].block_sight = False
-                    spawn_npc_at(x, y, 'QuestGuy')
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+                spawn_npc_at(x, y, 'QuestGuy')
             if c == '+':
-                    #print(str(x) + "|" + str(y))
-                    level_map[x][y].blocked = True
-                    level_map[x][y].block_sight = True
-                    spawn_npc_at(x, y, 'UnlockedDoor')
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+                spawn_npc_at(x, y, 'UnlockedDoor')
             if c == '_':
-                    #print(str(x) + "|" + str(y))
-                    level_map[x][y].blocked = True
-                    level_map[x][y].block_sight = True
-                    spawn_npc_at(x, y, 'OpenDoor')
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
+                spawn_npc_at(x, y, 'OpenDoor')
             if c == 's':
-                #print(str(x) + "|" + str(y))
-                level_map[x][y].blocked = False
-                level_map[x][y].block_sight = False
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
                 stairs = Entity.Entity(x, y, '<', 'stairs', libtcod.white, always_visible=True)
                 objects.append(stairs)
             x += 1
@@ -828,12 +838,9 @@ def player_move_or_interact(dx, dy):
         if object.fighter and object.x == x and object.y == y:
             player.fighter.attack(object)
 
-
-
-
             return
         if isinstance(object.ai, Components.QuestNpc) and object.x == x and object.y == y:
-            print "Reward!!!! .... ??"
+            # print "Reward!!!! .... ??"
             object.ai.talk()
             return
         if object.blocks:
@@ -844,7 +851,6 @@ def player_move_or_interact(dx, dy):
 
     player.move(dx, dy)
     Fov.require_recompute()
-
 
 
 def get_open_tiles():

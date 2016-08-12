@@ -21,11 +21,12 @@ consoles = {}
 gameState = None
 
 
-def initialize(map_console, panel_console, side_panel_console):
+def initialize(map_console, entity_console, panel_console, side_panel_console):
     global consoles, gameState
     consoles['map_console'] = map_console
     consoles['panel_console'] = panel_console
     consoles['side_panel_console'] = side_panel_console
+    consoles['entity_console'] = entity_console
 
 
 def clear_map():
@@ -49,56 +50,82 @@ def render_tile(x, y):
 
     tile = map[x][y]
 
-    if not visible:
-        # if it's not visible right now, the player can only see it if it's explored
-        if tile.explored:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+    if not Constants.DEBUG:
+        if libtcod.map_is_walkable(Fov.get_fov_map(), x, y):
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, ' ',
+                                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
+        else:
+            libtcod.console_put_char_ex(consoles['map_console'], x, y, 'X',
                                         Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
-    else:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                        tile.f_color - offset_color, libtcod.BKGND_SET)
             tile.explored = True
-
-
-def full_map():
-    libtcod.console_clear(consoles['map_console'])
-    Fov.recompute()
-
-    map = Map.current_map()
-    player = GameState.get_player()
-
-    Map.move_camera(player.x, player.y)
-
-    camera_x, camera_y = Map.get_camera()
-    # print "cx: " + str(camera_x) + " | cy: " + str(camera_y)
-
-    # go through all tiles, and set their background color
-    for y in range(Constants.MAP_CONSOLE_HEIGHT):
-        for x in range(Constants.MAP_CONSOLE_WIDTH):
-            map_x, map_y = (camera_x + x, camera_y + y)
-            tile = map[map_x][map_y]
-            visible = Fov.is_visible(pos=(map_x, map_y))
-
-            if not visible:
-                # if it's not visible right now, the player can only see it if it's explored
-                if tile.explored:
-                    if tile.blocked:
-                        char = '#'
-                    else:
-                        char = '.'
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
-
-            else:
-                offset_color = get_offset_color(map_x, map_y)
+    else:
+        if not visible:
+            # if it's not visible right now, the player can only see it if it's explored
+            if tile.explored:
+                libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
+        else:
                 libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                             tile.f_color - offset_color, libtcod.BKGND_SET)
-                libtcod.console_set_char_background(consoles['map_console'], x, y,
-                                                    tile.b_color - offset_color, flag=libtcod.BKGND_SET)
                 tile.explored = True
 
 
+def full_map():
+
+
+    if Fov.recompute():
+
+        map = Map.current_map()
+        player = GameState.get_player()
+
+        Map.move_camera(player.x, player.y)
+
+        camera_x, camera_y = Map.get_camera()
+    # print "cx: " + str(camera_x) + " | cy: " + str(camera_y)
+
+    # go through all tiles, and set their background color
+        for y in range(Constants.MAP_CONSOLE_HEIGHT):
+            for x in range(Constants.MAP_CONSOLE_WIDTH):
+                map_x, map_y = (camera_x + x, camera_y + y)
+                tile = map[map_x][map_y]
+                visible = Fov.is_visible(pos=(map_x, map_y))
+
+                if Constants.DEBUG:
+                    if Fov.is_visible(pos=(map_x, map_y)):
+                        color = libtcod.white
+                    else:
+                        color = libtcod.dark_grey
+                    if libtcod.map_is_walkable(Fov.get_fov_map(), map_x, map_y):
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
+                                                    color, libtcod.BKGND_SET)
+                    else:
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, 'X',
+                                                    color, libtcod.BKGND_SET)
+                    tile.explored = True
+                else:
+                    if not visible:
+                        # if it's not visible right now, the player can only see it if it's explored
+                        if tile.explored:
+                            if tile.blocked:
+                                char = '#'
+                            else:
+                                char = '.'
+                            libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
+                                                        Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
+
+                    else:
+                        offset_color = get_offset_color(map_x, map_y)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                                    tile.f_color - offset_color, libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(consoles['map_console'], x, y,
+                                                            tile.b_color - offset_color, flag=libtcod.BKGND_SET)
+                        tile.explored = True
+
+
+
+
 def objects():
+    libtcod.console_clear(consoles['entity_console'])
     for object in Map.get_all_objects():
         if object != GameState.get_player():
             object.draw()
@@ -184,6 +211,7 @@ def ui():
 def update():
     # blit the contents of "panel" to the root console
     libtcod.console_blit(consoles['map_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0)
+    libtcod.console_blit(consoles['entity_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0)
     libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH,
                          Constants.PANEL_HEIGHT, 0, 0,
                          Constants.PANEL_Y)
@@ -193,7 +221,8 @@ def update():
 
 
 def blank(x, y):
-    libtcod.console_put_char(consoles['map_console'], x, y, ' ', libtcod.BKGND_NONE)
+    x, y = Map.to_camera_coordinates(x, y)
+    libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
 
 
 def get_offset_color(map_x, map_y):
@@ -209,10 +238,10 @@ def draw_object(obj, visible=True):
 
     if visible:
 
-        libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
-        libtcod.console_set_char_background(consoles['map_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
+        libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
+        libtcod.console_set_char_background(consoles['entity_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
     else:
-        libtcod.console_put_char_ex(consoles['map_console'], x, y, obj.char, libtcod.darker_gray,
+        libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, libtcod.darker_gray,
                                     libtcod.BKGND_NONE)
 
 
@@ -301,61 +330,11 @@ def pop_up(width=None, height=None, title=None, text=None):
             return
 
 
-def inventory(width=None, height=None, title=None, text=None):
-    # calculate total height for the header (after auto-wrap) and one line per option
-    if width is None:
-        width = Constants.MAP_CONSOLE_WIDTH - 30
-
-    if height is None:
-        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
-
-
-    # create an off-screen console that represents the menu's window
-    pop = libtcod.console_new(width, height)
-    # print the header, with auto-wrap
-    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-
-    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt=title)
-
-    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
-
-    # blit the contents of "window" to the root console
-    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
-    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
-
-    button_text = '[ X ]'
-    button = UI.Button(button_text,
-                       Map.Rect(width/2,height - 2, len(button_text), 1),
-                       Map.Rect(x,y,width, height),
-                       function=UI.close_window)
-
-    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
-
-    while True:
-        key = libtcod.Key()
-        mouse = libtcod.Mouse()
-        libtcod.console_flush()
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-        # present the root console to the player and check for input
-
-        if button.draw(key, mouse) == 'close':
-            return
-
-
-        if key.vk == libtcod.KEY_ENTER and key.lalt:
-            # Alt+Enter: toggle fullscreen
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
-            return
-
-
 
 
 
 def render_all():
+    libtcod.console_clear(0)
     full_map()
     objects()
     ui()

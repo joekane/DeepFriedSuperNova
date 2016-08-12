@@ -147,14 +147,14 @@ class BasicMonster:
         # a basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
         player = GameState.get_player()
-        if Fov.is_visible(obj=monster):
 
+        if Fov.is_visible(obj=monster):
             # move towards player if far away
-            if monster.distance_to(player) >= 2:
-                monster.move_astar(player)
-            # close enough, attack! (if the player is still alive.)
-            elif player.fighter.hp > 0:
+            dist = monster.distance_to(player)
+            if dist <= 1.5 and player.fighter.hp > 0:
                 monster.fighter.attack(player)
+            else:
+                monster.move_astar(player)
         else:
             return False
 
@@ -174,18 +174,22 @@ class Door:
     def take_turn(self):
         if self.status is 'closed':
             self.owner.blocks = True
-            Fov.fov_change(self.owner.x, self.owner.y, True, True)
-            Map.level_map[self.owner.x][self.owner.y].blocked = True
-            Map.level_map[self.owner.x][self.owner.y].block_sight = True
+            self.owner.blocks_sight = True
+            # Fov.fov_change(self.owner.x, self.owner.y, True, True)
+            # Map.level_map[self.owner.x][self.owner.y].blocked = True
+            # Map.level_map[self.owner.x][self.owner.y].block_sight = True
             self.owner.char = '+'
         if self.status is 'open':
             self.owner.blocks = False
-            Fov.fov_change(self.owner.x, self.owner.y, False, False)
-            Map.level_map[self.owner.x][self.owner.y].blocked = False
-            Map.level_map[self.owner.x][self.owner.y].block_sight = False
+            self.owner.blocks_sight = False
+            # Fov.fov_change(self.owner.x, self.owner.y, False, False)
+            # Map.level_map[self.owner.x][self.owner.y].blocked = False
+            # Map.level_map[self.owner.x][self.owner.y].block_sight = False
 
             self.owner.char = '_'
         if self.status is 'locked':
+            self.owner.blocks = True
+            self.owner.blocks_sight = True
             self.owner.name = 'locked door'
         return False
 
@@ -215,6 +219,7 @@ class BasicRangedMonster:
             if monster.distance_to(player) > self.attack_range:
                 monster.move_astar(player)
                 self.reload -= 1
+
             # close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0 and self.reload <= 0:
                 Animate.follow_line(self.owner, player)
@@ -233,7 +238,7 @@ class SpawningMonster:
         self.new_monster = new_monster
         self.owner = owner
 
-    def take_turn(self):
+    def take_turn(self, fov):
         # a basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
         player = GameState.get_player()

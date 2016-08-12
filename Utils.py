@@ -13,6 +13,7 @@ import Constants
 import GameState
 import libtcodpy as libtcod
 import Map
+import Fov
 import time
 import Animate
 
@@ -184,17 +185,9 @@ def inspect_tile(x, y):
             delay = time.time()
 
 
-def connected_cells(source, target, map):
-    # Create a FOV map that has the dimensions of the map
-    fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
+def connected_cells(source, target):
 
-    # Scan the current map each turn and set all the walls as unwalkable
-
-    for y1 in range(Constants.MAP_HEIGHT):
-        for x1 in range(Constants.MAP_WIDTH):
-            libtcod.map_set_properties(fov, x1, y1, not map[x1][y1] == 1, not map[x1][y1] == 1)
-
-    my_path = libtcod.path_new_using_map(fov, 1.41)
+    my_path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
 
     libtcod.path_compute(my_path, source[0], source[1], target[0], target[1])
 

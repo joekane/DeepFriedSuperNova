@@ -24,6 +24,8 @@ game_msgs = []
 dungeon_level = 0
 
 
+
+
 def initialize():
     global imported_items_list, imported_npc_list, imported_quest_list
     global current_quests, player, inventory, game_msgs, dungeon_level
@@ -114,11 +116,11 @@ def get_quest_item(number):
 
 def player_has_item(name):
     for item in inventory:
-        print item.name + " | " + name
+        #print item.name + " | " + name
         if item.name == name:
-            print "True!"
+            #print "True!"
             return True
-    print "False"
+    #print "False"
     return False
 
 
@@ -165,3 +167,4 @@ def read_external_quests():
 
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
+

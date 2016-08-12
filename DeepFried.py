@@ -130,7 +130,7 @@ def process_mouse_clicks():
 
     # walk to target tile
     if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
-        # print "Mouse Pressed!"
+
         continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
         return True
     if mouse.rbutton_pressed:
@@ -239,12 +239,16 @@ def handle_keys():
                     next_level()
             elif key_char == 'c':
                 # show character information
+                player = GameState.get_player()
                 level_up_xp = Constants.LEVEL_UP_BASE + player.level * Constants.LEVEL_UP_FACTOR
-                msgbox(
-                    'Character Information\n\nLevel: ' + str(player.level) + '\nExperience: ' + str(player.fighter.xp) +
-                    '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(player.fighter.max_hp) +
-                    '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense),
-                    Constants.CHARACTER_SCREEN_WIDTH)
+
+                text = 'Character Information\n\nLevel: ' + str(player.level) + '\nExperience: ' + str(
+                    player.fighter.xp) + \
+                       '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(
+                    player.fighter.max_hp) + \
+                       '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense)
+                Render.pop_up(width=40, title='Inventory Screen', text=text)
+
             elif key_char == 'p':
 
                 title = "Shadow State Archives II"
@@ -260,9 +264,12 @@ def handle_keys():
                        'Keycard required.'
 
                 Render.pop_up(title=title, text=text)
+            elif key_char == 'x':
+                Fov.require_recompute()
+                Constants.DEBUG = not Constants.DEBUG
 
             elif continue_walking:
-                continue_walking = GameState.get_player().walk_path()
+
                 return 'auto-walking'
             elif not continue_walking:
                 GameState.get_player().clear_path()
@@ -278,7 +285,7 @@ def new_game():
 
     GameState.initialize()
 
-    Render.initialize(map_console, panel, side_panel)
+    Render.initialize(map_console, entity_console, panel, side_panel)
 
     Map.load_diner_map()
     # Map.translate_map_data()
@@ -301,18 +308,18 @@ def next_level():
 
 
     # CAVES ONLY
-    # CaveGen.build()
+    CaveGen.build()
     # Map.translate_map_data()
 
     # OG MAPS
     #Map.make_map()
 
     # BSP Maps
-    Map.make_bsp()
+    # Map.make_bsp()
 
 
     # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
-    # Map.make_bsp(map=Map.translate_map_data())
+    Map.make_bsp(map=Map.translate_map_data())
 
 
     # Cannot MAP -> CA as CA map is not tiles[][]
@@ -333,10 +340,6 @@ def play_game():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
         (x, y) = (mouse.cx, mouse.cy)
 
-        Render.render_all()
-        process_mouse_hover()
-        libtcod.console_flush()
-
         # erase all objects at their old locations, before they move
         for obj in Map.get_all_objects():
             obj.clear()
@@ -349,7 +352,10 @@ def play_game():
         if player_action == 'exit':
             save_game()
             break
-        # let monsters take their turn
+
+        if player_action == 'auto-walking':
+            continue_walking = GameState.get_player().walk_path()
+            # let monsters take their turn
 
         if game_state == 'playing' and player_action != 'didnt-take-turn':
             for obj in Map.get_all_objects():
@@ -357,6 +363,11 @@ def play_game():
                     if obj.ai.take_turn() is not False:
                        # print "attemp to stop walking"
                         continue_walking = False
+
+        Render.render_all()
+        process_mouse_hover()
+        libtcod.console_flush()
+
 
 
 
@@ -465,6 +476,7 @@ libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 
 map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+entity_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
 side_panel = libtcod.console_new(20,
                                  Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
