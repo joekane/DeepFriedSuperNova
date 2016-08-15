@@ -16,6 +16,7 @@ import Map
 import math
 import Render
 import random
+import GameState
 
 
 class Entity:
@@ -25,6 +26,7 @@ class Entity:
                  speed= 10,
                  blocks=False,
                  blocks_sight=False,
+                 delay=0,
                  fighter=None,
                  always_visible=False,
                  ai=None,
@@ -35,6 +37,7 @@ class Entity:
         self.blocks_sight = blocks_sight
         self.x = x
         self.y = y
+        self.delay = delay
         self.CT = random.randint(0, 50)
         self.speed = speed
         self.char = char
@@ -77,7 +80,8 @@ class Entity:
             Fov.fov_change(self.x, self.y, False, False)
             self.x += dx
             self.y += dy
-            Fov.fov_change(self.x, self.y, False, True)
+            if self.name != 'player':
+                Fov.fov_change(self.x, self.y, False, True)
 
     def move_towards(self, target_x, target_y):
         # vector from this object to the target, and distance
@@ -103,51 +107,36 @@ class Entity:
 
     def move_astar(self, target):
         # Create a FOV map that has the dimensions of the map
-        fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
-        map = Map.current_map()
-        # Scan the current map each turn and set all the walls as unwalkable
 
-        for y1 in range(Constants.MAP_CONSOLE_HEIGHT):
-            for x1 in range(Constants.MAP_CONSOLE_WIDTH):
-                x2, y2 = Map.to_map_coordinates(x1, y1)
-                if x2 is not None and y2 is not None:
-                    libtcod.map_set_properties(fov, x1, y1, not map[x2][y2].block_sight, not map[x2][y2].blocked)
 
-        # Scan all the objects to see if there are objects that must be navigated around
-        # Check also that the object isn't self or the target (so that the start and the end points are free)
-        # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        # print Map.get_visible_objects()
-        for obj in Map.get_visible_objects():
-            if obj.blocks and obj != self and obj != target:
-                x2, y2 = Map.to_camera_coordinates(obj.x, obj.y)
-                # Set the tile as a wall so it must be navigated around
-                libtcod.map_set_properties(fov, x2, y2, True, False)
-
-        # Allocate a A* path
         # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0 if diagonal moves are prohibited
-        my_path = libtcod.path_new_using_map(fov, 1.41)
+        self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.5)
 
         # Compute the path between self's coordinates and the target's coordinates
-        libtcod.path_compute(my_path, self.x, self.y, target.x, target.y)
+
+        # new_target = Map.adjacent_open_tiles(target)
+
+        libtcod.path_compute(self.path, self.x, self.y, target.x, target.y)
 
         # Check if the path exists, and in this case, also the path is shorter than 25 tiles
         # The path size matters if you want the monster to use alternative longer paths (for example through other
         # rooms) if for example the player is in a corridor
         # It makes sense to keep path size relatively low to keep the monsters from running around the map if there's
         # an alternative path really far away
-        if not libtcod.path_is_empty(my_path) and libtcod.path_size(my_path) < 25:
+        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 25:
             # Find the next coordinates in the computed full path
-            self.path = my_path
+            print "Path found!"
             self.walk_path()
 
         else:
             # Keep the old move function as a backup so that if there are no paths (for example another monster blocks
             # a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
+            print "Fail: walking towards"
             self.move_towards(target.x, target.y)
 
         # Delete the path to free memory
-        libtcod.path_delete(my_path)
+        # libtcod.path_delete(my_path)
 
     def move_astar_xy(self, target_x, target_y, force=False):
         if self.path is None or force:
@@ -187,8 +176,7 @@ class Entity:
 
     def walk_path(self):
         if self.path is None:
-            # print "Path None"
-            pass
+            GameState.continue_walking = False
         else:
             # print path
             # Find the next coordinates in the computed full path
@@ -200,8 +188,8 @@ class Entity:
                 Fov.require_recompute()
                 return True
             self.path = None
+            GameState.continue_walking = False
 
-        return False
 
     def draw(self):
         # set the color and then draw the character that represents this object at its positionss
