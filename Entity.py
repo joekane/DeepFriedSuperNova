@@ -15,14 +15,16 @@ import Fov
 import Map
 import math
 import Render
+import random
 
 
 class Entity:
     # this is a generic object: the player, a monster, an item, the stairs...
     # it's always represented by a character on screen.
     def __init__(self, x, y, char, name, color,
+                 speed= 10,
                  blocks=False,
-                 transparent=True,
+                 blocks_sight=False,
                  fighter=None,
                  always_visible=False,
                  ai=None,
@@ -30,9 +32,11 @@ class Entity:
                  equipment=None, ranged=None):
         self.name = name
         self.blocks = blocks
-        self.transparent = transparent
+        self.blocks_sight = blocks_sight
         self.x = x
         self.y = y
+        self.CT = random.randint(0, 50)
+        self.speed = speed
         self.char = char
         self.color = color
         self.always_visible = always_visible
@@ -70,8 +74,10 @@ class Entity:
     def move(self, dx, dy):
         # move by the given amount, if the destination is not blocked
         if not Map.is_blocked(self.x + dx, self.y + dy):
+            Fov.fov_change(self.x, self.y, False, False)
             self.x += dx
             self.y += dy
+            Fov.fov_change(self.x, self.y, False, True)
 
     def move_towards(self, target_x, target_y):
         # vector from this object to the target, and distance
@@ -110,7 +116,7 @@ class Entity:
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
         # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        print Map.get_visible_objects()
+        # print Map.get_visible_objects()
         for obj in Map.get_visible_objects():
             if obj.blocks and obj != self and obj != target:
                 x2, y2 = Map.to_camera_coordinates(obj.x, obj.y)
@@ -147,30 +153,13 @@ class Entity:
         if self.path is None or force:
             # print "a* self.path is None"
             # Create a FOV map that has the dimensions of the map
-            fov = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
 
             if self.x == target_x and self.y == target_y:
                 return
 
-            Fov.require_recompute()
-            map = Map.current_map()
-
-            # Scan the current map each turn and set all the walls as unwalkable
-            for y1 in range(Constants.MAP_HEIGHT):
-                for x1 in range(Constants.MAP_WIDTH):
-                    libtcod.map_set_properties(fov, x1, y1, not map[x1][y1].block_sight, not map[x1][y1].blocked)
-
-            # Scan all the objects to see if there are objects that must be navigated around
-            # Check also that the object isn't self or the target (so that the start and the end points are free)
-            # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-            for obj in Map.get_all_objects():
-                if obj.blocks and obj != self:
-                    # Set the tile as a wall so it must be navigated around
-                    libtcod.map_set_properties(fov, obj.x, obj.y, True, False)
-
             # Allocate a A* path
             # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0 if diagonal moves are prohibited
-            my_path = libtcod.path_new_using_map(fov, 1.41)
+            my_path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
 
             # Compute the path between self's coordinates and the target's coordinates
             libtcod.path_compute(my_path, self.x, self.y, target_x, target_y)
@@ -206,8 +195,7 @@ class Entity:
             x, y = libtcod.path_walk(self.path, True)
             if x or y:
                 # Set self's coordinates to the next path tile
-                self.x = x
-                self.y = y
+                self.move_towards(x, y)
                 # print "Path Walk"
                 Fov.require_recompute()
                 return True
@@ -226,3 +214,7 @@ class Entity:
     def clear(self):
         # erase the character that represents this object
         Render.blank(self.x, self.y)
+
+    def change_CT(self, value):
+        self.CT += value * (int(self.speed) / 10)
+

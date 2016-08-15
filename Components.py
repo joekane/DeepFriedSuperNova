@@ -18,6 +18,168 @@ import Map
 import Fov
 import Utils
 import Animate
+import Render
+import Schedule
+
+
+class PlayeControlled:
+    def __init__(self, owner=None):
+        self.owner = owner
+
+
+    def end_turn(self, cost):
+        self.owner.action_points += 100
+        Schedule.add_to_pq((self.owner.action_points, self.owner))
+
+
+    # AI for a basic monster.
+    def take_turn(self):
+        while True:
+            # print "looping"
+            key = libtcod.Key()
+            mouse = libtcod.Mouse()
+
+            libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+            (x, y) = (mouse.cx, mouse.cy)
+
+            player = GameState.get_player()
+
+            if key.vk == libtcod.KEY_ENTER and key.lalt:
+                # Alt+Enter: toggle fullscreen
+                libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+            elif key.vk == libtcod.KEY_ESCAPE:
+                return 0  # exit game
+
+            # if process_mouse_clicks():
+            #    return 0
+
+            # movement keys
+            if True:
+                # movement keys
+                # movement keys
+                if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+                    Map.player_move_or_interact(0, -1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+                    Map.player_move_or_interact(0, 1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
+                    Map.player_move_or_interact(-1, 0)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
+                    Map.player_move_or_interact(1, 0)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_HOME or key.vk == libtcod.KEY_KP7:
+                    Map.player_move_or_interact(-1, -1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_PAGEUP or key.vk == libtcod.KEY_KP9:
+                    Map.player_move_or_interact(1, -1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_END or key.vk == libtcod.KEY_KP1:
+                    Map.player_move_or_interact(-1, 1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_PAGEDOWN or key.vk == libtcod.KEY_KP3:
+                    Map.player_move_or_interact(1, 1)
+                    return self.end_turn(100)
+                elif key.vk == libtcod.KEY_KP5:
+                    pass  # do nothing ie wait for the monster to come to you
+                else:
+                    # test for other keys
+                    key_char = chr(key.c)
+
+                    if key_char == 'g':
+                        # pick up an item
+                        for object in Map.get_all_objects():  # look for an item in the player's tile
+                            if object.x == player.x and object.y == player.y and object.item:
+                                object.item.pick_up()
+                                break
+                    elif key_char == 'i':
+                        # show the inventory; if an item is selected, use it
+                        # img = libtcod.image_load('orc.png')
+                        # libtcod.image_blit_2x(img, 0, 0, 0)
+
+                        # img2 = libtcod.image_load('orc_80.png')
+                        # libtcod.image_blit_2x(img2, 0, 40, 0)
+
+                        chosen_item = inventory_menu(
+                            'Press the key next to an item to use it, or any other to cancel.\n')
+
+                        if chosen_item is not None:
+                            chosen_item.use()
+                            return 0
+                    elif key_char == 'd':
+                        # show the inventory; if an item is selected, drop it
+                        chosen_item = inventory_menu(
+                            'Press the key next to an item to drop it, or any other to cancel.\n')
+
+                        if chosen_item is not None:
+                            chosen_item.drop()
+                    elif key_char == 'f':
+                        for obj in GameState.get_all_equipped(player):
+                            if obj.owner.ranged:
+                                obj.owner.ranged.fire()
+                                return 100
+                        Utils.message("No ranged weapon equipped!", libtcod.light_amber)
+                    elif key_char == 'h':
+                        for obj in GameState.get_inventory():
+                            if obj.name == 'healing potion':
+                                obj.item.use()
+                                return 0
+                        return Utils.message("No helaing potions.", libtcod.light_amber)
+                    elif key_char == '<':
+                        # go down stairs, if the player is on them
+                        stairs = Map.get_stairs()
+                        if stairs.x == player.x and stairs.y == player.y:
+                            GameState.next_level()
+                    elif key_char == 'c':
+                        # show character information
+                        player = GameState.get_player()
+                        level_up_xp = Constants.LEVEL_UP_BASE + player.level * Constants.LEVEL_UP_FACTOR
+
+                        text = 'Character Information\n\nLevel: ' + str(player.level) + '\nExperience: ' + str(
+                            player.fighter.xp) + \
+                               '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(
+                            player.fighter.max_hp) + \
+                               '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense)
+                        Render.pop_up(width=40, title='Inventory Screen', text=text)
+
+                    elif key_char == 'p':
+
+                        title = "Shadow State Archives II"
+
+                        text = '"The ambient phenomenon was an ancient engine, the wealthy machine. Crushing, pausing...' \
+                               ' a conceptual humming which attended to the numbers underneath the intervening, silver' \
+                               'sky." \n\n The towering massive ultragovernment concrete superstructure data library that' \
+                               'contains the largest digital collection of intergalactic personnel files ever assembled' \
+                               'in any known galaxy. Here dwell massive servers guarded by all manner of nanotechnology' \
+                               'powered droids, cipher enhanced biowardens, all seeing quantum lenses, and roaming alpha' \
+                               'turrets. This place is high alert.\n' \
+                               '\n' \
+                               'Keycard required.'
+
+                        Render.pop_up(title=title, text=text)
+                    elif key_char == 'b':
+
+                        title = "Beastiary"
+
+                        text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
+
+                        Render.beastiary(width=60, height=50, title=title, text=text)
+                    elif key_char == 'x':
+                        Fov.require_recompute()
+                        Constants.DEBUG = not Constants.DEBUG
+
+                    # elif continue_walking: # contimue walking
+                    #    return 0
+                    # elif not continue_walking:
+                    #    GameState.get_player().clear_path()
+
+                    # return 0
+                # print "took turn"
+                # return Constants.TURN_COST
+                Render.render_all()
 
 
 class Fighter:
@@ -110,6 +272,7 @@ class QuestNpc:
         self.owner = owner
 
     def take_turn(self):
+        self.owner.CT=100
         return False
 
     def talk(self):
@@ -144,19 +307,23 @@ class BasicMonster:
 
     # AI for a basic monster.
     def take_turn(self):
-        # a basic monster takes its turn. If you can see it, it can see you
-        monster = self.owner
-        player = GameState.get_player()
 
-        if Fov.is_visible(obj=monster):
-            # move towards player if far away
-            dist = monster.distance_to(player)
-            if dist <= 1.5 and player.fighter.hp > 0:
-                monster.fighter.attack(player)
-            else:
-                monster.move_astar(player)
-        else:
-            return False
+
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            player = GameState.get_player()
+
+            if Fov.is_visible(obj=monster):
+                # move towards player if far away
+                dist = monster.distance_to(player)
+                if dist <= 1.5 and player.fighter.hp > 0:
+                    monster.fighter.attack(player)
+                else:
+                    monster.move_astar(player)
+
+            # self.owner.action_points += 100
+            # Schedule.add_to_pq((self.owner.action_points, self.owner))
+            return 100
 
 
 class Door:
@@ -172,6 +339,7 @@ class Door:
             self.status = door_status
 
     def take_turn(self):
+        self.owner.CT = 100
         if self.status is 'closed':
             self.owner.blocks = True
             self.owner.blocks_sight = True
@@ -211,25 +379,27 @@ class BasicRangedMonster:
         self.reload = 0
 
     def take_turn(self):
-        # a basic monster takes its turn. If you can see it, it can see you
-        monster = self.owner
-        if Fov.is_visible(obj=monster):
-            player = GameState.get_player()
-            # move towards player if far away
-            if monster.distance_to(player) > self.attack_range:
-                monster.move_astar(player)
-                self.reload -= 1
+        if self.owner.CT >= 100:
+            self.owner.CT = 0
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            if Fov.is_visible(obj=monster):
+                player = GameState.get_player()
+                # move towards player if far away
+                if monster.distance_to(player) > self.attack_range:
+                    monster.move_astar(player)
+                    self.reload -= 1
 
-            # close enough, attack! (if the player is still alive.)
-            elif player.fighter.hp > 0 and self.reload <= 0:
-                Animate.follow_line(self.owner, player)
-                monster.fighter.attack(player)
-                self.reload = 3
+                # close enough, attack! (if the player is still alive.)
+                elif player.fighter.hp > 0 and self.reload <= 0:
+                    Animate.follow_line(self.owner, player)
+                    monster.fighter.attack(player)
+                    self.reload = 3
+                else:
+                    self.reload -= 1
+                    pass
             else:
-                self.reload -= 1
-                pass
-        else:
-            return False
+                return False
 
 
 class SpawningMonster:
@@ -239,25 +409,27 @@ class SpawningMonster:
         self.owner = owner
 
     def take_turn(self, fov):
-        # a basic monster takes its turn. If you can see it, it can see you
-        monster = self.owner
-        player = GameState.get_player()
-        if Fov.is_visible(obj=monster):
-            # TO-DO: Randomize location of spawn
-            #       Randomize how often spawn occurs
-            # move towards player if far away
-            chance_to_spawn = libtcod.random_get_int(0, 0, 10)
+        if self.owner.CT >= 100:
+            self.owner.CT = 0
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            player = GameState.get_player()
+            if Fov.is_visible(obj=monster):
+                # TO-DO: Randomize location of spawn
+                #       Randomize how often spawn occurs
+                # move towards player if far away
+                chance_to_spawn = libtcod.random_get_int(0, 0, 10)
 
-            if chance_to_spawn >= 7:
-                self.split()
+                if chance_to_spawn >= 7:
+                    self.split()
+                else:
+                    if monster.distance_to(player) >= 2:
+                        monster.move_astar(player)
+                    # close enough, attack! (if the player is 8still alive.)
+                    elif player.fighter.hp > 0:
+                        monster.fighter.attack(player)
             else:
-                if monster.distance_to(player) >= 2:
-                    monster.move_astar(player)
-                # close enough, attack! (if the player is 8still alive.)
-                elif player.fighter.hp > 0:
-                    monster.fighter.attack(player)
-        else:
-            return False
+                return False
 
     def split(self):
         loc = Map.adjacent_open_tiles(self.owner)
@@ -296,15 +468,17 @@ class ConfusedMonster:
         self.owner = owner
 
     def take_turn(self):
-        if self.num_turns > 0:  # still confused...
-            # move in a random direction, and decrease the number of turns confused
-            self.owner.move(libtcod.random_get_int(0, -1, 1), libtcod.random_get_int(0, -1, 1))
-            self.num_turns -= 1
+        if self.owner.CT >= 100:
+            self.owner.CT = 0
+            if self.num_turns > 0:  # still confused...
+                # move in a random direction, and decrease the number of turns confused
+                self.owner.move(libtcod.random_get_int(0, -1, 1), libtcod.random_get_int(0, -1, 1))
+                self.num_turns -= 1
 
-        else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
-            self.owner.ai = self.old_ai
-            Utils.message('The ' + self.owner.name + ' is no longer confused!', libtcod.red)
-        return False
+            else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
+                self.owner.ai = self.old_ai
+                Utils.message('The ' + self.owner.name + ' is no longer confused!', libtcod.red)
+            return False
 
 
 class Item:
@@ -428,4 +602,7 @@ def monster_death(monster):
     monster.fighter = None
     monster.ai = None
     monster.name = 'remains of ' + monster.name
+    Schedule.release(monster)
+    Schedule.pq
+
     monster.send_to_back()

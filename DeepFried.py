@@ -264,6 +264,13 @@ def handle_keys():
                        'Keycard required.'
 
                 Render.pop_up(title=title, text=text)
+            elif key_char == 'b':
+
+                title = "Beastiary"
+
+                text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
+
+                Render.beastiary(width=60, height=50, title=title, text=text)
             elif key_char == 'x':
                 Fov.require_recompute()
                 Constants.DEBUG = not Constants.DEBUG
@@ -296,77 +303,24 @@ def new_game():
     game_state = 'playing'
 
 
-def next_level():
-
-
-    # advance to the next level
-    GameState.add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
-    GameState.get_player().fighter.heal(GameState.get_player().fighter.max_hp / 2)  # heal the player by 50%
-
-    GameState.add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
-    GameState.dungeon_level += 1
-
-
-    # CAVES ONLY
-    CaveGen.build()
-    # Map.translate_map_data()
-
-    # OG MAPS
-    #Map.make_map()
-
-    # BSP Maps
-    # Map.make_bsp()
-
-
-    # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
-    Map.make_bsp(map=Map.translate_map_data())
-
-
-    # Cannot MAP -> CA as CA map is not tiles[][]
-    # BORKED!
-    # CaveGen.build(Map.make_map())
-
-    Fov.initialize()
-    Map.spawn_doors()
-
-    SoundEffects.play_music('SSA')
-
 
 def play_game():
     global key, mouse, continue_walking
+    import Schedule
     player_action = None
+    next_delta = 1
+
+    loop_count = 0
 
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-        (x, y) = (mouse.cx, mouse.cy)
+        # Render.object_clear()
 
-        # erase all objects at their old locations, before they move
-        for obj in Map.get_all_objects():
-            obj.clear()
 
-        # handle keys and exit game if needed
-        if not check_level_up(): # and key.vk != libtcod.KEY_NONE:
-            player_action = handle_keys()
-            # print player_action
+        Schedule.tick()
 
-        if player_action == 'exit':
-            save_game()
-            break
-
-        if player_action == 'auto-walking':
-            continue_walking = GameState.get_player().walk_path()
-            # let monsters take their turn
-
-        if game_state == 'playing' and player_action != 'didnt-take-turn':
-            for obj in Map.get_all_objects():
-                if obj.ai:
-                    if obj.ai.take_turn() is not False:
-                       # print "attemp to stop walking"
-                        continue_walking = False
 
         Render.render_all()
-        process_mouse_hover()
-        libtcod.console_flush()
+        # process_mouse_hover()
 
 
 

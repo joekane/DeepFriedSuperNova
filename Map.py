@@ -601,6 +601,7 @@ def number_of_adjacent_objects(obj):
 
 
 def spawn_npc_at(x, y, npc):
+    import Schedule
     fighter_component = None
     ai_component = None
     if 'fighter_component' in GameState.imported_npc_list[npc]:
@@ -623,12 +624,17 @@ def spawn_npc_at(x, y, npc):
                             GameState.imported_npc_list[npc]['name'],
                             eval(GameState.imported_npc_list[npc]['color']),
                             always_visible=vis,
+                            speed=int(GameState.imported_npc_list[npc]['speed']),
                             blocks=True,
                             fighter=fighter_component,
                             ai=ai_component)
 
     objects.append(monster)
+    monster.action_points = 0
 
+    if monster.speed > 0:
+        Schedule.register(monster)
+        Schedule.add_to_pq((monster.action_points, monster))
 
 def spawn_item_at(x,y, item_name):
     item_component = None

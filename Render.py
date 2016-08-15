@@ -122,6 +122,9 @@ def full_map():
                         tile.explored = True
 
 
+def object_clear():
+    for obj in Map.get_all_objects():
+        obj.clear()
 
 
 def objects():
@@ -330,12 +333,70 @@ def pop_up(width=None, height=None, title=None, text=None):
             return
 
 
+def beastiary(width=None, height=None, title=None, text=None):
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    # calculate total height for the header (after auto-wrap) and one line per option
+    if width is None:
+        width = Constants.MAP_CONSOLE_WIDTH - 30
+
+    if height is None:
+        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
+
+    pop = libtcod.console_new(width, height)
+    # print the header, with auto-wrap
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+
+    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
+                                flag=libtcod.BKGND_SET,
+                                fmt=title)
+
+    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
+
+
+    # blit the contents of "window" to the root console
+    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
+    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
+
+
+    button_text = '[ Click to Continue ]'
+    button = UI.Button(button_text,
+                       Map.Rect(width/2,height - 2, len(button_text), 1),
+                       Map.Rect(x,y,width, height),
+                       function=UI.close_window)
+
+    img = libtcod.image_load('cipher_warden_80x80_test_01.png')
+    libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
+    # show the background image, at twice the regular console resolution
+    libtcod.image_blit_2x(img, pop, 19, 6)
+
+
+
+
+    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
+
+    while True:
+
+        libtcod.console_flush()
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+        if button.draw(key, mouse) == 'close':
+            return
+
+        if key.vk == libtcod.KEY_ENTER and key.lalt:
+            # Alt+Enter: toggle fullscreen
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
+            return
 
 
 
 def render_all():
-    libtcod.console_clear(0)
+    # libtcod.console_clear(0)
     full_map()
     objects()
     ui()
     update()
+    libtcod.console_flush()

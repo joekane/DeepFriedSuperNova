@@ -10,6 +10,9 @@ import libtcodpy as libtcod
 
 DEBUG = False
 
+
+TURN_COST = 100
+
 #SOUND
 MUSIC_ON = False
 SOUND_ON = False

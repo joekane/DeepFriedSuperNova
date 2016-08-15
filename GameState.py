@@ -13,6 +13,11 @@ import libtcodpy as libtcod
 import Components
 import Entity
 import ConfigParser
+import Map
+import CaveGen
+import Fov
+import SoundEffects
+
 
 imported_items_list = {}
 imported_npc_list = {}
@@ -24,11 +29,11 @@ game_msgs = []
 dungeon_level = 0
 
 
-
-
 def initialize():
     global imported_items_list, imported_npc_list, imported_quest_list
     global current_quests, player, inventory, game_msgs, dungeon_level
+
+    import Schedule
 
     imported_items_list = {}
     imported_npc_list = {}
@@ -49,11 +54,18 @@ def initialize():
                                            death_function=Components.player_death)
     player = Entity.Entity(0, 0, '@', 'player', libtcod.white,
                            blocks=True,
+                           ai=Components.PlayeControlled(),
                            fighter=fighter_component)
 
     starting_equipment()
+    player.speed = 10
 
     player.level = 1
+    player.action_points = 100
+
+    Schedule.register(player)
+    Schedule.add_to_pq((player.action_points, player))
+
     dungeon_level = 0
 
 
@@ -168,3 +180,40 @@ def read_external_quests():
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
 
+
+
+def next_level():
+    global dungeon_level
+
+
+    # advance to the next level
+    add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
+    get_player().fighter.heal(get_player().fighter.max_hp / 2)  # heal the player by 50%
+    get_player().action_points = 0
+    add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
+    dungeon_level += 1
+
+
+    # CAVES ONLY
+    # CaveGen.build()
+    # Map.translate_map_data()
+
+    # OG MAPS
+    #Map.make_map()
+
+    # BSP Maps
+    Map.make_bsp()
+
+
+    # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
+    # Map.make_bsp(map=Map.translate_map_data())
+
+
+    # Cannot MAP -> CA as CA map is not tiles[][]
+    # BORKED!
+    # CaveGen.build(Map.make_map())
+
+    Fov.initialize()
+    # Map.spawn_doors()
+
+    SoundEffects.play_music('SSA')
