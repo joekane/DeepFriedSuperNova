@@ -16,6 +16,13 @@ import Map
 import Fov
 import time
 import Animate
+import Render
+
+map_old_x = 0
+map_old_y = 0
+delay = 0
+new_animation = True
+
 
 def message(new_msg, color=libtcod.white):
     import textwrap
@@ -163,25 +170,34 @@ def random_choice(chances_dict):
 
 
 def inspect_tile(x, y):
-    global delay, mouse_old_x, mouse_old_y, new_animation
+    global delay, map_old_x, map_old_y, new_animation
 
     if 0 < x < Constants.MAP_CONSOLE_WIDTH and 0 < y < Constants.MAP_CONSOLE_HEIGHT:
         # Mouse over Inspection
-        if x is mouse_old_x and y is mouse_old_y:
+
+        camera_x, camera_y = Map.get_camera()
+        map_x, map_y = (camera_x + x, camera_y + y)
+
+        if map_x is map_old_x and map_y is map_old_y:
             if time.time() - delay > Constants.INSPECTION_DELAY:
-                camera_x, camera_y = Map.get_camera()
-                map_x, map_y = (camera_x + x, camera_y + y)
+                # Post-Delay
+
                 if Map.level_map[map_x][map_y].explored:
                     obj = [obj for obj in Map.get_all_objects() if obj.x == map_x and obj.y == map_y]
                     if len(obj) == 0:
                         pass
                     else:
+                        # print "animating..."
                         Animate.inspect_banner(x, y, obj[0].name, new_animation)
                         new_animation = False
+            else:
+                # Pre-Delay
+                pass
         else:
+            Render.clear_animations()
             new_animation = True
-            mouse_old_x = x
-            mouse_old_y = y
+            map_old_x = map_x
+            map_old_y = map_y
             delay = time.time()
 
 
@@ -197,8 +213,3 @@ def connected_cells(source, target):
         return False
 
     libtcod.path_delete(my_path)
-
-delay = 0
-new_animation = True
-mouse_old_x = 0
-mouse_old_y = 0

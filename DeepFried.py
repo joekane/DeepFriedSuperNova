@@ -292,7 +292,7 @@ def new_game():
 
     GameState.initialize()
 
-    Render.initialize(map_console, entity_console, panel, side_panel)
+    Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
 
     Map.load_diner_map()
     # Map.translate_map_data()
@@ -306,6 +306,7 @@ def new_game():
 
 def play_game():
     global key, mouse, continue_walking
+    import profile
     import Schedule
     player_action = None
     next_delta = 1
@@ -313,14 +314,12 @@ def play_game():
     loop_count = 0
 
     while not libtcod.console_is_window_closed():
-        # Render.object_clear()
-
-
-        Schedule.tick()
-
-
         Render.render_all()
-        # process_mouse_hover()
+        Schedule.all_at_once()
+
+
+
+
 
 
 
@@ -434,6 +433,8 @@ entity_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_
 panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
 side_panel = libtcod.console_new(20,
                                  Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
+animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+
 
 SoundEffects.initilize()
 

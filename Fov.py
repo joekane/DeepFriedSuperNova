@@ -50,7 +50,8 @@ def recompute():
         Map.visible_objects = None
 
         for obj in Map.get_all_objects():
-            fov_change(obj.x, obj.y, obj.blocks_sight, obj.blocks)
+            if obj.name != 'player':
+                fov_change(obj.x, obj.y, obj.blocks_sight, obj.blocks)
 
         # print "COMPUTING FOV!!!"
         libtcod.map_compute_fov(fov_map, player.x, player.y,

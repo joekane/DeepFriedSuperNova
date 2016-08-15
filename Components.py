@@ -28,8 +28,33 @@ class PlayeControlled:
 
 
     def end_turn(self, cost):
-        self.owner.action_points += 100
-        Schedule.add_to_pq((self.owner.action_points, self.owner))
+        # self.owner.action_points += 100
+        # Schedule.add_to_pq((self.owner.action_points, self.owner))
+        return cost
+
+    def process_mouse_clicks(self, mouse):
+
+        # (x, y) = Map.to_camera_coordinates(mouse.cx, mouse.cy)
+        (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
+        # walk to target tile
+        if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
+            GameState.continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
+            return self.end_turn(Constants.TURN_COST)
+        if mouse.rbutton_pressed:
+            # print "Mouse Pressed!"
+            x, y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+            GameState.get_player().x = x
+            GameState.get_player().y = y
+            Fov.require_recompute()
+            return 0
+
+    def process_mouse_hover(self, mouse):
+        (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
+        if not self.owner.x == map_x and not self.owner.y == map_y:
+            Utils.inspect_tile(mouse.cx, mouse.cy)
+
 
 
     # AI for a basic monster.
@@ -52,8 +77,11 @@ class PlayeControlled:
             elif key.vk == libtcod.KEY_ESCAPE:
                 return 0  # exit game
 
-            # if process_mouse_clicks():
-            #    return 0
+            if self.process_mouse_clicks(mouse):
+                return 0
+
+            if self.process_mouse_hover(mouse):
+                return 0
 
             # movement keys
             if True:
@@ -61,28 +89,28 @@ class PlayeControlled:
                 # movement keys
                 if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
                     Map.player_move_or_interact(0, -1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
                     Map.player_move_or_interact(0, 1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
                     Map.player_move_or_interact(-1, 0)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
                     Map.player_move_or_interact(1, 0)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_HOME or key.vk == libtcod.KEY_KP7:
                     Map.player_move_or_interact(-1, -1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_PAGEUP or key.vk == libtcod.KEY_KP9:
                     Map.player_move_or_interact(1, -1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_END or key.vk == libtcod.KEY_KP1:
                     Map.player_move_or_interact(-1, 1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_PAGEDOWN or key.vk == libtcod.KEY_KP3:
                     Map.player_move_or_interact(1, 1)
-                    return self.end_turn(100)
+                    return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_KP5:
                     pass  # do nothing ie wait for the monster to come to you
                 else:
@@ -120,7 +148,7 @@ class PlayeControlled:
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:
                                 obj.owner.ranged.fire()
-                                return 100
+                                Constants.TURN_COST
                         Utils.message("No ranged weapon equipped!", libtcod.light_amber)
                     elif key_char == 'h':
                         for obj in GameState.get_inventory():
@@ -170,16 +198,21 @@ class PlayeControlled:
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
+                    elif GameState.continue_walking:
+                        self.owner.walk_path()
+                        return self.end_turn(Constants.TURN_COST)
+                    elif not GameState.continue_walking:
+                        GameState.get_player().clear_path()
 
-                    # elif continue_walking: # contimue walking
-                    #    return 0
-                    # elif not continue_walking:
-                    #    GameState.get_player().clear_path()
 
                     # return 0
                 # print "took turn"
                 # return Constants.TURN_COST
+                # print "rendering"
                 Render.render_all()
+
+                #Render.update()
+                #libtcod.console_flush()
 
 
 class Fighter:
@@ -304,26 +337,28 @@ class BasicMonster:
     def __init__(self, owner=None):
         self.given = False
         self.owner = owner
+        self.active = False
 
     # AI for a basic monster.
     def take_turn(self):
-
-
             # a basic monster takes its turn. If you can see it, it can see you
             monster = self.owner
             player = GameState.get_player()
 
-            if Fov.is_visible(obj=monster):
+            if self.active or Fov.is_visible(obj=monster):
+                self.active = True
                 # move towards player if far away
                 dist = monster.distance_to(player)
+                print self.owner.name + " | " + str(dist)
                 if dist <= 1.5 and player.fighter.hp > 0:
                     monster.fighter.attack(player)
                 else:
                     monster.move_astar(player)
+                GameState.continue_walking = False
 
             # self.owner.action_points += 100
             # Schedule.add_to_pq((self.owner.action_points, self.owner))
-            return 100
+            return Constants.TURN_COST
 
 
 class Door:

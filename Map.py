@@ -697,6 +697,26 @@ def is_blocked(x, y):
 
     return False
 
+def directly_adjacent_open_tiles(obj):
+    open_tiles = []
+
+
+    if (not is_blocked(obj.x, obj.y - 1)):
+        open_tiles.append([obj.x, obj.y - 1])
+    if (not is_blocked(obj.x + 1, obj.y)):
+        open_tiles.append([obj.x + 1, obj.y])
+    if (not is_blocked(obj.x - 1, obj.y + 1)):
+        open_tiles.append([obj.x - 1, obj.y + 1])
+    if (not is_blocked(obj.x, obj.y + 1)):
+        open_tiles.append([obj.x, obj.y + 1])
+
+    if (len(open_tiles) == 0):
+        return [None, None]
+
+    choice = random.choice(open_tiles)
+    print(choice)
+    return choice
+
 
 def adjacent_open_tiles(obj):
     open_tiles = []
@@ -707,7 +727,7 @@ def adjacent_open_tiles(obj):
         open_tiles.append([obj.x, obj.y - 1])
     if (not is_blocked(obj.x + 1, obj.y - 1)):
         open_tiles.append([obj.x + 1, obj.y - 1])
-    if (not is_blocked(obj.x - 1, obj.y)):
+    if (not is_blocked(obj.x - 1, obj.y - 1)):
         open_tiles.append([obj.x - 1, obj.y - 1])
     if (not is_blocked(obj.x + 1, obj.y)):
         open_tiles.append([obj.x + 1, obj.y])
@@ -721,7 +741,7 @@ def adjacent_open_tiles(obj):
         return [None, None]
 
     choice = random.choice(open_tiles)
-    #print(choice)
+    print(choice)
     return choice
 
 

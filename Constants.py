@@ -12,6 +12,7 @@ DEBUG = False
 
 
 TURN_COST = 100
+BASE_SPEED = 10
 
 #SOUND
 MUSIC_ON = False

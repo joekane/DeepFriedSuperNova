@@ -28,6 +28,8 @@ inventory = []
 game_msgs = []
 dungeon_level = 0
 
+continue_walking = False
+
 
 def initialize():
     global imported_items_list, imported_npc_list, imported_quest_list

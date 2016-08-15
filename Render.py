@@ -21,12 +21,13 @@ consoles = {}
 gameState = None
 
 
-def initialize(map_console, entity_console, panel_console, side_panel_console):
+def initialize(map_console, entity_console, panel_console, side_panel_console, animation_console):
     global consoles, gameState
     consoles['map_console'] = map_console
     consoles['panel_console'] = panel_console
     consoles['side_panel_console'] = side_panel_console
     consoles['entity_console'] = entity_console
+    consoles['animation_console'] = animation_console
 
 
 def clear_map():
@@ -213,14 +214,34 @@ def ui():
 
 def update():
     # blit the contents of "panel" to the root console
-    libtcod.console_blit(consoles['map_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0)
-    libtcod.console_blit(consoles['entity_console'], 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0)
+    libtcod.console_blit(consoles['map_console'], 0, 0,
+                         Constants.SCREEN_WIDTH,
+                         Constants.SCREEN_HEIGHT, 0, 0, 0)
+    libtcod.console_blit(consoles['entity_console'], 0, 0,
+                         Constants.SCREEN_WIDTH,
+                         Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0)
     libtcod.console_blit(consoles['panel_console'], 0, 0, Constants.SCREEN_WIDTH,
                          Constants.PANEL_HEIGHT, 0, 0,
                          Constants.PANEL_Y)
     libtcod.console_blit(consoles['side_panel_console'], 0, 0, Constants.SCREEN_WIDTH - Constants.MAP_CONSOLE_WIDTH,
                          Constants.SCREEN_HEIGHT, 0,
                          Constants.MAP_CONSOLE_WIDTH, 0)
+    libtcod.console_blit(consoles['animation_console'], 0, 0,
+                         Constants.SCREEN_WIDTH,
+                         Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0)
+
+
+def clear_animations():
+    libtcod.console_clear(consoles['animation_console'])
+    libtcod.console_blit(consoles['animation_console'], 0, 0, Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT, 0, 0, 0, 1.0, 0.0)
+
+
+def update_animations():
+    libtcod.console_blit(consoles['animation_console'], 0, 0, Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT, 0, 0, 0, 1.0, 0.0)
+    libtcod.console_flush()
+
+
+
 
 
 def blank(x, y):
@@ -396,7 +417,8 @@ def beastiary(width=None, height=None, title=None, text=None):
 def render_all():
     # libtcod.console_clear(0)
     full_map()
-    objects()
+    if not Constants.DEBUG:
+        objects()
     ui()
     update()
     libtcod.console_flush()
