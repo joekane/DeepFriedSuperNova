@@ -11,11 +11,15 @@
 
 import libtcodpy as libtcod
 import Components
+import Constants
 import Entity
 import ConfigParser
 import Map
 import CaveGen
+import UI
+import Utils
 import Fov
+import Render
 import SoundEffects
 
 
@@ -183,6 +187,23 @@ def read_external_quests():
         imported_quest_list[str(i)] = dict(config.items(i))
 
 
+def new_game():
+    initialize()
+
+    map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+    entity_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+    panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
+    side_panel = libtcod.console_new(20, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
+    animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+
+    Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
+
+    Map.load_diner_map()
+    # Map.translate_map_data()
+
+    Fov.initialize()
+    play_game()
+
 
 def next_level():
     global dungeon_level
@@ -219,3 +240,41 @@ def next_level():
     # Map.spawn_doors()
 
     SoundEffects.play_music('SSA')
+
+
+def play_game():
+    import Schedule
+    Fov.require_recompute()
+
+    while not libtcod.console_is_window_closed():
+        Render.render_all()
+        Schedule.all_at_once()
+
+
+
+def check_level_up():
+    # see if the player's experience is enough to level-up
+
+    level_up_xp = Constants.LEVEL_UP_BASE + player.level * Constants.LEVEL_UP_FACTOR
+    if player.fighter.xp >= level_up_xp:
+        # it is! level up
+        player.level += 1
+        player.fighter.xp -= level_up_xp
+        Utils.message('Your battle skills grow stronger! You reached level ' + str(player.level) + '!', libtcod.yellow)
+
+        choice = None
+        while choice is None:  # keep asking until a choice is made
+            choice = UI.menu('Level up! Choose a stat to raise:\n',
+                          ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
+                           'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
+                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
+                          Constants.LEVEL_SCREEN_WIDTH)
+
+        if choice == 0:
+            player.fighter.base_max_hp += 20
+            player.fighter.hp += 20
+        elif choice == 1:
+            player.fighter.base_power += 1
+        elif choice == 2:
+            player.fighter.base_defense += 1
+        return True

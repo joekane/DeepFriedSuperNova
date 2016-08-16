@@ -111,5 +111,45 @@ def inspect_banner(x, y, banner_text, new_animation=True):
     libtcod.console_print_ex(animation_console, x + 3, y, libtcod.BKGND_NONE, libtcod.LEFT, banner_text)
 
 
+def large_button(x, y, text, hover, length=None, target=0):
+
+    animation_console = target
+
+    if hover:
+        color = libtcod.light_azure
+    else:
+        color = libtcod.azure
+
+    if length is None:
+        length = len(text)
+    text = text.center(length)
+
+    x = x - ((length + 2) / 2)
+    # print text
+
+
+    base_color = color
+    value = 40
+    adj = libtcod.Color(value, value, value)
+    color1 = base_color - adj - adj
+    color2 = base_color - adj
+    color3 = base_color
+
+
+    #libtcod.console_put_char_ex(animation_console, x + 1, y, libtcod.CHAR_HLINE, color, libtcod.BKGND_NONE)
+
+    libtcod.console_put_char_ex(animation_console, x, y - 1, libtcod.CHAR_NW, color1, libtcod.BKGND_NONE)
+    libtcod.console_put_char_ex(animation_console, x, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
+    libtcod.console_put_char_ex(animation_console, x, y + 1, libtcod.CHAR_SW, color3, libtcod.BKGND_NONE)
+
+    for z in range(length):
+        libtcod.console_put_char_ex(animation_console, x + z + 1, y - 1, libtcod.CHAR_HLINE, color1, libtcod.BKGND_NONE)
+        libtcod.console_put_char_ex(animation_console, x + z + 1, y, text[z], color2, libtcod.BKGND_NONE)
+        libtcod.console_put_char_ex(animation_console, x + z + 1, y + 1, libtcod.CHAR_HLINE, color3, libtcod.BKGND_NONE)
+
+    libtcod.console_put_char_ex(animation_console, x + 1 + length, y - 1, libtcod.CHAR_NE, color1, libtcod.BKGND_NONE)
+    libtcod.console_put_char_ex(animation_console, x + 1 + length, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
+    libtcod.console_put_char_ex(animation_console, x + 1 + length, y + 1, libtcod.CHAR_SE, color3, libtcod.BKGND_NONE)
+
 
 
