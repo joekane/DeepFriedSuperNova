@@ -59,6 +59,11 @@ class PlayeControlled:
 
     # AI for a basic monster.
     def take_turn(self):
+        if GameState.continue_walking:
+            self.owner.walk_path()
+            return self.end_turn(Constants.TURN_COST)
+        elif not GameState.continue_walking:
+            GameState.get_player().clear_path()
         while True:
             # print "looping"
             key = libtcod.Key()
@@ -198,11 +203,7 @@ class PlayeControlled:
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
-                    elif GameState.continue_walking:
-                        self.owner.walk_path()
-                        return self.end_turn(Constants.TURN_COST)
-                    elif not GameState.continue_walking:
-                        GameState.get_player().clear_path()
+
 
 
                     # return 0
@@ -333,7 +334,7 @@ class QuestNpc:
             Utils.message("greedy bastard.")
 
 
-class BasicMonster:
+class MeleeMonster:
     def __init__(self, owner=None):
         self.given = False
         self.owner = owner
@@ -345,96 +346,211 @@ class BasicMonster:
             monster = self.owner
             player = GameState.get_player()
 
-            if self.active or Fov.is_visible(obj=monster):
+            if Fov.is_visible(obj=monster):
                 self.active = True
+                GameState.continue_walking = False
+
+            if self.active:
                 # move towards player if far away
                 dist = monster.distance_to(player)
-                print self.owner.name + " | " + str(dist)
+                # print self.owner.name + " | " + str(dist)
                 if dist <= 1.5 and player.fighter.hp > 0:
                     monster.fighter.attack(player)
                 else:
                     monster.move_astar(player)
-                GameState.continue_walking = False
+
 
             # self.owner.action_points += 100
             # Schedule.add_to_pq((self.owner.action_points, self.owner))
             return Constants.TURN_COST
 
 
-class Door:
-    def __init__(self, door_status=None, owner=None):
+
+
+class AssassinMonster:
+    def __init__(self, owner=None):
+        self.given = False
         self.owner = owner
-        if door_status is None:
-            chance = libtcod.random_get_int(0, 0, 100)
-            if chance <= 2:
-                self.status = 'locked'
-            else:
-                self.status = 'closed'
-        else:
-            self.status = door_status
+        self.active = True
 
+    # AI for a basic monster.
     def take_turn(self):
-        self.owner.CT = 100
-        if self.status is 'closed':
-            self.owner.blocks = True
-            self.owner.blocks_sight = True
-            # Fov.fov_change(self.owner.x, self.owner.y, True, True)
-            # Map.level_map[self.owner.x][self.owner.y].blocked = True
-            # Map.level_map[self.owner.x][self.owner.y].block_sight = True
-            self.owner.char = '+'
-        if self.status is 'open':
-            self.owner.blocks = False
-            self.owner.blocks_sight = False
-            # Fov.fov_change(self.owner.x, self.owner.y, False, False)
-            # Map.level_map[self.owner.x][self.owner.y].blocked = False
-            # Map.level_map[self.owner.x][self.owner.y].block_sight = False
-
-            self.owner.char = '_'
-        if self.status is 'locked':
-            self.owner.blocks = True
-            self.owner.blocks_sight = True
-            self.owner.name = 'locked door'
-        return False
-
-    def interact(self):
-        # print "interact!"
-        if self.status == 'closed':
-            self.status = 'open'
-        if self.status == 'open':
-            pass
-        else:
-            Utils.message("Locked!", libtcod.dark_red)
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            player = GameState.get_player()
+            dist = monster.distance_to(player)
 
 
-class BasicRangedMonster:
+            if Fov.is_visible(obj=monster):
+                self.active = True
+                GameState.continue_walking = False
+            else:
+                if dist > 25:
+                    self.active = False
+                else:
+                    self.active = False
+
+
+
+
+            if self.active:
+                # move towards player if far away
+
+                # print self.owner.name + " | " + str(dist)
+                if dist <= 1.5 and player.fighter.hp > 0:
+                    monster.fighter.attack(player)
+                else:
+                    monster.move_astar(player)
+
+
+            # self.owner.action_points += 100
+            # Schedule.add_to_pq((self.owner.action_points, self.owner))
+            return Constants.TURN_COST
+
+
+
+
+class SentinelMonster:
+    def __init__(self, owner=None):
+        self.given = False
+        self.owner = owner
+        self.active = False
+
+
+    # AI for a basic monster.
+    def take_turn(self):
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            player = GameState.get_player()
+
+            if Fov.is_visible(obj=monster):
+                self.active = True
+                GameState.continue_walking = False
+
+            if self.active:
+                # move towards player if far away
+                dist = monster.distance_to(player)
+                print self.owner.name + " | " + str(dist)
+                if dist <= 1.5 and player.fighter.hp > 0:
+                    monster.fighter.attack(player)
+                if dist >= 6:
+                    monster.move_astar_xy(self.post_x, self.post_y)
+                else:
+                    monster.move_astar(player)
+            else:
+                self.post_x = self.owner.x
+                self.post_y = self.owner.y
+
+            # self.owner.action_points += 100
+            # Schedule.add_to_pq((self.owner.action_points, self.owner))
+            return Constants.TURN_COST
+
+
+
+
+class ScoutMonster:
+    def __init__(self, owner=None):
+        self.given = False
+        self.owner = owner
+        self.active = False
+
+    # AI for a basic monster.
+    def take_turn(self):
+            # a basic monster takes its turn. If you can see it, it can see you
+            monster = self.owner
+            player = GameState.get_player()
+
+            if Fov.is_visible(obj=monster):
+                self.active = True
+                GameState.continue_walking = False
+
+            if self.active:
+                # move towards player if far away
+                dist = monster.distance_to(player)
+                # print self.owner.name + " | " + str(dist)
+                if dist <= 1.5 and player.fighter.hp > 0:
+                    monster.fighter.attack(player)
+                else:
+                    monster.move_astar(player)
+
+            # self.owner.action_points += 100
+            # Schedule.add_to_pq((self.owner.action_points, self.owner))
+            return Constants.TURN_COST
+
+
+
+class RangedMonster:
     # AI for a basic monster.
     def __init__(self, attack_range=5, owner=None):
         self.owner = owner
         self.attack_range = attack_range
         self.reload = 0
+        self.active = False
 
     def take_turn(self):
-        if self.owner.CT >= 100:
-            self.owner.CT = 0
             # a basic monster takes its turn. If you can see it, it can see you
             monster = self.owner
+            player = GameState.get_player()
+
             if Fov.is_visible(obj=monster):
-                player = GameState.get_player()
+                self.active = True
+                GameState.continue_walking = False
                 # move towards player if far away
-                if monster.distance_to(player) > self.attack_range:
+
+            if self.active:
+
+                dist = monster.distance_to(player)
+
+                if dist > self.attack_range:
                     monster.move_astar(player)
                     self.reload -= 1
-
                 # close enough, attack! (if the player is still alive.)
                 elif player.fighter.hp > 0 and self.reload <= 0:
                     Animate.follow_line(self.owner, player)
                     monster.fighter.attack(player)
                     self.reload = 3
                 else:
+                    # Move away?
                     self.reload -= 1
-                    pass
+
+            return Constants.TURN_COST
+
+
+class RangedTurretMonster:
+    # AI for a basic monster.
+    def __init__(self, attack_range=5, owner=None):
+        self.owner = owner
+        self.attack_range = attack_range
+        self.reload = 0
+        self.active = False
+
+    def take_turn(self):
+        # a basic monster takes its turn. If you can see it, it can see you
+        monster = self.owner
+        player = GameState.get_player()
+
+        if Fov.is_visible(obj=monster):
+            self.active = True
+            GameState.continue_walking = False
+            # move towards player if far away
+
+        if self.active:
+
+            dist = monster.distance_to(player)
+
+            if dist > self.attack_range:
+                # monster.move_astar(player)
+                self.reload -= 1
+            # close enough, attack! (if the player is still alive.)
+            elif player.fighter.hp > 0 and self.reload <= 0:
+                Animate.follow_line(self.owner, player)
+                monster.fighter.attack(player)
+                self.reload = 3
             else:
-                return False
+                # Move away?
+                self.reload -= 1
+
+        return Constants.TURN_COST
 
 
 class SpawningMonster:
@@ -641,3 +757,48 @@ def monster_death(monster):
     Schedule.pq
 
     monster.send_to_back()
+
+
+class Door:
+    def __init__(self, door_status=None, owner=None):
+        self.owner = owner
+        if door_status is None:
+            chance = libtcod.random_get_int(0, 0, 100)
+            if chance <= 2:
+                self.status = 'locked'
+            else:
+                self.status = 'closed'
+        else:
+            self.status = door_status
+
+    def take_turn(self):
+        self.owner.CT = 100
+        if self.status is 'closed':
+            self.owner.blocks = True
+            self.owner.blocks_sight = True
+            # Fov.fov_change(self.owner.x, self.owner.y, True, True)
+            # Map.level_map[self.owner.x][self.owner.y].blocked = True
+            # Map.level_map[self.owner.x][self.owner.y].block_sight = True
+            self.owner.char = '+'
+        if self.status is 'open':
+            self.owner.blocks = False
+            self.owner.blocks_sight = False
+            # Fov.fov_change(self.owner.x, self.owner.y, False, False)
+            # Map.level_map[self.owner.x][self.owner.y].blocked = False
+            # Map.level_map[self.owner.x][self.owner.y].block_sight = False
+
+            self.owner.char = '_'
+        if self.status is 'locked':
+            self.owner.blocks = True
+            self.owner.blocks_sight = True
+            self.owner.name = 'locked door'
+        return False
+
+    def interact(self):
+        # print "interact!"
+        if self.status == 'closed':
+            self.status = 'open'
+        if self.status == 'open':
+            pass
+        else:
+            Utils.message("Locked!", libtcod.dark_red)

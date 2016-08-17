@@ -318,12 +318,6 @@ def play_game():
         Schedule.all_at_once()
 
 
-
-
-
-
-
-
 def main_menu():
 
     img = libtcod.image_load('diner.png')
@@ -426,6 +420,8 @@ def check_level_up():
 libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'python/libtcod tutorial', False)
 libtcod.sys_set_fps(Constants.LIMIT_FPS)
+
+
 
 
 map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)

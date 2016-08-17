@@ -132,7 +132,7 @@ class Entity:
             # Keep the old move function as a backup so that if there are no paths (for example another monster blocks
             # a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
-            print "Fail: walking towards"
+            print self.name + " Fail: walking towards"
             self.move_towards(target.x, target.y)
 
         # Delete the path to free memory
