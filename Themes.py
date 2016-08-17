@@ -102,7 +102,7 @@ def apply_ssa_theme():
     GROUND_COLOR = [libtcod.grey]
     GROUND_BCOLOR = [libtcod.dark_grey]
 
-    WALL_CHAR = [libtcod.CHAR_CHECKBOX_UNSET]
+    WALL_CHAR = [255]
     WALL_COLOR = [libtcod.darker_flame]
     WALL_BCOLOR = [libtcod.dark_red]
 

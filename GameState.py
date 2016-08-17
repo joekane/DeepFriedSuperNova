@@ -226,9 +226,9 @@ def next_level():
     #Map.make_map()
 
     # BSP Maps
-    #Map.make_bsp()
+    Map.make_bsp()
 
-    Map.wilderness()
+    # Map.wilderness()
 
     # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
     # Map.make_bsp(map=Map.translate_map_data())

@@ -29,6 +29,9 @@ def initialize(map_console, entity_console, panel_console, side_panel_console, a
     consoles['entity_console'] = entity_console
     consoles['animation_console'] = animation_console
 
+    # libtcod.console_set_default_background(consoles['animation_console'], libtcod.Color(255,255,255))
+    # libtcod.console_set_background_flag(consoles['animation_console'], libtcod.BKGND_MULTIPLY)
+
 
 def clear_map():
     libtcod.console_clear(consoles['map_console'])
@@ -38,6 +41,8 @@ def full_map():
     import Noise
 
     if Fov.recompute():
+
+        print "Draw Map"
 
         map = Map.current_map()
         player = GameState.get_player()
@@ -98,7 +103,7 @@ def full_map():
                         # if it's not visible right now, the player can only see it if it's explored
                         if tile.explored:
                             if tile.blocked:
-                                char = '#'
+                                char = 207
                             else:
                                 char = '.'
                             libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
@@ -218,17 +223,20 @@ def update():
                          Constants.MAP_CONSOLE_WIDTH, 0)
     libtcod.console_blit(consoles['animation_console'], 0, 0,
                          Constants.SCREEN_WIDTH,
-                         Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0)
+                         Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 0.0)
 
 
 def clear_animations():
+    # print "clear"
     libtcod.console_clear(consoles['animation_console'])
     libtcod.console_blit(consoles['animation_console'], 0, 0, Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT, 0, 0, 0, 1.0, 0.0)
 
 
 def update_animations():
+    # print "update"
     libtcod.console_blit(consoles['animation_console'], 0, 0, Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT, 0, 0, 0, 1.0, 0.0)
     libtcod.console_flush()
+
 
 
 def blank(x, y):
@@ -349,7 +357,7 @@ def beastiary(width=None, height=None, title=None, text=None):
 
     # calculate total height for the header (after auto-wrap) and one line per option
     if width is None:
-        width = Constants.MAP_CONSOLE_WIDTH - 30
+        width = Constants.MAP_CONSOLE_WIDTH - 10
 
     if height is None:
         height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
@@ -363,26 +371,28 @@ def beastiary(width=None, height=None, title=None, text=None):
                                 flag=libtcod.BKGND_SET,
                                 fmt=title)
 
-    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
+
 
 
     # blit the contents of "window" to the root console
-    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
-    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
+    x = 0
+    y = 0
 
 
     button_text = '[ Click to Continue ]'
     button = UI.Button(button_text,
-                       Map.Rect(width/2,height - 2, len(button_text), 1),
-                       Map.Rect(x,y,width, height),
+                       width / 2,
+                       height - 2,
                        function=UI.close_window)
 
     img = libtcod.image_load('cipher_warden_80x80_test_01.png')
     libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
     # show the background image, at twice the regular console resolution
-    libtcod.image_blit_2x(img, pop, 19, 6)
+    libtcod.image_blit_2x(img, pop, 9, 2)
 
-
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+    libtcod.console_print_rect(pop, 3, 3, width - 6, height, text)
 
 
     libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)

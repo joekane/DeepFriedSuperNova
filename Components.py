@@ -52,7 +52,8 @@ class PlayeControlled:
     def process_mouse_hover(self, mouse):
         (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
 
-        if not self.owner.x == map_x and not self.owner.y == map_y:
+        if self.owner.x != map_x or self.owner.y != map_y:
+            # libtcod.console_set_char_background(0, mouse.cx, mouse.cy, libtcod.Color(10, 10, 240), libtcod.BKGND_SET)
             Utils.inspect_tile(mouse.cx, mouse.cy)
 
 
@@ -199,7 +200,7 @@ class PlayeControlled:
 
                         text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
 
-                        Render.beastiary(width=60, height=50, title=title, text=text)
+                        Render.beastiary(width=50, height=45, title=title, text=text)
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
@@ -210,9 +211,9 @@ class PlayeControlled:
                 # print "took turn"
                 # return Constants.TURN_COST
                 # print "rendering"
-                Render.render_all()
+                # Render.render_all()
 
-                #Render.update()
+                Render.update()
                 #libtcod.console_flush()
 
 
