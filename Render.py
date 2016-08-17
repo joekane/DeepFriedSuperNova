@@ -72,7 +72,7 @@ def render_tile(x, y):
 
 
 def full_map():
-
+    import Noise
 
     if Fov.recompute():
 
@@ -96,11 +96,38 @@ def full_map():
                         color = libtcod.white
                     else:
                         color = libtcod.dark_grey
+
+                    pre_value = Noise.get_height_value(x,y)
+
+                    # print nx, ny, pre_value
+                    if 0 <= pre_value < 0.1:
+                        char = '0'
+                    elif 0.1 <= pre_value < 0.2:
+                        char = '1'
+                    elif 0.2 <= pre_value < 0.3:
+                        char = '2'
+                    elif 0.3 <= pre_value < 0.4:
+                        char = '3'
+                    elif 0.4 <= pre_value < 0.5:
+                        char = '4'
+                    elif 0.5 <= pre_value < 0.6:
+                        char = '5'
+                    elif 0.6 <= pre_value < 0.96:
+                        char = '6'
+                    elif 0.96 <= pre_value < 0.97:
+                        char = '7'
+                    elif 0.97 <= pre_value < 0.99:
+                        char = '8'
+                    elif 0.99 <= pre_value < 1.0:
+                        char = '9'
+                    else:
+                        char = '0'
+
                     if libtcod.map_is_walkable(Fov.get_fov_map(), map_x, map_y):
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
                                                     color, libtcod.BKGND_SET)
                     else:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, 'X',
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
                                                     color, libtcod.BKGND_SET)
                     tile.explored = True
                 else:
@@ -241,9 +268,6 @@ def update_animations():
     libtcod.console_flush()
 
 
-
-
-
 def blank(x, y):
     x, y = Map.to_camera_coordinates(x, y)
     libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
@@ -331,16 +355,18 @@ def pop_up(width=None, height=None, title=None, text=None):
     y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
 
 
-    button_text = '[ Click to Continue ]'
+    button_text = 'Click to Continue'
     button = UI.Button(button_text,
-                       Map.Rect(width/2,height - 2, len(button_text), 1),
-                       Map.Rect(x,y,width, height),
-                       function=UI.close_window)
+                       width / 2,
+                       height - 3,
+                       function=UI.close_window,
+                       target=pop,
+                       length=len(button_text))
 
     libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
 
     while True:
-
+        libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, 0.0)
         libtcod.console_flush()
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 

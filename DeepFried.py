@@ -10,14 +10,9 @@
 
 # -*- coding: utf-8 -*-
 import libtcodpy as libtcod
-import Utils
-import Render
-import Fov
-import Map
-import time
-import GameState
 import Constants
 import SoundEffects
+<<<<<<< HEAD
 import CaveGen
 
 
@@ -350,6 +345,10 @@ def main_menu():
         elif choice == 2:  # quit
             break
 
+=======
+import UI
+import Noise
+>>>>>>> refs/remotes/origin/Interface_Work
 
 def save_game():
     # file = shelve.open('savegame', 'n')
@@ -387,40 +386,11 @@ def load_game():
 # Initialization & Main Loop
 #############################################
 
-def check_level_up():
-    # see if the player's experience is enough to level-up
-    player = GameState.get_player()
-    level_up_xp = Constants.LEVEL_UP_BASE + player.level * Constants.LEVEL_UP_FACTOR
-    if player.fighter.xp >= level_up_xp:
-        # it is! level up
-        player.level += 1
-        player.fighter.xp -= level_up_xp
-        Utils.message('Your battle skills grow stronger! You reached level ' + str(player.level) + '!', libtcod.yellow)
-
-        choice = None
-        while choice is None:  # keep asking until a choice is made
-            choice = menu('Level up! Choose a stat to raise:\n',
-                          ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
-                           'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
-                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
-                          Constants.LEVEL_SCREEN_WIDTH)
-
-        if choice == 0:
-            player.fighter.base_max_hp += 20
-            player.fighter.hp += 20
-        elif choice == 1:
-            player.fighter.base_power += 1
-        elif choice == 2:
-            player.fighter.base_defense += 1
-        return True
-
-
-""" INITIALIZATION """
-
 libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep Fried Supernova', False)
 libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
+<<<<<<< HEAD
 
 
 
@@ -432,15 +402,11 @@ side_panel = libtcod.console_new(20,
 animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 
 
+=======
+>>>>>>> refs/remotes/origin/Interface_Work
 SoundEffects.initilize()
+Noise.initialze()
 
-mouse = libtcod.Mouse()
-key = libtcod.Key()
-Fov.require_recompute()
 
-game_state = None
-char_cycle = 1
+UI.Display_MainMenu()
 
-continue_walking = True
-
-main_menu()
