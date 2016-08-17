@@ -74,6 +74,93 @@ class Rect:
         return self.y2 - self.y1
 
 
+def wilderness():
+    import Noise
+    global objects, level_map, stairs
+    Themes.apply_forrest_theme()
+
+    player = GameState.get_player()
+    objects = [player]
+
+    level_map = [[Tile(True,
+                       block_sight=True,
+                       char=Themes.wall_char(),
+                       f_color=Themes.wall_color(),
+                       b_color=Themes.wall_bcolor())
+                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+    for x in range(Constants.MAP_WIDTH):
+        for y in range(Constants.MAP_HEIGHT):
+            pre_value = Noise.get_height_value(x, y)
+            print pre_value
+
+            if 0 <= pre_value < 0.1:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='~',
+                                       f_color=libtcod.darker_blue,
+                                       b_color=libtcod.black)
+            elif 0.1 <= pre_value < 0.2:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='~',
+                                       f_color=libtcod.dark_blue,
+                                       b_color=libtcod.black)
+            elif 0.2 <= pre_value < 0.3:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='~',
+                                       f_color=libtcod.blue,
+                                       b_color=libtcod.black)
+            elif 0.3 <= pre_value < 0.4:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='%',
+                                       f_color=libtcod.blue,
+                                       b_color=libtcod.black)
+            elif 0.4 <= pre_value < 0.5:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='~',
+                                       f_color=libtcod.light_blue,
+                                       b_color=libtcod.black)
+            elif 0.5 <= pre_value < 0.6:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=';',
+                                       f_color=libtcod.light_green,
+                                       b_color=libtcod.black)
+            elif 0.6 <= pre_value < 0.7:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=',',
+                                       f_color=libtcod.green,
+                                       b_color=libtcod.black)
+            elif 0.7 <= pre_value < 0.90:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='`',
+                                       f_color=libtcod.dark_green,
+                                       b_color=libtcod.black)
+            elif 0.90 <= pre_value < 0.999:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='^',
+                                       f_color=libtcod.dark_sepia,
+                                       b_color=libtcod.black)
+            else:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char='^',
+                                       f_color=libtcod.dark_grey,
+                                       b_color=libtcod.black)
+            level_map[x][y].explored = True
+
+
+
+
+
+
 def translate_map_data():
     import CaveGen
     global objects, level_map, stairs

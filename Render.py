@@ -34,43 +34,6 @@ def clear_map():
     libtcod.console_clear(consoles['map_console'])
 
 
-def render_tile(x, y):
-    # NOT SURE IF WORKS!?!?!
-    Fov.recompute()
-
-    map = Map.current_map()
-
-    # go through all tiles, and set their background color
-
-    visible = Fov.is_visible(pos=(x, y))
-
-    player = GameState.get_player()
-
-    offset_value = int(Utils.distance_between(x, y, player.x, player.y)) * Constants.TORCH_RADIUS
-    offset_color = libtcod.Color(offset_value, offset_value, offset_value)
-
-    tile = map[x][y]
-
-    if not Constants.DEBUG:
-        if libtcod.map_is_walkable(Fov.get_fov_map(), x, y):
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, ' ',
-                                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
-        else:
-            libtcod.console_put_char_ex(consoles['map_console'], x, y, 'X',
-                                        Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
-            tile.explored = True
-    else:
-        if not visible:
-            # if it's not visible right now, the player can only see it if it's explored
-            if tile.explored:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
-        else:
-                libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                            tile.f_color - offset_color, libtcod.BKGND_SET)
-                tile.explored = True
-
-
 def full_map():
     import Noise
 
