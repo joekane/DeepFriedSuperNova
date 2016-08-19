@@ -52,8 +52,8 @@ def load_game():
 # Initialization & Main Loop
 #############################################
 
-libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-# libtcod.console_set_custom_font('cp437_16x16.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
+# libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+libtcod.console_set_custom_font('cp437_16x16.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
 
 libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep Fried Supernova', False)
 libtcod.sys_set_fps(Constants.LIMIT_FPS)

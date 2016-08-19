@@ -211,6 +211,195 @@ def inventory_menu(header):
     return GameState.inventory[index].item
 
 
+class Skill:
+    def __init__(self, char, purchased=False):
+        self.char = char
+        self.purchased = purchased
+
+
+
+
+def skill_tree():
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    # calculate total height for the header (after auto-wrap) and one line per option
+    width = Constants.MAP_CONSOLE_WIDTH
+    height = Constants.MAP_CONSOLE_HEIGHT
+
+    st = libtcod.console_new(width, height)
+    # print the header, with auto-wrap
+    libtcod.console_set_default_foreground(st, Constants.UI_PopFore)
+    libtcod.console_set_default_background(st, Constants.UI_PopBack)
+
+    libtcod.console_print_frame(st, 0, 0, width, height, clear=True,
+                                flag=libtcod.BKGND_SET,
+                                fmt="Skill Tree")
+
+    libtcod.console_print_rect(st, 4, 4, width, height, 'Insert Skill Tree')
+
+    # blit the contents of "window" to the root console
+    x = 0
+    y = 0
+
+    file = open('Assets\skill_tree.map', 'r')
+
+    # fill map with "blocked" tiles
+    #kills = [[' ' for y in range(Constants.MAP_CONSOLE_HEIGHT)] for x in range(Constants.MAP_CONSOLE_WIDTH)]
+
+    skills = [[Skill(' ') for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+
+
+    selected_x = 0
+    selected_y = 0
+
+    for y in range(Constants.MAP_CONSOLE_HEIGHT):
+        line = file.readline()
+        # print line
+        x = 0
+        for c in line:
+            if c == 'S':
+                selected_x = x
+                selected_y = y
+                skills[x][y] = Skill(c, True)
+            else:
+                skills[x][y] = Skill(c)
+            x += 1
+
+    # print selected_x, selected_y
+
+
+
+    button_text = 'Exit'
+    ct_button = Button(button_text,
+                       width / 2,
+                       height - 3,
+                       length=6,
+                       function=close_window)
+
+
+
+    while True:
+
+        libtcod.console_flush()
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
+
+
+        if key.vk == libtcod.KEY_LEFT:
+            if skills[selected_x-1][selected_y].char == "-":
+                selected_x -= 2
+        elif key.vk == libtcod.KEY_RIGHT:
+            if skills[selected_x + 1][selected_y].char == "-":
+                selected_x += 2
+        elif key.vk == libtcod.KEY_UP:
+            if skills[selected_x][selected_y-1].char == "|":
+                selected_y -= 2
+        elif key.vk == libtcod.KEY_DOWN:
+            if skills[selected_x ][selected_y+1].char == "|":
+                selected_y += 2
+        elif key.vk == libtcod.KEY_SPACE:
+            skills[selected_x][selected_y].purchased = True
+
+        if selected_y < 0:
+            selected_y = 0
+        if selected_x < 0:
+            selected_x = 0
+
+        offset = 20, 10
+
+        for y in range(Constants.MAP_CONSOLE_HEIGHT):
+            for x in range(Constants.MAP_CONSOLE_WIDTH):
+                # print skills
+                if selected_x == x and selected_y == y:
+                    color = libtcod.purple
+                else:
+                    if skills[x][y].purchased:
+                        color = libtcod.green
+                    else:
+                        color = libtcod.white
+
+                char = skills[x][y].char
+                if char == "|":
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_VLINE, libtcod.white, Constants.UI_PopBack)
+                elif char == "-":
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_HLINE, libtcod.white, Constants.UI_PopBack)
+                elif char == ".":
+                    if color == libtcod.purple:
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE,
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW,
+                                                    color, Constants.UI_PopBack)
+                    else:
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, ' ',
+                                                    color, Constants.UI_PopBack)
+                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, ' ',
+                                                    color, Constants.UI_PopBack)
+
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], chr(4),
+                                                libtcod.white, Constants.UI_PopBack)
+
+
+
+
+                elif char != ' ' and char != chr(10):
+                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE, color, Constants.UI_PopBack)
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
+                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW, color, Constants.UI_PopBack)
+
+                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
+
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], char, libtcod.red, Constants.UI_PopBack)
+
+                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
+
+                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE, color, Constants.UI_PopBack)
+                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
+                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW, color, Constants.UI_PopBack)
+
+
+
+        if ct_button.draw(key, mouse) == 'close':
+            return
+
+
+
+        if key.vk == libtcod.KEY_ENTER and key.lalt:
+            # Alt+Enter: toggle fullscreen
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE:
+            return
+
+        libtcod.console_blit(st, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
+
+
+
+
 def close_window():
     return 'close'
 

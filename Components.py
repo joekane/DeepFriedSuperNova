@@ -20,6 +20,8 @@ import Utils
 import Animate
 import Render
 import Schedule
+import UI
+
 
 
 class PlayeControlled:
@@ -137,19 +139,21 @@ class PlayeControlled:
                         # img2 = libtcod.image_load('orc_80.png')
                         # libtcod.image_blit_2x(img2, 0, 40, 0)
 
-                        chosen_item = inventory_menu(
-                            'Press the key next to an item to use it, or any other to cancel.\n')
+                        # chosen_item = inventory_menu(
+                        #    'Press the key next to an item to use it, or any other to cancel.\n')
 
-                        if chosen_item is not None:
-                            chosen_item.use()
-                            return 0
+                        # if chosen_item is not None:
+                        #    chosen_item.use()
+                        #    return 0
+                        pass
                     elif key_char == 'd':
                         # show the inventory; if an item is selected, drop it
-                        chosen_item = inventory_menu(
-                            'Press the key next to an item to drop it, or any other to cancel.\n')
+                        # chosen_item = inventory_menu(
+                        #    'Press the key next to an item to drop it, or any other to cancel.\n')
 
-                        if chosen_item is not None:
-                            chosen_item.drop()
+                        # if chosen_item is not None:
+                        #     chosen_item.drop()
+                        pass
                     elif key_char == 'f':
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:
@@ -201,6 +205,10 @@ class PlayeControlled:
                         text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
 
                         Render.beastiary(width=50, height=45, title=title, text=text)
+                    elif key_char == 's':
+                        UI.skill_tree()
+
+
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
@@ -212,8 +220,8 @@ class PlayeControlled:
                 # return Constants.TURN_COST
                 # print "rendering"
                 # Render.render_all()
-
-                Render.update()
+                Render.render_all()
+                # Render.update()
                 #libtcod.console_flush()
 
 

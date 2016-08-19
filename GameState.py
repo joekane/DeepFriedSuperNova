@@ -219,7 +219,7 @@ def next_level():
 
 
     # CAVES ONLY
-    # CaveGen.build()
+    #CaveGen.build()
     # Map.translate_map_data()
 
     # OG MAPS
@@ -249,7 +249,7 @@ def play_game():
     Fov.require_recompute()
 
     while not libtcod.console_is_window_closed():
-        Render.render_all()
+        # Render.render_all()
         Schedule.all_at_once()
 
 

@@ -103,7 +103,7 @@ def full_map():
                         # if it's not visible right now, the player can only see it if it's explored
                         if tile.explored:
                             if tile.blocked:
-                                char = 207
+                                char = 206
                             else:
                                 char = '.'
                             libtcod.console_put_char_ex(consoles['map_console'], x, y, char,

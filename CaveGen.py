@@ -56,8 +56,8 @@ rnd = random.seed(666)
 Neighbours = 4  # Openess 3 or 4
 Interations = 30000   #
 
-CloseCellProb = 45  # Lower Number (45) = Open, Higher = Constricted (75)
-CloseCellRange = 0 # variabliity
+CloseCellProb = 65  # Lower Number (45) = Open, Higher = Constricted (75)
+CloseCellRange = 10 # variabliity
 
 Smoothing = 50
 
@@ -236,7 +236,6 @@ def corridorXGetEdge():
 
     pDirection = random.choice(validdirections)
     pLocation = offset(pLocation, pDirection)
-
 
 
 def connectCaves_new():
