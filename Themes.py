@@ -1,6 +1,10 @@
 import libtcodpy as libtcod
 import random
+import ConfigParser
 # DEFAULT
+
+
+Color = libtcod.Color
 
 GROUND_CHAR = ['.', ',', ';']
 GROUND_COLOR = [libtcod.green, libtcod.light_green, libtcod.dark_green]
@@ -24,6 +28,58 @@ BOX_COLOR = [libtcod.lightest_blue]
 BOX_BCOLOR = None
 
 OUT_OF_FOV_COLOR = libtcod.darker_gray
+
+theme_list = {}
+
+def initialize():
+    config = ConfigParser.RawConfigParser()
+    config.read('Assets\_themes.list')
+
+    for i in config.sections():
+        theme_list[str(i)] = dict(config.items(i))
+
+
+
+    print theme_list
+
+
+def set_theme(theme):
+    global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
+    global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
+    global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
+    global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
+    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
+    global OUT_OF_FOV_COLOR
+
+    print GROUND_COLOR
+    GROUND_CHAR = theme_list[theme]['ground_char'].split(' ')
+    GROUND_COLOR = theme_list[theme]['ground_color'].split(' ')
+    GROUND_BCOLOR = theme_list[theme]['ground_bcolor'].split(' ')
+    print GROUND_COLOR
+
+    WALL_CHAR = theme_list[theme]['wall_char'].split(' ')
+    WALL_COLOR = theme_list[theme]['wall_color'].split(' ')
+    WALL_BCOLOR = theme_list[theme]['wall_bcolor'].split(' ')
+
+    DOOR_CLOSED_CHAR = theme_list[theme]['door_closed_char'].split(' ')
+    DOOR_OPEN_CHAR = theme_list[theme]['door_open_char'].split(' ')
+    DOOR_COLOR = theme_list[theme]['door_color'].split(' ')
+    DOOR_BCOLOR =theme_list[theme]['door_bcolor'].split(' ')
+
+    GLASS_CHAR = theme_list[theme]['glass_char'].split(' ')
+    GLASS_COLOR = theme_list[theme]['glass_color'].split(' ')
+    GLASS_BCOLOR = theme_list[theme]['glass_bcolor'].split(' ')
+
+    BOX_CHAR = theme_list[theme]['box_char'].split(' ')
+    BOX_COLOR = theme_list[theme]['box_color'].split(' ')
+    BOX_BCOLOR = theme_list[theme]['box_bcolor'].split(' ')
+
+    OUT_OF_FOV_COLOR = theme_list[theme]['out_of_fov_color']
+
+
+
+
+
 
 
 def apply_default_theme():
@@ -122,7 +178,7 @@ def apply_ssa_theme():
     OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 
-def apply_diner_theme():
+def OLD_apply_diner_theme():
     global GROUND_CHAR, GROUND_COLOR, GROUND_BCOLOR
     global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
     global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
@@ -159,21 +215,27 @@ def ground_char():
 
 
 def ground_color():
-    return random.choice(GROUND_COLOR)
+    color = random.choice(GROUND_COLOR)
+    # return color
+    return eval(str(color))
 
 
 def ground_bcolor():
-    return random.choice(GROUND_BCOLOR)
+    color = random.choice(GROUND_BCOLOR)
+    return eval(str(color))
 
 
 def wall_char():
     return random.choice(WALL_CHAR)
 
 def wall_color():
-    return random.choice(WALL_COLOR)
+    print "C) " + str(WALL_COLOR)
+    color = random.choice(WALL_COLOR)
+    return eval(str(color))
 
 def wall_bcolor():
-    return random.choice(WALL_BCOLOR)
+    color = random.choice(WALL_BCOLOR)
+    return eval(str(color))
 
 
 def glass_char():

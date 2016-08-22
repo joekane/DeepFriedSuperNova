@@ -221,7 +221,8 @@ def load_diner_map():
 
     file = open('Levels\diner.map', 'r')
 
-    Themes.apply_diner_theme()
+    # Themes.apply_diner_theme()
+
 
     # fill map with "blocked" tiles
     level_map = [[Tile(True,
@@ -391,7 +392,8 @@ def make_bsp(map=None):
 
     objects = [player]
 
-    Themes.apply_ssa_theme()
+    # Themes.apply_ssa_theme()
+    Themes.set_theme('Shadow State Archive')
     # Themes.apply_forrest_theme()
 
     if map is None:

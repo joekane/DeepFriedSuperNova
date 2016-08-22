@@ -1,0 +1,47 @@
+[Shadow State Archive]
+GROUND_CHAR = libtcod.CHAR_SE
+GROUND_COLOR = libtcod.grey
+GROUND_BCOLOR = libtcod.dark_grey
+
+WALL_CHAR = 255
+WALL_COLOR = libtcod.darker_flame
+WALL_BCOLOR = libtcod.dark_red
+
+DOOR_CLOSED_CHAR = #
+DOOR_OPEN_CHAR = _
+DOOR_COLOR = libtcod.lighter_grey
+DOOR_BCOLOR = libtcod.black
+
+GLASS_CHAR = libtcod.CHAR_BLOCK1
+GLASS_COLOR = libtcod.lightest_blue
+GLASS_BCOLOR = libtcod.black
+
+BOX_CHAR = libtcod.CHAR_BLOCK1
+BOX_COLOR = libtcod.lightest_blue
+BOX_BCOLOR = libtcod.black
+
+OUT_OF_FOV_COLOR = libtcod.darker_gray
+
+[Forest]
+GROUND_CHAR = . , "
+GROUND_COLOR = libtcod.dark_green libtcod.darker_green libtcod.darkest_green
+GROUND_BCOLOR = libtcod.darkest_sepia
+
+WALL_CHAR = libtcod.CHAR_ARROW2_N
+WALL_COLOR = libtcod.sepia
+WALL_BCOLOR = libtcod.darkest_green
+
+DOOR_CLOSED_CHAR = X
+DOOR_OPEN_CHAR = |
+DOOR_COLOR = libtcod.darkest_yellow
+DOOR_BCOLOR = libtcod.dark_sepia
+
+GLASS_CHAR = libtcod.CHAR_BLOCK1
+GLASS_COLOR = libtcod.lightest_blue
+GLASS_BCOLOR = libtcod.black
+
+BOX_CHAR = libtcod.CHAR_BLOCK1
+BOX_COLOR = libtcod.lightest_blue
+BOX_BCOLOR = libtcod.black
+
+OUT_OF_FOV_COLOR = libtcod.darker_gray

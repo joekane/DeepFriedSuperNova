@@ -12,6 +12,7 @@
 import libtcodpy as libtcod
 import Constants
 import SoundEffects
+import Themes
 import UI
 import Noise
 
@@ -59,6 +60,7 @@ libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep
 libtcod.sys_set_fps(Constants.LIMIT_FPS)
 
 SoundEffects.initilize()
+Themes.initialize()
 Noise.initialze()
 
 UI.Display_MainMenu()
