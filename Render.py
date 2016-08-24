@@ -42,7 +42,7 @@ def full_map():
 
     if Fov.recompute():
 
-        print "Draw Map"
+        # print "Draw Map"
 
         map = Map.current_map()
         player = GameState.get_player()
@@ -110,7 +110,7 @@ def full_map():
                                                         Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
 
                     else:
-                        print tile.char, tile.f_color, tile.b_color
+                        # print tile.char, tile.f_color, tile.b_color
                         offset_color = get_offset_color(map_x, map_y)
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)

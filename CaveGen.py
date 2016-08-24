@@ -54,9 +54,9 @@ recur_max = 900
 
 rnd = random.seed(666)
 Neighbours = 4  # Openess 3 or 4
-Interations = 30000   #
+Interations = 15000   #
 
-CloseCellProb = 65  # Lower Number (45) = Open, Higher = Constricted (75)
+CloseCellProb = 55  # Lower Number (45) = Open, Higher = Constricted (75)
 CloseCellRange = 10 # variabliity
 
 Smoothing = 50
@@ -250,7 +250,7 @@ def connectCaves_new():
         del caves[caves.index(current_cave)]
         target_cave = caves[0]
 
-        if Utils.connected_cells(current_cave[0], target_cave[0], level_map):
+        if Utils.connected_cells(current_cave[0], target_cave[0]):
             pass
         else:
             print "added connection...."

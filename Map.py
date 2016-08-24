@@ -18,6 +18,7 @@ import Utils
 import Components
 import pygame
 import Themes
+import CaveGen
 import Spells
 
 level_map = None
@@ -74,10 +75,21 @@ class Rect:
         return self.y2 - self.y1
 
 
+def generate_map():
+    level = random.choice(Themes.LEVEL_STYLE)
+    if level == 'BSP':
+        make_bsp()
+    elif level == 'CA':
+        CaveGen.build()
+        translate_map_data()
+
+
+
+
 def wilderness():
     import Noise
     global objects, level_map, stairs
-    Themes.apply_forrest_theme()
+
 
     player = GameState.get_player()
     objects = [player]
@@ -167,7 +179,7 @@ def translate_map_data():
 
     data = CaveGen.get_level_data()
 
-    Themes.apply_forrest_theme()
+    # Themes.apply_forrest_theme()
 
     player = GameState.get_player()
     objects = [player]
@@ -221,7 +233,7 @@ def load_diner_map():
 
     file = open('Levels\diner.map', 'r')
 
-    # Themes.apply_diner_theme()
+    Themes.set_theme('Diner')
 
 
     # fill map with "blocked" tiles
@@ -393,7 +405,9 @@ def make_bsp(map=None):
     objects = [player]
 
     # Themes.apply_ssa_theme()
-    Themes.set_theme('Shadow State Archive')
+    # Themes.set_theme('Shadow State Archive')
+    # Themes.set_theme('Valley of Devils')
+
     # Themes.apply_forrest_theme()
 
     if map is None:

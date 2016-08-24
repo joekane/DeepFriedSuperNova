@@ -15,7 +15,7 @@ import Constants
 import Entity
 import ConfigParser
 import Map
-import CaveGen
+import Themes
 import UI
 import Utils
 import Fov
@@ -199,8 +199,6 @@ def new_game():
     Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
 
     Map.load_diner_map()
-    # Map.translate_map_data()
-    # Map.wilderness()
 
     Fov.initialize()
     play_game()
@@ -226,7 +224,7 @@ def next_level():
     #Map.make_map()
 
     # BSP Maps
-    Map.make_bsp()
+    #Map.make_bsp()
 
     # Map.wilderness()
 
@@ -237,6 +235,11 @@ def next_level():
     # Cannot MAP -> CA as CA map is not tiles[][]
     # BORKED!
     # CaveGen.build(Map.make_map())
+
+    #Themes.set_theme('Shadow State Archive')
+    Themes.set_theme('Valley of Devils')
+    Map.generate_map()
+
 
     Fov.initialize()
     # Map.spawn_doors()
