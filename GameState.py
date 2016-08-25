@@ -215,36 +215,16 @@ def next_level():
     add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
     dungeon_level += 1
 
-
-    # CAVES ONLY
-    #CaveGen.build()
-    # Map.translate_map_data()
-
-    # OG MAPS
-    #Map.make_map()
-
-    # BSP Maps
-    #Map.make_bsp()
-
-    # Map.wilderness()
-
-    # YOU CAN  CA->MAP as map's tiles[][] supercedes maps
-    # Map.make_bsp(map=Map.translate_map_data())
-
-
-    # Cannot MAP -> CA as CA map is not tiles[][]
-    # BORKED!
-    # CaveGen.build(Map.make_map())
-
-    #Themes.set_theme('Shadow State Archive')
-    Themes.set_theme('Valley of Devils')
+    Themes.set_theme('Shadow State Archive')
+    #Themes.set_theme('Valley of Devils')
+    #Themes.set_theme('Abyss of the Fish Men')
     Map.generate_map()
 
 
-    Fov.initialize()
+
     # Map.spawn_doors()
 
-    SoundEffects.play_music('SSA')
+
 
 
 def play_game():
@@ -283,3 +263,35 @@ def check_level_up():
         elif choice == 2:
             player.fighter.base_defense += 1
         return True
+
+
+def save_game():
+    # file = shelve.open('savegame', 'n')
+    # file['map'] = map
+    # file['objects'] = objects
+    # file['player_index'] = objects.index(player)
+    # file['inventory'] = inventory
+    # file['game_msgs'] = game_msgs
+    # file['game_state'] = game_state
+    # file['stairs_index'] = objects.index(stairs)
+    # file['dungeon_level'] = dungeon_level
+    # file.close()
+    pass
+
+
+def load_game():
+    # open the previously saved shelve and load the game data
+    # global map, objects, player, inventory, game_msgs, game_state, dungeon_level, stairs
+
+    # file = shelve.open('savegame', 'r')
+    # map = file['map']
+    # objects = file['objects']
+    # player = objects[file['player_index']]  # get index of player in objects list and access it
+    # inventory = file['inventory']
+    # game_msgs = file['game_msgs']
+    # game_state = file['game_state']
+    # stairs = objects[file['stairs_index']]
+    # # dungeon_level = file['dungeon_level']
+    # file.close()
+    # Fov.initialize()
+    pass

@@ -108,11 +108,16 @@ def wall_bcolor():
 
 
 def glass_char():
-    pass
+    return eval(str(random.choice(GLASS_CHAR)))
 
 
 def glass_color():
-    pass
+    color = random.choice(GLASS_COLOR)
+    return eval(str(color))
+
+def glass_bcolor():
+    color = random.choice(GLASS_BCOLOR)
+    return eval(str(color))
 
 
 def box_char():

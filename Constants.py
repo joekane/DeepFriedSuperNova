@@ -32,8 +32,8 @@ PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
 MAP_CONSOLE_WIDTH = SCREEN_WIDTH - 20
 MAP_CONSOLE_HEIGHT = SCREEN_HEIGHT - PANEL_HEIGHT
 
-MAP_WIDTH = 150 # MIN 70
-MAP_HEIGHT = 150 # MIN 40
+MAP_WIDTH = MAP_CONSOLE_WIDTH * 2# 150 # MIN 70
+MAP_HEIGHT = MAP_CONSOLE_HEIGHT * 2 # 150 # MIN 40
 
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
@@ -71,7 +71,7 @@ FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
 TORCH_RADIUS = 15  # 15 Def
 
-LIMIT_FPS = 60  # 20 frames-per-second maximum
+LIMIT_FPS = 0  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5
 

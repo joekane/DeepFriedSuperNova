@@ -76,12 +76,56 @@ class Rect:
 
 
 def generate_map():
+    import SoundEffects
     level = random.choice(Themes.LEVEL_STYLE)
+
     if level == 'BSP':
         make_bsp()
-    elif level == 'CA':
+    elif level == 'WILD':
         CaveGen.build()
         translate_map_data()
+    elif level == 'CAVE_TIGHT':
+        caves(style='TIGHT')
+    elif level == 'CAVE_OPEN':
+        caves(style='OPEN')
+    Fov.initialize()
+    SoundEffects.play_music('SSA')
+
+
+
+
+def caves(style='DEFAULT'):
+    import Noise
+    global objects, level_map, stairs
+
+    if style=='DEFAULT':
+        Noise.initialze(scale=10)
+    elif style == 'OPEN':
+        Noise.initialze(scale=15)
+    elif style == 'TIGHT':
+        Noise.initialze(scale=5)
+
+
+    player = GameState.get_player()
+    objects = [player]
+
+    level_map = [[Tile(True,
+                       block_sight=True,
+                       char=Themes.wall_char(),
+                       f_color=Themes.wall_color(),
+                       b_color=Themes.wall_bcolor())
+                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+    for x in range(1,Constants.MAP_WIDTH-1):
+        for y in range(1,Constants.MAP_HEIGHT-1):
+            pre_value = Noise.get_height_value(x, y)
+
+            if 0.52 <= pre_value < 1:
+                level_map[x][y] = Tile(False,
+                                       block_sight=False,
+                                       char=Themes.ground_char(),
+                                       f_color=Themes.ground_color(),
+                                       b_color=Themes.ground_bcolor())
 
 
 
@@ -90,6 +134,7 @@ def wilderness():
     import Noise
     global objects, level_map, stairs
 
+    Noise.initialze(scale=50)
 
     player = GameState.get_player()
     objects = [player]
@@ -104,7 +149,7 @@ def wilderness():
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
             pre_value = Noise.get_height_value(x, y)
-            print pre_value
+            # print pre_value
 
             if 0 <= pre_value < 0.1:
                 level_map[x][y] = Tile(False,
@@ -169,10 +214,6 @@ def wilderness():
             level_map[x][y].explored = True
 
 
-
-
-
-
 def translate_map_data():
     import CaveGen
     global objects, level_map, stairs
@@ -216,10 +257,6 @@ def translate_map_data():
             level_map[x][y].explored = False
 
     return level_map
-
-
-
-
 
 
 def load_diner_map():
@@ -579,6 +616,7 @@ def hline(map, x1, y, x2):
                          f_color=Themes.ground_color(),
                          b_color=Themes.ground_bcolor())
 
+
 def hline_left(map, x, y):
     while x >= 0 and map[x][y].blocked == True:
         map[x][y] = Tile(False,
@@ -610,6 +648,7 @@ def create_room(room):
                                    f_color=Themes.ground_color(),
                                    b_color=Themes.ground_bcolor())
 
+
 def create_v_tunnel(y1, y2, x):
     global level_map
     # vertical tunnel
@@ -620,6 +659,7 @@ def create_v_tunnel(y1, y2, x):
                                f_color=Themes.ground_color(),
                                b_color=Themes.ground_bcolor())
 
+
 def create_h_tunnel(x1, x2, y):
     global level_map
     for x in range(min(x1, x2), max(x1, x2) + 1):
@@ -628,6 +668,7 @@ def create_h_tunnel(x1, x2, y):
                                char=Themes.ground_char(),
                                f_color=Themes.ground_color(),
                                b_color=Themes.ground_bcolor())
+
 
 def place_objects(room):
     # this is where we decide the chance of each monster or item appearing.
@@ -739,6 +780,7 @@ def spawn_npc_at(x, y, npc):
         Schedule.register(monster)
         Schedule.add_to_pq((monster.action_points, monster))
 
+
 def spawn_item_at(x,y, item_name):
     item_component = None
     equipment_component = None
@@ -799,6 +841,7 @@ def is_blocked(x, y):
             return True
 
     return False
+
 
 def directly_adjacent_open_tiles(obj):
     open_tiles = []
@@ -901,10 +944,10 @@ def move_camera(target_x, target_y):
         x = 0
     if y < 0:
         y = 0
-    if x > Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH - 1:
-        x = Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH - 1
-    if y > Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT - 1:
-        y = Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT - 1
+    if x > Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH:
+        x = Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH
+    if y > Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT:
+        y = Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT
 
     if x != camera_x or y != camera_y:
         Fov.require_recompute()
@@ -914,9 +957,10 @@ def move_camera(target_x, target_y):
 
 def to_camera_coordinates(x, y):
     # convert coordinates on the map to coordinates on the screen
+    # print "ToCam: " + str(x) + " " + str(y)
     (x, y) = (x - camera_x, y - camera_y)
 
-    if x < 0 or y < 0 or x >= Constants.MAP_CONSOLE_WIDTH or y >= Constants.MAP_CONSOLE_HEIGHT:
+    if x < 0 or y < 0 or x > Constants.MAP_CONSOLE_WIDTH or y > Constants.MAP_CONSOLE_HEIGHT:
         return None, None  # if it's outside the map, return nothing
 
     return x, y
@@ -924,9 +968,10 @@ def to_camera_coordinates(x, y):
 
 def to_map_coordinates(x, y):
     # convert coordinates on the map to coordinates on the screen
+    # print "ToMap: " + str(x) + " " + str(y)
     (x, y) = (x + camera_x, y + camera_y)
 
-    if x < 0 or y < 0 or x >= Constants.MAP_WIDTH or y >= Constants.MAP_HEIGHT:
+    if x < 0 or y < 0 or x > Constants.MAP_WIDTH -1 or y > Constants.MAP_HEIGHT - 1:
         return None, None  # if it's outside the map, return nothing
 
     return x, y
@@ -946,7 +991,6 @@ def get_visible_objects():
             return visible_objects
     else:
         return visible_objects
-
 
 
 def get_stairs():
@@ -1014,6 +1058,31 @@ def get_total_blocked_corners(x,y):
     if level_map[x+1][y+1].blocked:
         count += 1
     return count
+
+
+def find_unexplored_tile(start_tile, list):
+    global level_map
+
+    # print "Cell: " + str(cell)
+    x, y = start_tile
+    print "start"
+    print list
+    # print 'Recursoin Start:'
+    # assume surface is a 2D image and surface[x][y] is the color at x, y.
+    if level_map[x][y].blocked: # the base case
+        return
+    if (x, y) in list:
+        return
+    if not level_map[x][y].explored: # the base case
+        list.append((x, y))
+    if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
+        find_unexplored_tile( (x + 1, y), list) # right
+        find_unexplored_tile( (x - 1, y), list) # left
+        find_unexplored_tile((x, y + 1), list)
+        find_unexplored_tile((x, y - 1), list) # up
+    return list[0]
+
+
 
 
 def spawn_doors():

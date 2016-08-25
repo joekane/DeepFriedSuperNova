@@ -21,6 +21,7 @@ import Animate
 import Render
 import Schedule
 import UI
+import Themes
 
 
 
@@ -32,24 +33,27 @@ class PlayeControlled:
     def end_turn(self, cost):
         # self.owner.action_points += 100
         # Schedule.add_to_pq((self.owner.action_points, self.owner))
+        self.owner.delay += cost
         return cost
 
     def process_mouse_clicks(self, mouse):
 
         # (x, y) = Map.to_camera_coordinates(mouse.cx, mouse.cy)
         (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
-
-        # walk to target tile
-        if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
-            GameState.continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
-            return self.end_turn(Constants.TURN_COST)
-        if mouse.rbutton_pressed:
-            # print "Mouse Pressed!"
-            x, y = Map.to_map_coordinates(mouse.cx, mouse.cy)
-            GameState.get_player().x = x
-            GameState.get_player().y = y
-            Fov.require_recompute()
-            return 0
+        # print "MouseClickMap: " + str(map_x) + " " + str(map_y)
+        if map_x is not None and map_y is not None:
+            # walk to target tile
+            if mouse.lbutton_pressed and Map.is_explored(map_x, map_y):
+                GameState.continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
+                return self.end_turn(Constants.TURN_COST)
+            if mouse.rbutton_pressed:
+                # print "Mouse Pressed!"
+                x, y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+                GameState.get_player().x = x
+                GameState.get_player().y = y
+                Fov.require_recompute()
+                return 0
+        return 0
 
     def process_mouse_hover(self, mouse):
         (map_x, map_y) = Map.to_map_coordinates(mouse.cx, mouse.cy)
@@ -62,12 +66,14 @@ class PlayeControlled:
 
     # AI for a basic monster.
     def take_turn(self):
-        if GameState.continue_walking:
-            self.owner.walk_path()
-            return self.end_turn(Constants.TURN_COST)
-        elif not GameState.continue_walking:
-            GameState.get_player().clear_path()
         while True:
+            Render.render_all()
+            if GameState.continue_walking:
+                #print "Auto-Walking"
+                self.owner.walk_path()
+                return self.end_turn(Constants.TURN_COST)
+            elif not GameState.continue_walking:
+                GameState.get_player().clear_path()
             # print "looping"
             key = libtcod.Key()
             mouse = libtcod.Mouse()
@@ -147,13 +153,12 @@ class PlayeControlled:
                         #    return 0
                         pass
                     elif key_char == 'd':
-                        # show the inventory; if an item is selected, drop it
-                        # chosen_item = inventory_menu(
-                        #    'Press the key next to an item to drop it, or any other to cancel.\n')
+                        print "Test:"
+                        x, y = Map.find_unexplored_tile( (self.owner.x, self.owner.y), [])
+                        print x, y
+                        if x is not None and y is not None:
+                            GameState.continue_walking = GameState.get_player().move_astar_xy(x, y, True)
 
-                        # if chosen_item is not None:
-                        #     chosen_item.drop()
-                        pass
                     elif key_char == 'f':
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:
@@ -220,7 +225,7 @@ class PlayeControlled:
                 # return Constants.TURN_COST
                 # print "rendering"
                 # Render.render_all()
-                Render.render_all()
+
                 # Render.update()
                 #libtcod.console_flush()
 

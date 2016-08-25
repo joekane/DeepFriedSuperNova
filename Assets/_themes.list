@@ -73,3 +73,54 @@ BOX_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_sepia
 
+
+
+[Valley of Devils]
+LEVEL_STYLE = CAVE_OPEN
+GROUND_CHAR = 056 054 047
+GROUND_COLOR = libtcod.dark_green
+GROUND_BCOLOR = libtcod.darker_sepia
+
+WALL_CHAR = libtcod.CHAR_ARROW2_N
+WALL_COLOR = libtcod.sepia
+WALL_BCOLOR = libtcod.darkest_green
+
+DOOR_CLOSED_CHAR = 213
+DOOR_OPEN_CHAR = 213
+DOOR_COLOR = libtcod.darkest_yellow
+DOOR_BCOLOR = libtcod.dark_sepia
+
+GLASS_CHAR = libtcod.CHAR_BLOCK1
+GLASS_COLOR = libtcod.lightest_blue
+GLASS_BCOLOR = libtcod.black
+
+BOX_CHAR = libtcod.CHAR_BLOCK1
+BOX_COLOR = libtcod.lightest_blue
+BOX_BCOLOR = libtcod.black
+
+OUT_OF_FOV_COLOR = libtcod.darker_sepia
+
+[Abyss of the Fish Men]
+LEVEL_STYLE = CAVE_TIGHT
+GROUND_CHAR = 056
+GROUND_COLOR = libtcod.dark_grey
+GROUND_BCOLOR = libtcod.black
+
+WALL_CHAR = 176
+WALL_COLOR = libtcod.dark_sepia
+WALL_BCOLOR = libtcod.black
+
+DOOR_CLOSED_CHAR = 213
+DOOR_OPEN_CHAR = 213
+DOOR_COLOR = libtcod.darkest_yellow
+DOOR_BCOLOR = libtcod.dark_sepia
+
+GLASS_CHAR = libtcod.CHAR_BLOCK1
+GLASS_COLOR = libtcod.lightest_blue
+GLASS_BCOLOR = libtcod.black
+
+BOX_CHAR = libtcod.CHAR_BLOCK1
+BOX_COLOR = libtcod.lightest_blue
+BOX_BCOLOR = libtcod.black
+
+OUT_OF_FOV_COLOR = libtcod.darker_grey

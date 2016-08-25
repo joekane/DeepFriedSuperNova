@@ -60,44 +60,13 @@ def full_map():
                 visible = Fov.is_visible(pos=(map_x, map_y))
 
                 if Constants.DEBUG:
-                    if Fov.is_visible(pos=(map_x, map_y)):
-                        color = libtcod.white
-                    else:
-                        color = libtcod.dark_grey
-
-                    pre_value = Noise.get_height_value(x,y)
-
-                    # print nx, ny, pre_value
-                    if 0 <= pre_value < 0.1:
-                        char = '0'
-                    elif 0.1 <= pre_value < 0.2:
-                        char = '1'
-                    elif 0.2 <= pre_value < 0.3:
-                        char = '2'
-                    elif 0.3 <= pre_value < 0.4:
-                        char = '3'
-                    elif 0.4 <= pre_value < 0.5:
-                        char = '4'
-                    elif 0.5 <= pre_value < 0.6:
-                        char = '5'
-                    elif 0.6 <= pre_value < 0.96:
-                        char = '6'
-                    elif 0.96 <= pre_value < 0.97:
-                        char = '7'
-                    elif 0.97 <= pre_value < 0.99:
-                        char = '8'
-                    elif 0.99 <= pre_value < 1.0:
-                        char = '9'
-                    else:
-                        char = '0'
-
-                    if libtcod.map_is_walkable(Fov.get_fov_map(), map_x, map_y):
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
-                                                    color, libtcod.BKGND_SET)
-                    else:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                    color, libtcod.BKGND_SET)
-                    tile.explored = True
+                    # print tile.char, tile.f_color, tile.b_color
+                    # offset_color = get_offset_color(map_x, map_y)
+                    offset_color = libtcod.Color(0,0,0)
+                    libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                                                tile.f_color - offset_color, libtcod.BKGND_SET)
+                    libtcod.console_set_char_background(consoles['map_console'], x, y,
+                                                        tile.b_color - offset_color, flag=libtcod.BKGND_SET)
                 else:
                     if not visible:
                         # if it's not visible right now, the player can only see it if it's explored
@@ -246,7 +215,10 @@ def blank(x, y):
 
 
 def get_offset_color(map_x, map_y):
-    dist = int(Utils.distance_between(map_x, map_y, GameState.player.x, GameState.player.y))
+    try:
+        dist = int(Utils.distance_between(map_x, map_y, GameState.player.x, GameState.player.y))
+    except:
+        dist = 0
     offset_value = int((float(dist) / Constants.TORCH_RADIUS) * 255)
     offset_value = max(0, min(offset_value, 255)) / 2
     offset_color = libtcod.Color(offset_value, offset_value, offset_value)
@@ -417,8 +389,7 @@ def beastiary(width=None, height=None, title=None, text=None):
 def render_all():
     # libtcod.console_clear(0)
     full_map()
-    if not Constants.DEBUG:
-        objects()
+    objects()
     ui()
     update()
     libtcod.console_flush()

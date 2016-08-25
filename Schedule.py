@@ -45,15 +45,17 @@ def alt_tick():
         if result != 0:
             obj.action_points -= result
             time_travelers.sort(key=lambda x: x.action_points, reverse=True)
-            for obj in time_travelers:
-                print obj.name + " | " + str(obj.action_points)
+           # for obj in time_travelers:
+                #print obj.name + " | " + str(obj.action_points)
 
 
 def all_at_once():
     for obj in time_travelers:
         if obj.delay > 0:
+            # print obj.name, obj.delay
             obj.delay -= obj.speed
         else:
+
             obj.delay = obj.ai.take_turn()
 
 
