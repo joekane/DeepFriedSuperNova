@@ -15,6 +15,7 @@ import Constants
 import Entity
 import GameState
 import Map
+import random
 import Fov
 import Utils
 import Animate
@@ -153,12 +154,11 @@ class PlayeControlled:
                         #    return 0
                         pass
                     elif key_char == 'd':
-                        print "Test:"
-                        x, y = Map.find_unexplored_tile( (self.owner.x, self.owner.y), [])
-                        print x, y
-                        if x is not None and y is not None:
-                            GameState.continue_walking = GameState.get_player().move_astar_xy(x, y, True)
-
+                        tile = random.choice(Map.get_open_tiles())
+                        # x,y  = Map.find_unexplored_tile( (self.owner.x, self.owner.y), [])
+                        # print x, y
+                        #GameState.continue_walking = GameState.get_player().move_astar_xy(tile.x, tile.y, True)
+                        pass
                     elif key_char == 'f':
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:

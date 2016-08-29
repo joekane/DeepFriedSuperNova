@@ -1060,27 +1060,6 @@ def get_total_blocked_corners(x,y):
     return count
 
 
-def find_unexplored_tile(start_tile, list):
-    global level_map
-
-    # print "Cell: " + str(cell)
-    x, y = start_tile
-    print "start"
-    print list
-    # print 'Recursoin Start:'
-    # assume surface is a 2D image and surface[x][y] is the color at x, y.
-    if level_map[x][y].blocked: # the base case
-        return
-    if (x, y) in list:
-        return
-    if not level_map[x][y].explored: # the base case
-        list.append((x, y))
-    if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
-        find_unexplored_tile( (x + 1, y), list) # right
-        find_unexplored_tile( (x - 1, y), list) # left
-        find_unexplored_tile((x, y + 1), list)
-        find_unexplored_tile((x, y - 1), list) # up
-    return list[0]
 
 
 
