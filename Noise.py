@@ -28,7 +28,7 @@ def get_height_value(x, y):
     return libtcod.heightmap_get_value(height_map, x, y)
 
 
-def get_noise_value(x, y, scale=16, type='DEFAULT'):
+def get_noise_value(x, y, scale=16, type='FBM'):
     nx, ny = float(x) / scale, float(y) / scale
 
     if type == 'DEFAULT':

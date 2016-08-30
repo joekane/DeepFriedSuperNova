@@ -7,7 +7,6 @@
 # * permission of Joe Kane
 # *******************************************************/
 
-
 import libtcodpy as libtcod
 import Constants
 import GameState
@@ -16,7 +15,6 @@ import random
 import Fov
 import Utils
 import Components
-import pygame
 import Themes
 import CaveGen
 import Spells
@@ -33,9 +31,28 @@ def current_map():
     return level_map
 
 
+def new_map(solid=True):
+    global level_map
+
+    if solid:
+        level_map = [[Tile(True,
+                           block_sight=True,
+                           char=Themes.wall_char(),
+                           f_color=Themes.wall_color(),
+                           b_color=Themes.wall_bcolor())
+                      for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    else:
+        level_map = [[Tile(False,
+                           block_sight=False,
+                           char=Themes.wall_char(),
+                           f_color=Themes.wall_color(),
+                           b_color=Themes.wall_bcolor())
+                      for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+
 class Tile:
     # a tile of the map and its properties
-    def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black ):
+    def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black):
         self.blocked = blocked
         self.explored = False
         self.char = char
@@ -79,42 +96,47 @@ def generate_map():
     import SoundEffects
     level = random.choice(Themes.LEVEL_STYLE)
 
+    new_map()
+
     if level == 'BSP':
-        make_bsp()
+        #bsp_dungeon()
+        rooms_only_dungeon
+        spawn_doors()
     elif level == 'WILD':
         CaveGen.build()
-        translate_map_data()
+        read_cavegen_data()
     elif level == 'CAVE_TIGHT':
-        caves(style='TIGHT')
+        # caves(style='TIGHT')
+        wilderness()
+        #basic_dungeon()
+        #spawn_doors()
     elif level == 'CAVE_OPEN':
         caves(style='OPEN')
+        basic_dungeon()
     Fov.initialize()
     SoundEffects.play_music('SSA')
-
-
 
 
 def caves(style='DEFAULT'):
     import Noise
     global objects, level_map, stairs
 
-    if style=='DEFAULT':
+    if style == 'DEFAULT':
         Noise.initialze(scale=10)
     elif style == 'OPEN':
         Noise.initialze(scale=15)
     elif style == 'TIGHT':
         Noise.initialze(scale=5)
 
-
     player = GameState.get_player()
     objects = [player]
 
-    level_map = [[Tile(True,
-                       block_sight=True,
-                       char=Themes.wall_char(),
-                       f_color=Themes.wall_color(),
-                       b_color=Themes.wall_bcolor())
-                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    # level_map = [[Tile(True,
+    #                   block_sight=True,
+    #                   char=Themes.wall_char(),
+    #                   f_color=Themes.wall_color(),
+    #                   b_color=Themes.wall_bcolor())
+    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     for x in range(1,Constants.MAP_WIDTH-1):
         for y in range(1,Constants.MAP_HEIGHT-1):
@@ -128,23 +150,21 @@ def caves(style='DEFAULT'):
                                        b_color=Themes.ground_bcolor())
 
 
-
-
 def wilderness():
     import Noise
     global objects, level_map, stairs
 
-    Noise.initialze(scale=50)
+    Noise.initialze(scale=100)
 
     player = GameState.get_player()
     objects = [player]
 
-    level_map = [[Tile(True,
-                       block_sight=True,
-                       char=Themes.wall_char(),
-                       f_color=Themes.wall_color(),
-                       b_color=Themes.wall_bcolor())
-                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    #level_map = [[Tile(True,
+    #                   block_sight=True,
+    #                   char=Themes.wall_char(),
+    #                   f_color=Themes.wall_color(),
+    #                   b_color=Themes.wall_bcolor())
+    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
@@ -196,7 +216,7 @@ def wilderness():
             elif 0.7 <= pre_value < 0.90:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
-                                       char='`',
+                                       char='*',
                                        f_color=libtcod.dark_green,
                                        b_color=libtcod.black)
             elif 0.90 <= pre_value < 0.999:
@@ -214,7 +234,7 @@ def wilderness():
             level_map[x][y].explored = True
 
 
-def translate_map_data():
+def read_cavegen_data(): # OBSOLETE?
     import CaveGen
     global objects, level_map, stairs
 
@@ -225,12 +245,12 @@ def translate_map_data():
     player = GameState.get_player()
     objects = [player]
 
-    level_map = [[Tile(True,
-                       block_sight=True,
-                       char=Themes.wall_char(),
-                       f_color=Themes.wall_color(),
-                       b_color=Themes.wall_bcolor())
-                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    # level_map = [[Tile(True,
+    #                    block_sight=True,
+    #                  char=Themes.wall_char(),
+    #                   f_color=Themes.wall_color(),
+    #                   b_color=Themes.wall_bcolor())
+    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
@@ -272,14 +292,15 @@ def load_diner_map():
 
     Themes.set_theme('Diner')
 
+    new_map()
 
     # fill map with "blocked" tiles
-    level_map = [[Tile(True,
-                       block_sight=True,
-                       char=Themes.wall_char(),
-                       f_color=Themes.wall_color(),
-                       b_color=Themes.wall_bcolor())
-                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    # level_map = [[Tile(True,
+    #                   block_sight=True,
+    #                   char=Themes.wall_char(),
+    #                   f_color=Themes.wall_color(),
+    #                   b_color=Themes.wall_bcolor())
+    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     y = 0
 
@@ -351,20 +372,20 @@ def load_diner_map():
         y += 1
 
 
-def make_map(map=None):
+def basic_dungeon():
     global level_map, objects, stairs
 
     player = GameState.get_player()
 
     objects = [player]
 
-    if map is None:
-        # fill map with "blocked" tiles
-        level_map = [[Tile(True)
-                      for y in range(Constants.MAP_HEIGHT)]
-                     for x in range(Constants.MAP_WIDTH)]
-    else:
-        level_map = map
+    # if map is None:
+    #    # fill map with "blocked" tiles
+    #    level_map = [[Tile(True)
+    #                  for y in range(Constants.MAP_HEIGHT)]
+    #                 for x in range(Constants.MAP_WIDTH)]
+    #else:
+    #    level_map = map
 
 
     rooms = []
@@ -434,7 +455,90 @@ def make_map(map=None):
     return level_map
 
 
-def make_bsp(map=None):
+def rooms_only_dungeon():
+    global level_map, objects, stairs
+
+    player = GameState.get_player()
+
+    objects = [player]
+
+    # if map is None:
+    #    # fill map with "blocked" tiles
+    #    level_map = [[Tile(True)
+    #                  for y in range(Constants.MAP_HEIGHT)]
+    #                 for x in range(Constants.MAP_WIDTH)]
+    # else:
+    #    level_map = map
+
+
+    rooms = []
+    num_rooms = 0
+
+    for r in range(Constants.MAX_ROOMS):
+        # random width and height
+        w = libtcod.random_get_int(0, Constants.ROOM_MIN_SIZE, Constants.ROOM_MAX_SIZE)
+        h = libtcod.random_get_int(0, Constants.ROOM_MIN_SIZE, Constants.ROOM_MAX_SIZE)
+        # random position without going out of the boundaries of the map
+        x = libtcod.random_get_int(0, 0, Constants.MAP_WIDTH - w - 1)
+        y = libtcod.random_get_int(0, 0, Constants.MAP_HEIGHT - h - 1)
+        # "Rect" class makes rectangles easier to work with
+        new_room = Rect(x, y, w, h)
+
+        # run through the other rooms and see if they intersect with this one
+        failed = False
+        for other_room in rooms:
+            if new_room.intersect(other_room):
+                failed = True
+                break
+
+        if not failed:
+            # this means there are no intersections, so this room is valid
+
+            # "paint" it to the map's tiles
+            create_room(new_room)
+
+            # center coordinates of new room, will be useful later
+            (new_x, new_y) = new_room.center()
+            # optional: print "room number" to see how the map drawing worked
+            #          we may have more than ten rooms, so print 'A' for the first room, 'B' for the next...
+            # room_no = Object(new_x, new_y, chr(65+num_rooms), 'Room #', libtcod.white)
+            # objects.insert(0, room_no) #draw early, so monsters are drawn on top
+
+
+            if num_rooms == 0:
+                # this is the first room, where the player starts at
+                player.x = new_x
+                player.y = new_y
+            else:
+                # all rooms after the first:
+                # connect it to the previous room with a tunnel
+
+                # center coordinates of previous room
+                (prev_x, prev_y) = rooms[num_rooms - 1].center()
+
+                # draw a coin (random number that is either 0 or 1)
+                if libtcod.random_get_int(0, 0, 1) == 1:
+                    # first move horizontally, then vertically
+                    create_h_tunnel(prev_x, new_x, prev_y)
+                    create_v_tunnel(prev_y, new_y, new_x)
+                else:
+                    # first move vertically, then horizontally
+                    create_v_tunnel(prev_y, new_y, prev_x)
+                    create_h_tunnel(prev_x, new_x, new_y)
+            # add some contents to this room, such as monsters
+            place_objects(new_room)
+            # finally, append the new room to the list
+            rooms.append(new_room)
+            num_rooms += 1
+
+    # create stairs at the center of the last room
+    stairs = Entity.Entity(new_x, new_y, '<', 'stairs', libtcod.white, always_visible=True)
+    objects.append(stairs)
+    stairs.send_to_back()  # so it's drawn below the monsters
+    return level_map
+
+
+def bsp_dungeon():
     global level_map, objects, stairs, bsp_rooms
 
     player = GameState.get_player()
@@ -447,16 +551,16 @@ def make_bsp(map=None):
 
     # Themes.apply_forrest_theme()
 
-    if map is None:
-        # fill map with "blocked" tiles
-        level_map = [[Tile(True,
-                           block_sight=True,
-                           char=Themes.wall_char(),
-                           f_color=Themes.wall_color(),
-                           b_color=Themes.wall_bcolor())
-                      for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-    else:
-        level_map = map
+    # if map is None:
+    #    # fill map with "blocked" tiles
+    #    level_map = [[Tile(True,
+    #                       block_sight=True,
+    #                       char=Themes.wall_char(),
+    #                       f_color=Themes.wall_color(),
+    #                       b_color=Themes.wall_bcolor())
+    #                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    #else:
+    #    level_map = map
 
 
 
@@ -471,6 +575,8 @@ def make_bsp(map=None):
 
     # Traverse the nodes and create rooms
     libtcod.bsp_traverse_inverted_level_order(bsp, traverse_node)
+    # print "ROOMS:"
+    # print bsp_rooms
 
     # Random room for the stairs
     stairs_location = random.choice(bsp_rooms)
@@ -670,6 +776,9 @@ def create_h_tunnel(x1, x2, y):
                                b_color=Themes.ground_bcolor())
 
 
+# HELPERS
+
+
 def place_objects(room):
     # this is where we decide the chance of each monster or item appearing.
 
@@ -763,6 +872,7 @@ def spawn_npc_at(x, y, npc):
     else:
         vis = False
 
+
     monster = Entity.Entity(x, y,
                             GameState.imported_npc_list[npc]['char'],
                             GameState.imported_npc_list[npc]['name'],
@@ -778,7 +888,40 @@ def spawn_npc_at(x, y, npc):
 
     if monster.speed > 0:
         Schedule.register(monster)
-        Schedule.add_to_pq((monster.action_points, monster))
+
+
+def spawn_door_at(x, y, npc):
+    import Schedule
+    fighter_component = None
+    ai_component = None
+    if 'fighter_component' in GameState.imported_npc_list[npc]:
+        fighter_component = Components.Fighter(hp=int(GameState.imported_npc_list[npc]['hp']),
+                                               defense=int(GameState.imported_npc_list[npc]['defense']),
+                                               power=int(GameState.imported_npc_list[npc]['power']),
+                                               xp=int(GameState.imported_npc_list[npc]['xp']),
+                                               death_function=eval(
+                                                   'Components.' + GameState.imported_npc_list[npc]['death_function']))
+
+    if 'ai_component' in GameState.imported_npc_list[npc]:
+        ai_component = eval('Components.' + GameState.imported_npc_list[npc]['ai_component'])
+
+    if 'always_visible' in GameState.imported_npc_list[npc]:
+        vis = GameState.imported_npc_list[npc]['color']
+    else:
+        vis = False
+
+    monster = Entity.Entity(x, y,
+                            GameState.imported_npc_list[npc]['char'],
+                            GameState.imported_npc_list[npc]['name'],
+                            eval(GameState.imported_npc_list[npc]['color']),
+                            always_visible=vis,
+                            speed=int(GameState.imported_npc_list[npc]['speed']),
+                            blocks=True,
+                            blocks_sight=True,
+                            fighter=fighter_component,
+                            ai=ai_component)
+
+    objects.append(monster)
 
 
 def spawn_item_at(x,y, item_name):
@@ -1060,10 +1203,6 @@ def get_total_blocked_corners(x,y):
     return count
 
 
-
-
-
-
 def spawn_doors():
 
     valid_nodes = []
@@ -1074,14 +1213,11 @@ def spawn_doors():
                 count = get_total_blocked_corners(x,y)
                 chance = libtcod.random_get_int(0, 0, 100)
                 if count == 0 and chance <= 50:
-                    Fov.fov_change(x, y, True, True)
-                    spawn_npc_at(x,y, 'Door')
+                    spawn_door_at(x,y, 'Door')
                 elif count == 1 and chance <= 40:
-                    Fov.fov_change(x, y, True, True)
-                    spawn_npc_at(x,y, 'Door')
+                    spawn_door_at(x,y, 'Door')
                 elif count == 2 and chance <= 30:
-                    Fov.fov_change(x, y, True, True)
-                    spawn_npc_at(x,y, 'Door')
+                    spawn_door_at(x,y, 'Door')
                 elif count == 3 and chance <= 2:
-                    Fov.fov_change(x, y, True, True)
-                    spawn_npc_at(x,y, 'Door')
+                    spawn_door_at(x,y, 'Door')
+

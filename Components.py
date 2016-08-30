@@ -68,13 +68,8 @@ class PlayeControlled:
     # AI for a basic monster.
     def take_turn(self):
         while True:
-            Render.render_all()
-            if GameState.continue_walking:
-                #print "Auto-Walking"
-                self.owner.walk_path()
-                return self.end_turn(Constants.TURN_COST)
-            elif not GameState.continue_walking:
-                GameState.get_player().clear_path()
+            # Render.render_all()
+
             # print "looping"
             key = libtcod.Key()
             mouse = libtcod.Mouse()
@@ -97,6 +92,13 @@ class PlayeControlled:
 
             if self.process_mouse_hover(mouse):
                 return 0
+
+            if GameState.continue_walking:
+                #print "Auto-Walking"
+                self.owner.walk_path()
+                return self.end_turn(Constants.TURN_COST)
+            elif not GameState.continue_walking:
+                GameState.get_player().clear_path()
 
             # movement keys
             if True:
@@ -218,9 +220,7 @@ class PlayeControlled:
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
 
-
-
-                    # return 0
+            return 0
                 # print "took turn"
                 # return Constants.TURN_COST
                 # print "rendering"
@@ -379,8 +379,6 @@ class MeleeMonster:
             return Constants.TURN_COST
 
 
-
-
 class AssassinMonster:
     def __init__(self, owner=None):
         self.given = False
@@ -422,8 +420,6 @@ class AssassinMonster:
             return Constants.TURN_COST
 
 
-
-
 class SentinelMonster:
     def __init__(self, owner=None):
         self.given = False
@@ -460,8 +456,6 @@ class SentinelMonster:
             return Constants.TURN_COST
 
 
-
-
 class ScoutMonster:
     def __init__(self, owner=None):
         self.given = False
@@ -490,7 +484,6 @@ class ScoutMonster:
             # self.owner.action_points += 100
             # Schedule.add_to_pq((self.owner.action_points, self.owner))
             return Constants.TURN_COST
-
 
 
 class RangedMonster:
@@ -777,8 +770,8 @@ class Door:
     def __init__(self, door_status=None, owner=None):
         self.owner = owner
         if door_status is None:
-            chance = libtcod.random_get_int(0, 0, 100)
-            if chance <= 2:
+            chance = libtcod.random_get_int(0, 0, 1000)
+            if chance <= 5:
                 self.status = 'locked'
             else:
                 self.status = 'closed'
@@ -786,27 +779,26 @@ class Door:
             self.status = door_status
 
     def take_turn(self):
-        self.owner.CT = 100
         if self.status is 'closed':
             self.owner.blocks = True
             self.owner.blocks_sight = True
-            # Fov.fov_change(self.owner.x, self.owner.y, True, True)
+            #Fov.fov_change(self.owner.x, self.owner.y, True, True)
             # Map.level_map[self.owner.x][self.owner.y].blocked = True
             # Map.level_map[self.owner.x][self.owner.y].block_sight = True
             self.owner.char = '+'
-        if self.status is 'open':
+        elif self.status is 'open':
             self.owner.blocks = False
             self.owner.blocks_sight = False
-            # Fov.fov_change(self.owner.x, self.owner.y, False, False)
+            #Fov.fov_change(self.owner.x, self.owner.y, False, False)
             # Map.level_map[self.owner.x][self.owner.y].blocked = False
             # Map.level_map[self.owner.x][self.owner.y].block_sight = False
 
             self.owner.char = '_'
-        if self.status is 'locked':
+        elif self.status is 'locked':
             self.owner.blocks = True
             self.owner.blocks_sight = True
             self.owner.name = 'locked door'
-        return False
+        return 0
 
     def interact(self):
         # print "interact!"
@@ -816,3 +808,4 @@ class Door:
             pass
         else:
             Utils.message("Locked!", libtcod.dark_red)
+        self.take_turn()

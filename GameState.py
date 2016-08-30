@@ -70,7 +70,6 @@ def initialize():
     player.action_points = 100
 
     Schedule.register(player)
-    Schedule.add_to_pq((player.action_points, player))
 
     dungeon_level = 0
 
@@ -216,13 +215,9 @@ def next_level():
     dungeon_level += 1
 
     Themes.set_theme('Shadow State Archive')
-    #Themes.set_theme('Valley of Devils')
-    #Themes.set_theme('Abyss of the Fish Men')
+    # Themes.set_theme('Abyss of the Fish Men')
+    # Themes.set_theme('Valley of Devils')
     Map.generate_map()
-
-
-
-    # Map.spawn_doors()
 
 
 
@@ -232,9 +227,8 @@ def play_game():
     Fov.require_recompute()
 
     while not libtcod.console_is_window_closed():
-        # Render.render_all()
-        Schedule.all_at_once()
-
+        Render.render_all()
+        Schedule.process()
 
 
 def check_level_up():

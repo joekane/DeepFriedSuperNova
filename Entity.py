@@ -106,37 +106,14 @@ class Entity:
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def move_astar(self, target):
-        # Create a FOV map that has the dimensions of the map
-
-
-        # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0 if diagonal moves are prohibited
         self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.5)
-
-        # Compute the path between self's coordinates and the target's coordinates
-
-        # new_target = Map.adjacent_open_tiles(target)
-
         libtcod.path_compute(self.path, self.x, self.y, target.x, target.y)
 
-        # Check if the path exists, and in this case, also the path is shorter than 25 tiles
-        # The path size matters if you want the monster to use alternative longer paths (for example through other
-        # rooms) if for example the player is in a corridor
-        # It makes sense to keep path size relatively low to keep the monsters from running around the map if there's
-        # an alternative path really far away
         if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 25:
-            # Find the next coordinates in the computed full path
-            print "Path found!"
             self.walk_path()
 
         else:
-            # Keep the old move function as a backup so that if there are no paths (for example another monster blocks
-            # a corridor)
-            # it will still try to move towards the player (closer to the corridor opening)
-            print self.name + " Fail: walking towards"
             self.move_towards(target.x, target.y)
-
-        # Delete the path to free memory
-        # libtcod.path_delete(my_path)
 
     def move_astar_xy(self, target_x, target_y, force=False):
         if self.path is None or force:

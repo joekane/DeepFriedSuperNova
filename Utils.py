@@ -201,6 +201,16 @@ def inspect_tile(x, y):
             delay = time.time()
 
 
+def find_path(source, target):
+    fov_map = libtcod.map_new(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
+    for y in range(Constants.MAP_HEIGHT):
+        for x in range(Constants.MAP_WIDTH):
+            libtcod.map_set_properties(fov_map, x, y, True, True)
+
+    path = libtcod.path_new_using_map(fov_map, 1.5)
+    libtcod.path_compute(path, source[0], source[1], target[0], target[1])
+    return path
+
 def connected_cells(source, target):
 
     my_path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
