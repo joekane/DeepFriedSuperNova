@@ -43,16 +43,24 @@ class Vertex:
 class Graph:
     def __init__(self):
         self.vert_dict = {}
+        self.room_list = []
         self.num_vertices = 0
+        self.num_rooms = 0
 
     def __iter__(self):
-        return iter(self.vert_dict.values())
+        return iter(self.room_list)
+        #return iter(self.vert_dict.values())
 
     def add_vertex(self, node):
-        self.num_vertices = self.num_vertices + 1
+        self.num_vertices += 1
         new_vertex = Vertex(node)
         self.vert_dict[node] = new_vertex
         return new_vertex
+
+    def add_room(self, room):
+        self.num_rooms += 1
+        self.room_list.append(room)
+        return room
 
     def get_vertex(self, n):
         if n in self.vert_dict:
@@ -60,7 +68,7 @@ class Graph:
         else:
             return None
 
-    def add_edge(self, frm, to, cost=0):
+    def add_edge_vert(self, frm, to, cost=0):
         if frm not in self.vert_dict:
             self.add_vertex(frm)
         if to not in self.vert_dict:
@@ -68,6 +76,15 @@ class Graph:
 
         self.vert_dict[frm].add_neighbor(self.vert_dict[to], cost)
         self.vert_dict[to].add_neighbor(self.vert_dict[frm], cost)
+
+    def add_room_edge(self, frm, to, cost=0):
+        if frm not in self.room_list:
+            self.add_room(frm)
+        if to not in self.room_list:
+            self.add_room(to)
+        print "Room edge!"
+        frm.add_neighbor(to, cost)
+        to.add_neighbor(frm, cost)
 
     def get_vertices(self):
         return self.vert_dict.keys()
@@ -96,8 +113,13 @@ def dijkstra(aGraph, start):
     start.set_distance(0)
 
     # Put tuple pair into the priority queue
-    unvisited_queue = [(v.get_distance(), v) for v in aGraph]
+    print "Graph:"
+    print
+    unvisited_queue = [(v.get_distance(), v)for v in aGraph]
     heapq.heapify(unvisited_queue)
+
+    print "UV:"
+    print unvisited_queue
 
     while len(unvisited_queue):
         # Pops a vertex with the smallest distance
@@ -115,11 +137,7 @@ def dijkstra(aGraph, start):
             if new_dist < next.get_distance():
                 next.set_distance(new_dist)
                 next.set_previous(current)
-                print 'updated : current = %s next = %s new_dist = %s' \
-                      % (current.get_id(), next.get_id(), next.get_distance())
-            else:
-                print 'not updated : current = %s next = %s new_dist = %s' \
-                      % (current.get_id(), next.get_id(), next.get_distance())
+
 
         # Rebuild heap
         # 1. Pop every item

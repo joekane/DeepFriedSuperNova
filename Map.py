@@ -66,12 +66,21 @@ class Tile:
 
 
 class Rect:
+
     # a rectangle on the map. used to characterize a room.
     def __init__(self, x, y, w, h):
+        import sys
         self.x1 = x
         self.y1 = y
         self.x2 = x + w
         self.y2 = y + h
+        self.adjacent = {}
+        # Set distance to infinity for all nodes
+        self.distance = sys.maxint
+        # Mark all nodes unvisited
+        self.visited = False
+        # Predecessor
+        self.previous = None
 
     def center(self):
         center_x = (self.x1 + self.x2) / 2
@@ -82,6 +91,28 @@ class Rect:
         # returns true if this rectangle intersects with another one
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
+
+    def add_neighbor(self, neighbor, weight=0):
+        self.adjacent[neighbor] = weight
+
+    def get_connections(self):
+        return self.adjacent.keys()
+
+    def get_weight(self, neighbor):
+        print "Weight: " + str(self.adjacent[neighbor])
+        return self.adjacent[neighbor]
+
+    def set_distance(self, dist):
+        self.distance = dist
+
+    def get_distance(self):
+        return self.distance
+
+    def set_previous(self, prev):
+        self.previous = prev
+
+    def set_visited(self):
+        self.visited = True
 
     @property
     def width(self):
@@ -100,7 +131,7 @@ def generate_map():
 
     if level == 'BSP':
         #bsp_dungeon()
-        rooms_only_dungeon
+        rooms_only_dungeon()
         spawn_doors()
     elif level == 'WILD':
         CaveGen.build()
@@ -456,6 +487,7 @@ def basic_dungeon():
 
 
 def rooms_only_dungeon():
+    import span_tree
     global level_map, objects, stairs
 
     player = GameState.get_player()
@@ -473,6 +505,13 @@ def rooms_only_dungeon():
 
     rooms = []
     num_rooms = 0
+
+    g = span_tree.Graph()
+
+
+
+
+
 
     for r in range(Constants.MAX_ROOMS):
         # random width and height
@@ -494,6 +533,8 @@ def rooms_only_dungeon():
         if not failed:
             # this means there are no intersections, so this room is valid
 
+            # Add room to MST graph
+            g.add_room(new_room)
             # "paint" it to the map's tiles
             create_room(new_room)
 
@@ -504,32 +545,37 @@ def rooms_only_dungeon():
             # room_no = Object(new_x, new_y, chr(65+num_rooms), 'Room #', libtcod.white)
             # objects.insert(0, room_no) #draw early, so monsters are drawn on top
 
-
             if num_rooms == 0:
                 # this is the first room, where the player starts at
                 player.x = new_x
                 player.y = new_y
             else:
-                # all rooms after the first:
-                # connect it to the previous room with a tunnel
+                # not first one so we can link
+                print "We are here arent wE?"
+                lastRoom = g.room_list[num_rooms-1]
+                g.add_room_edge(new_room, lastRoom, Utils.distance_between( new_room.x1, new_room.x2,
+                                                                            lastRoom.x1, lastRoom.x2))
+                if random.randint(1,100) < 40:
+                    randRoom = random.choice(g.room_list)
+                    g.add_room_edge(new_room, randRoom, Utils.distance_between(new_room.x1, new_room.x2,
+                                                                               randRoom.x1, randRoom.x2))
 
-                # center coordinates of previous room
-                (prev_x, prev_y) = rooms[num_rooms - 1].center()
 
-                # draw a coin (random number that is either 0 or 1)
-                if libtcod.random_get_int(0, 0, 1) == 1:
-                    # first move horizontally, then vertically
-                    create_h_tunnel(prev_x, new_x, prev_y)
-                    create_v_tunnel(prev_y, new_y, new_x)
-                else:
-                    # first move vertically, then horizontally
-                    create_v_tunnel(prev_y, new_y, prev_x)
-                    create_h_tunnel(prev_x, new_x, new_y)
+
+
             # add some contents to this room, such as monsters
-            place_objects(new_room)
+            # place_objects(new_room)
             # finally, append the new room to the list
             rooms.append(new_room)
             num_rooms += 1
+
+    print "Room Count: " + str(num_rooms)
+
+    span_tree.dijkstra(g, g.room_list[0])
+
+    for room in g.room_list:
+        print "Adj: " + str(room.adjacent)
+        print "D* Dist: " + str(room.distance)
 
     # create stairs at the center of the last room
     stairs = Entity.Entity(new_x, new_y, '<', 'stairs', libtcod.white, always_visible=True)
@@ -1003,7 +1049,7 @@ def directly_adjacent_open_tiles(obj):
         return [None, None]
 
     choice = random.choice(open_tiles)
-    print(choice)
+    # print(choice)
     return choice
 
 
@@ -1030,7 +1076,7 @@ def adjacent_open_tiles(obj):
         return [None, None]
 
     choice = random.choice(open_tiles)
-    print(choice)
+    # print(choice)
     return choice
 
 
