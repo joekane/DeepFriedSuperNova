@@ -81,6 +81,7 @@ class Rect:
         self.visited = False
         # Predecessor
         self.previous = None
+        self.id = None
 
     def center(self):
         center_x = (self.x1 + self.x2) / 2
@@ -99,7 +100,7 @@ class Rect:
         return self.adjacent.keys()
 
     def get_weight(self, neighbor):
-        print "Weight: " + str(self.adjacent[neighbor])
+        # print "Weight: " + str(self.adjacent[neighbor])
         return self.adjacent[neighbor]
 
     def set_distance(self, dist):
@@ -131,6 +132,7 @@ def generate_map():
 
     if level == 'BSP':
         #bsp_dungeon()
+        #basic_dungeon()
         rooms_only_dungeon()
         spawn_doors()
     elif level == 'WILD':
@@ -487,31 +489,16 @@ def basic_dungeon():
 
 
 def rooms_only_dungeon():
-    import span_tree
+    import SpanningTree
     global level_map, objects, stairs
 
     player = GameState.get_player()
 
     objects = [player]
 
-    # if map is None:
-    #    # fill map with "blocked" tiles
-    #    level_map = [[Tile(True)
-    #                  for y in range(Constants.MAP_HEIGHT)]
-    #                 for x in range(Constants.MAP_WIDTH)]
-    # else:
-    #    level_map = map
-
-
-    rooms = []
     num_rooms = 0
 
-    g = span_tree.Graph()
-
-
-
-
-
+    g = SpanningTree.Graph()
 
     for r in range(Constants.MAX_ROOMS):
         # random width and height
@@ -525,58 +512,74 @@ def rooms_only_dungeon():
 
         # run through the other rooms and see if they intersect with this one
         failed = False
-        for other_room in rooms:
+        for other_room in g.room_list:
             if new_room.intersect(other_room):
                 failed = True
                 break
 
         if not failed:
-            # this means there are no intersections, so this room is valid
-
             # Add room to MST graph
-            g.add_room(new_room)
-            # "paint" it to the map's tiles
+            g.add_room(new_room, num_rooms)
+
+            # Carve room in level
             create_room(new_room)
-
-            # center coordinates of new room, will be useful later
-            (new_x, new_y) = new_room.center()
-            # optional: print "room number" to see how the map drawing worked
-            #          we may have more than ten rooms, so print 'A' for the first room, 'B' for the next...
-            # room_no = Object(new_x, new_y, chr(65+num_rooms), 'Room #', libtcod.white)
-            # objects.insert(0, room_no) #draw early, so monsters are drawn on top
-
-            if num_rooms == 0:
-                # this is the first room, where the player starts at
-                player.x = new_x
-                player.y = new_y
-            else:
-                # not first one so we can link
-                print "We are here arent wE?"
-                lastRoom = g.room_list[num_rooms-1]
-                g.add_room_edge(new_room, lastRoom, Utils.distance_between( new_room.x1, new_room.x2,
-                                                                            lastRoom.x1, lastRoom.x2))
-                if random.randint(1,100) < 40:
-                    randRoom = random.choice(g.room_list)
-                    g.add_room_edge(new_room, randRoom, Utils.distance_between(new_room.x1, new_room.x2,
-                                                                               randRoom.x1, randRoom.x2))
-
-
-
-
-            # add some contents to this room, such as monsters
-            # place_objects(new_room)
-            # finally, append the new room to the list
-            rooms.append(new_room)
+            place_objects(new_room)
             num_rooms += 1
 
-    print "Room Count: " + str(num_rooms)
+    # add Player to fist room
+    (new_x, new_y) = g.room_list[0].center()
+    player.x = new_x
+    player.y = new_y
 
-    span_tree.dijkstra(g, g.room_list[0])
 
+    # import plot_test
+    triangles = SpanningTree.get_triangles(g.room_list)
+
+    for tri in triangles:
+        new_room = g.room_list[tri[0]]
+        lastRoom = g.room_list[tri[1]]
+        g.add_room_edge(new_room, lastRoom, Utils.distance_between(new_room.x1, new_room.x2,
+                                                                   lastRoom.x1, lastRoom.x2))
+
+        new_room = g.room_list[tri[1]]
+        lastRoom = g.room_list[tri[2]]
+        g.add_room_edge(new_room, lastRoom, Utils.distance_between(new_room.x1, new_room.x2,
+                                                                   lastRoom.x1, lastRoom.x2))
+
+        new_room = g.room_list[tri[2]]
+        lastRoom = g.room_list[tri[0]]
+        g.add_room_edge(new_room, lastRoom, Utils.distance_between(new_room.x1, new_room.x2,
+                                                                   lastRoom.x1, lastRoom.x2))
+
+    SpanningTree.calculate_all_paths(g, g.room_list[0])
+
+    #room = g.room_list[3]
     for room in g.room_list:
-        print "Adj: " + str(room.adjacent)
-        print "D* Dist: " + str(room.distance)
+        path = [room.center()]
+        SpanningTree.shortest(room, path)
+        print 'The shortest path for %s : %s' % (room.center(), path[::-1])
 
+        s_node = None
+        for node in path:
+
+            if s_node is not None:
+                # TODO: Need better tunnels
+                # Line Tunnels
+                #create_tunnel(s_node, node)
+
+                # Shitty L Tunnels
+                if libtcod.random_get_int(0, 0, 1) == 1:
+                    # first move horizontally, then vertically
+                    create_h_tunnel(s_node[0], node[0], s_node[1])
+                    create_v_tunnel(s_node[1], node[1], node[0])
+                else:
+                    # first move vertically, then horizontally
+                    create_v_tunnel(s_node[1], node[1], s_node[0])
+                    create_h_tunnel(s_node[0], node[0], node[1])
+
+            s_node = node
+
+    (new_x, new_y) = g.room_list[-1].center()
     # create stairs at the center of the last room
     stairs = Entity.Entity(new_x, new_y, '<', 'stairs', libtcod.white, always_visible=True)
     objects.append(stairs)
@@ -799,6 +802,24 @@ def create_room(room):
                                    char=Themes.ground_char(),
                                    f_color=Themes.ground_color(),
                                    b_color=Themes.ground_bcolor())
+
+
+def create_tunnel(start, end):
+    global level_map
+    # print start, end
+    points = Utils.get_line(start, end)
+
+    # print "points"
+    # print points
+
+    for p in points:
+        level_map[p[0]][p[1]] = Tile(False,
+                               block_sight=False,
+                               char=Themes.ground_char(),
+                               f_color=Themes.ground_color(),
+                               b_color=Themes.ground_bcolor())
+
+
 
 
 def create_v_tunnel(y1, y2, x):

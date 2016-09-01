@@ -198,7 +198,7 @@ def new_game():
     Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
 
     Map.load_diner_map()
-
+    next_level()
     Fov.initialize()
     play_game()
 

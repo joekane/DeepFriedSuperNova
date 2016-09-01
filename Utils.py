@@ -44,19 +44,11 @@ def distance_to(self, other):
     dy = other.y - self.y
     return math.sqrt(dx ** 2 + dy ** 2)
 
+def get_drunk_line(start, end):
+    pass
 
 def get_line(start, end):
-    """Bresenham's Line Algorithm
-    Produces a list of tuples from start and end
 
-    >>> points1 = get_line((0, 0), (3, 4))
-    >>> points2 = get_line((3, 4), (0, 0))
-    >>> assert(set(points1) == set(points2))
-    >>> print points1
-    [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4)]
-    >>> print points2
-    [(3, 4), (2, 3), (1, 2), (1, 1), (0, 0)]
-    """
     # Setup initial conditions
     x1, y1 = start
     x2, y2 = end
