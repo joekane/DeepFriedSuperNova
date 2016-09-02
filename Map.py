@@ -18,6 +18,9 @@ import Components
 import Themes
 import CaveGen
 import Spells
+import gzip
+import xp_loader
+
 
 level_map = None
 objects = None
@@ -48,6 +51,20 @@ def new_map(solid=True):
                            f_color=Themes.wall_color(),
                            b_color=Themes.wall_bcolor())
                       for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+
+def load_xp():
+    global level_map
+    xp_file = gzip.open('pre-fab_test.xp')
+    raw_data = xp_file.read()
+    xp_file.close()
+
+    xp_data = xp_loader.load_xp_string(raw_data)
+
+    # xp_loader.load_layer_to_console(layer_0_console, xp_data['layer_data'][0])
+    # xp_loader.load_layer_to_console(layer_1_console, xp_data['layer_data'][1])
+
+    level_map = xp_loader.load_layer_to_map(level_map, 5, 5, xp_data['layer_data'][0])
 
 
 class Tile:
@@ -123,7 +140,7 @@ class Rect:
     def height(self):
         return self.y2 - self.y1
 
-
+# MAIN METHOD TO CALL LEVEL GEN BASED ON THEME
 def generate_map():
     import SoundEffects
     level = random.choice(Themes.LEVEL_STYLE)
@@ -133,8 +150,11 @@ def generate_map():
     if level == 'BSP':
         #bsp_dungeon()
         #basic_dungeon()
-        rooms_only_dungeon()
-        spawn_doors()
+        #rooms_only_dungeon()
+        drunk_walk()
+        #spawn_doors()
+        load_xp()
+        Fov.require_recompute()
     elif level == 'WILD':
         CaveGen.build()
         read_cavegen_data()
@@ -164,23 +184,12 @@ def caves(style='DEFAULT'):
     player = GameState.get_player()
     objects = [player]
 
-    # level_map = [[Tile(True,
-    #                   block_sight=True,
-    #                   char=Themes.wall_char(),
-    #                   f_color=Themes.wall_color(),
-    #                   b_color=Themes.wall_bcolor())
-    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-
     for x in range(1,Constants.MAP_WIDTH-1):
         for y in range(1,Constants.MAP_HEIGHT-1):
             pre_value = Noise.get_height_value(x, y)
 
             if 0.52 <= pre_value < 1:
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
 
 
 def wilderness():
@@ -191,13 +200,6 @@ def wilderness():
 
     player = GameState.get_player()
     objects = [player]
-
-    #level_map = [[Tile(True,
-    #                   block_sight=True,
-    #                   char=Themes.wall_char(),
-    #                   f_color=Themes.wall_color(),
-    #                   b_color=Themes.wall_bcolor())
-    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
@@ -273,26 +275,13 @@ def read_cavegen_data(): # OBSOLETE?
 
     data = CaveGen.get_level_data()
 
-    # Themes.apply_forrest_theme()
-
     player = GameState.get_player()
     objects = [player]
-
-    # level_map = [[Tile(True,
-    #                    block_sight=True,
-    #                  char=Themes.wall_char(),
-    #                   f_color=Themes.wall_color(),
-    #                   b_color=Themes.wall_bcolor())
-    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
             if data[x][y] != 1:
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
             elif data[x][y] == 2:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
@@ -327,14 +316,6 @@ def load_diner_map():
 
     new_map()
 
-    # fill map with "blocked" tiles
-    # level_map = [[Tile(True,
-    #                   block_sight=True,
-    #                   char=Themes.wall_char(),
-    #                   f_color=Themes.wall_color(),
-    #                   b_color=Themes.wall_bcolor())
-    #              for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-
     y = 0
 
     for l in range(Constants.MAP_HEIGHT):
@@ -343,11 +324,7 @@ def load_diner_map():
         for c in line:
             if c == ' ':
                 #print(str(x) + " " + str(y))
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
             if c == 'D':
                 #print(str(x) + "+" + str(y))
                 level_map[x][y].blocked = False
@@ -365,40 +342,20 @@ def load_diner_map():
                 level_map[x][y].blocked = True
                 level_map[x][y].block_sight = False
             if c == 'p':
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
                 player.x = x
                 player.y = y
             if c == 'Q':
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
                 spawn_npc_at(x, y, 'QuestGuy')
             if c == '+':
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
                 spawn_npc_at(x, y, 'UnlockedDoor')
             if c == '_':
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
                 spawn_npc_at(x, y, 'OpenDoor')
             if c == 's':
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
                 stairs = Entity.Entity(x, y, '<', 'stairs', libtcod.white, always_visible=True)
                 objects.append(stairs)
             x += 1
@@ -411,15 +368,6 @@ def basic_dungeon():
     player = GameState.get_player()
 
     objects = [player]
-
-    # if map is None:
-    #    # fill map with "blocked" tiles
-    #    level_map = [[Tile(True)
-    #                  for y in range(Constants.MAP_HEIGHT)]
-    #                 for x in range(Constants.MAP_WIDTH)]
-    #else:
-    #    level_map = map
-
 
     rooms = []
     num_rooms = 0
@@ -594,25 +542,6 @@ def bsp_dungeon():
 
     objects = [player]
 
-    # Themes.apply_ssa_theme()
-    # Themes.set_theme('Shadow State Archive')
-    # Themes.set_theme('Valley of Devils')
-
-    # Themes.apply_forrest_theme()
-
-    # if map is None:
-    #    # fill map with "blocked" tiles
-    #    level_map = [[Tile(True,
-    #                       block_sight=True,
-    #                       char=Themes.wall_char(),
-    #                       f_color=Themes.wall_color(),
-    #                       b_color=Themes.wall_bcolor())
-    #                  for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-    #else:
-    #    level_map = map
-
-
-
     # Empty global list for storing room coordinates
     bsp_rooms = []
 
@@ -678,11 +607,7 @@ def traverse_node(node, dat):
         # Dig room
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
-                level_map[x][y] = Tile(False,
-                                       block_sight=False,
-                                       char=Themes.ground_char(),
-                                       f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                create_ground(x, y)
 
         # Add center coordinates to the list of rooms
         bsp_rooms.append(((minx + maxx) / 2, (miny + maxy) / 2))
@@ -729,35 +654,68 @@ def traverse_node(node, dat):
     return True
 
 
+def drunk_walk():
+    global level_map, objects, stairs, bsp_rooms
+
+    player = GameState.get_player()
+
+    objects = [player]
+
+    max_walk_attempts = 10000
+    walk_attempts = 0
+
+    x, y = Constants.MAP_WIDTH / 2, Constants.MAP_HEIGHT / 2
+    x = 5
+    y = 5
+
+    while walk_attempts <= max_walk_attempts:
+
+        # carve current space
+        create_ground(x, y)
+
+        # decide which direction to go
+        d = random.randint(1, 100)
+
+        if 1 <= d < 25:
+            x -= 1
+        elif 25 <= d < 50:
+            x += 1
+        elif 50 <= d < 75:
+            y -= 1
+        elif 75 <= d < 101:
+            y += 1
+
+        if x > Constants.MAP_WIDTH -1:
+            x = Constants.MAP_WIDTH -1
+        if x < 1:
+            x = 1
+        if y > Constants.MAP_HEIGHT -1:
+            y = Constants.MAP_HEIGHT -1
+        if y < 1:
+            y = 1
+        walk_attempts += 1
+
+
+
+
+
 def vline(map, x, y1, y2):
     if y1 > y2:
         y1, y2 = y2, y1
 
     for y in range(y1, y2 + 1):
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
 
 
 def vline_up(map, x, y):
     while y >= 0 and map[x][y].blocked == True:
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
         y -= 1
 
 
 def vline_down(map, x, y):
     while y < Constants.MAP_HEIGHT and map[x][y].blocked == True:
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
         y += 1
 
 
@@ -765,30 +723,18 @@ def hline(map, x1, y, x2):
     if x1 > x2:
         x1, x2 = x2, x1
     for x in range(x1, x2 + 1):
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
 
 
 def hline_left(map, x, y):
     while x >= 0 and map[x][y].blocked == True:
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
         x -= 1
 
 
 def hline_right(map, x, y):
     while x < Constants.MAP_WIDTH and map[x][y].blocked == True:
-        map[x][y] = Tile(False,
-                         block_sight=False,
-                         char=Themes.ground_char(),
-                         f_color=Themes.ground_color(),
-                         b_color=Themes.ground_bcolor())
+        create_ground(x, y)
         x += 1
 
 
@@ -797,12 +743,23 @@ def create_room(room):
     # go through the tiles in the rectangle and make them passable
     for x in range(room.x1 + 1, room.x2):
         for y in range(room.y1 + 1, room.y2):
-            level_map[x][y] = Tile(False,
-                                   block_sight=False,
-                                   char=Themes.ground_char(),
-                                   f_color=Themes.ground_color(),
-                                   b_color=Themes.ground_bcolor())
+            create_ground(x, y)
 
+def create_ground(x, y):
+    global level_map
+    level_map[x][y] = Tile(False,
+                           block_sight=False,
+                           char=Themes.ground_char(),
+                           f_color=Themes.ground_color(),
+                           b_color=Themes.ground_bcolor())
+
+def create_wall(x, y):
+    global level_map
+    level_map[x][y] = Tile(True,
+                           block_sight=True,
+                           char=Themes.wall_char(),
+                           f_color=Themes.wall_color(),
+                           b_color=Themes.wall_bcolor())
 
 def create_tunnel(start, end):
     global level_map
@@ -813,34 +770,20 @@ def create_tunnel(start, end):
     # print points
 
     for p in points:
-        level_map[p[0]][p[1]] = Tile(False,
-                               block_sight=False,
-                               char=Themes.ground_char(),
-                               f_color=Themes.ground_color(),
-                               b_color=Themes.ground_bcolor())
-
-
+        create_ground(x, y)
 
 
 def create_v_tunnel(y1, y2, x):
     global level_map
     # vertical tunnel
     for y in range(min(y1, y2), max(y1, y2) + 1):
-        level_map[x][y] = Tile(False,
-                               block_sight=False,
-                               char=Themes.ground_char(),
-                               f_color=Themes.ground_color(),
-                               b_color=Themes.ground_bcolor())
+        create_ground(x, y)
 
 
 def create_h_tunnel(x1, x2, y):
     global level_map
     for x in range(min(x1, x2), max(x1, x2) + 1):
-        level_map[x][y] = Tile(False,
-                               block_sight=False,
-                               char=Themes.ground_char(),
-                               f_color=Themes.ground_color(),
-                               b_color=Themes.ground_bcolor())
+        create_ground(x, y)
 
 
 # HELPERS
