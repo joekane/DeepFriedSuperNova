@@ -17,9 +17,9 @@ GLASS_CHAR = libtcod.CHAR_BLOCK1
 GLASS_COLOR = libtcod.lightest_blue
 GLASS_BCOLOR = libtcod.black
 
-BOX_CHAR = libtcod.CHAR_BLOCK1
-BOX_COLOR = libtcod.lightest_blue
-BOX_BCOLOR = libtcod.black
+SHROUD_CHAR = libtcod.CHAR_BLOCK1
+SHROUD_COLOR = libtcod.lightest_blue
+SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_gray
 
@@ -42,9 +42,9 @@ GLASS_CHAR = libtcod.CHAR_BLOCK1
 GLASS_COLOR = libtcod.lightest_blue
 GLASS_BCOLOR = libtcod.black
 
-BOX_CHAR = libtcod.CHAR_BLOCK1
-BOX_COLOR = libtcod.lightest_blue
-BOX_BCOLOR = libtcod.black
+SHROUD_CHAR = 37
+SHROUD_COLOR = libtcod.lightest_blue
+SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_gray
 
@@ -67,9 +67,9 @@ GLASS_CHAR = libtcod.CHAR_BLOCK1
 GLASS_COLOR = libtcod.lightest_blue
 GLASS_BCOLOR = libtcod.black
 
-BOX_CHAR = libtcod.CHAR_BLOCK1
-BOX_COLOR = libtcod.lightest_blue
-BOX_BCOLOR = libtcod.black
+SHROUD_CHAR = libtcod.CHAR_BLOCK1
+SHROUD_COLOR = libtcod.lightest_blue
+SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_sepia
 
@@ -94,9 +94,9 @@ GLASS_CHAR = libtcod.CHAR_BLOCK1
 GLASS_COLOR = libtcod.lightest_blue
 GLASS_BCOLOR = libtcod.black
 
-BOX_CHAR = libtcod.CHAR_BLOCK1
-BOX_COLOR = libtcod.lightest_blue
-BOX_BCOLOR = libtcod.black
+SHROUD_CHAR = libtcod.CHAR_BLOCK1
+SHROUD_COLOR = libtcod.lightest_blue
+SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_sepia
 
@@ -119,8 +119,8 @@ GLASS_CHAR = libtcod.CHAR_BLOCK1
 GLASS_COLOR = libtcod.lightest_blue
 GLASS_BCOLOR = libtcod.black
 
-BOX_CHAR = libtcod.CHAR_BLOCK1
-BOX_COLOR = libtcod.lightest_blue
-BOX_BCOLOR = libtcod.black
+SHROUD_CHAR = libtcod.CHAR_BLOCK1
+SHROUD_COLOR = libtcod.lightest_blue
+SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_grey

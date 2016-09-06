@@ -25,9 +25,9 @@ GLASS_CHAR = [libtcod.CHAR_BLOCK1]
 GLASS_COLOR = [libtcod.lightest_blue]
 GLASS_BCOLOR = [libtcod.black]
 
-BOX_CHAR = [libtcod.CHAR_BLOCK1]
-BOX_COLOR = [libtcod.lightest_blue]
-BOX_BCOLOR = [libtcod.black]
+SHROUD_CHAR = [libtcod.CHAR_BLOCK1]
+SHROUD_COLOR = [libtcod.lightest_blue]
+SHROUD_BCOLOR = [libtcod.black]
 
 OUT_OF_FOV_COLOR = [libtcod.darker_gray]
 
@@ -50,7 +50,7 @@ def set_theme(theme):
     global WALL_CHAR, WALL_COLOR, WALL_BCOLOR
     global DOOR_CLOSED_CHAR, DOOR_OPEN_CHAR, DOOR_COLOR, DOOR_BCOLOR
     global GLASS_CHAR, GLASS_COLOR, GLASS_BCOLOR
-    global BOX_CHAR, BOX_COLOR, BOX_BCOLOR
+    global SHROUD_CHAR, SHROUD_COLOR, SHROUD_BCOLOR
     global OUT_OF_FOV_COLOR
 
     LEVEL_STYLE = theme_list[theme]['level_style'].split(' ')
@@ -66,15 +66,15 @@ def set_theme(theme):
     DOOR_CLOSED_CHAR = theme_list[theme]['door_closed_char'].split(' ')
     DOOR_OPEN_CHAR = theme_list[theme]['door_open_char'].split(' ')
     DOOR_COLOR = theme_list[theme]['door_color'].split(' ')
-    DOOR_BCOLOR =theme_list[theme]['door_bcolor'].split(' ')
+    DOOR_BCOLOR = theme_list[theme]['door_bcolor'].split(' ')
 
     GLASS_CHAR = theme_list[theme]['glass_char'].split(' ')
     GLASS_COLOR = theme_list[theme]['glass_color'].split(' ')
     GLASS_BCOLOR = theme_list[theme]['glass_bcolor'].split(' ')
 
-    BOX_CHAR = theme_list[theme]['box_char'].split(' ')
-    BOX_COLOR = theme_list[theme]['box_color'].split(' ')
-    BOX_BCOLOR = theme_list[theme]['box_bcolor'].split(' ')
+    SHROUD_CHAR = theme_list[theme]['shroud_char'].split(' ')
+    SHROUD_COLOR = theme_list[theme]['shroud_color'].split(' ')
+    SHROUD_BCOLOR = theme_list[theme]['shroud_bcolor'].split(' ')
 
     OUT_OF_FOV_COLOR = eval(theme_list[theme]['out_of_fov_color'])
 
@@ -115,17 +115,25 @@ def glass_color():
     color = random.choice(GLASS_COLOR)
     return eval(str(color))
 
+
 def glass_bcolor():
     color = random.choice(GLASS_BCOLOR)
     return eval(str(color))
 
 
-def box_char():
-    pass
+def shroud_char():
+    return eval(str(random.choice(SHROUD_CHAR)))
 
 
-def box_color():
-    pass
+def shroud_color():
+    color = random.choice(SHROUD_COLOR)
+    return eval(str(color))
+
+
+def shroud_bcolor():
+    color = random.choice(SHROUD_BCOLOR)
+    return eval(str(color))
+
 
 
 

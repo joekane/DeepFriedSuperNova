@@ -35,7 +35,13 @@ def initialize():
 
 
 def fov_change(x,y, blocks_sight, blocks):
-    libtcod.map_set_properties(fov_map, x, y, not blocks_sight, not blocks)
+    if blocks_sight == 'Unchanged':
+        print "NONE!!!"
+        blocks_sight = Map.level_map[x][y].block_sight
+        libtcod.map_set_properties(fov_map, x, y, not blocks_sight, not blocks)
+    else:
+        libtcod.map_set_properties(fov_map, x, y, not blocks_sight, not blocks)
+
 
 
 def require_recompute():

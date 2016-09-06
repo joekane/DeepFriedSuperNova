@@ -77,11 +77,11 @@ class Entity:
     def move(self, dx, dy):
         # move by the given amount, if the destination is not blocked
         if not Map.is_blocked(self.x + dx, self.y + dy):
-            Fov.fov_change(self.x, self.y, False, False)
+            Fov.fov_change(self.x, self.y, 'Unchanged', False)
             self.x += dx
             self.y += dy
             if self.name != 'player':
-                Fov.fov_change(self.x, self.y, False, True)
+                Fov.fov_change(self.x, self.y, 'Unchanged', True)
 
     def move_towards(self, target_x, target_y):
         # vector from this object to the target, and distance

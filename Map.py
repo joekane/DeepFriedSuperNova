@@ -53,9 +53,13 @@ def new_map(solid=True):
                       for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
 
-def load_xp():
+def load_prefab(x, y, key, rotation):
     global level_map
-    xp_file = gzip.open('pre-fab_test.xp')
+    import Prefabs
+
+    room_type = Prefabs.get_prefab(key)
+
+    xp_file = gzip.open('Levels\_' + room_type + '.xp')
     raw_data = xp_file.read()
     xp_file.close()
 
@@ -64,7 +68,23 @@ def load_xp():
     # xp_loader.load_layer_to_console(layer_0_console, xp_data['layer_data'][0])
     # xp_loader.load_layer_to_console(layer_1_console, xp_data['layer_data'][1])
 
-    level_map = xp_loader.load_layer_to_map(level_map, 5, 5, xp_data['layer_data'][0])
+    map_x = x
+    map_y = y
+
+
+    try:
+        level_map = xp_loader.load_layer_to_map(level_map, map_x, map_y, xp_data['layer_data'][0], rotation=rotation)
+        xp_objects = xp_loader.load_layer_to_objects(level_map, map_x, map_y, xp_data['layer_data'][1], rotation=rotation)
+
+        for obj in xp_objects:
+            if obj[0] == 'door':
+                spawn_door_at(obj[1][0], obj[1][1], 'Door')
+    except:
+        pass
+    return
+
+
+    # Handle objects from file and apply probabilitys, etc.
 
 
 class Tile:
@@ -151,9 +171,11 @@ def generate_map():
         #bsp_dungeon()
         #basic_dungeon()
         #rooms_only_dungeon()
-        drunk_walk()
+        #drunk_walk()
         #spawn_doors()
-        load_xp()
+        # load_prefab(9, 4, 'blank_room')
+        # load_prefab(5, 2, 'plus_hallway')
+        pre_fabs()
         Fov.require_recompute()
     elif level == 'WILD':
         CaveGen.build()
@@ -696,6 +718,148 @@ def drunk_walk():
         walk_attempts += 1
 
 
+def pre_fabs():
+    global level_map, objects, stairs, bsp_rooms
+    import Prefabs
+
+    player = GameState.get_player()
+
+    directions = ['Up', 'Down', 'Left', 'Right']
+
+    rotations = ['90', '180', '270', 'None']
+
+    objects = [player]
+
+    builders = []
+    max_attempts = 3
+    attempts = 1
+
+    x = 15
+    y = 25
+    con_x = x + 3
+    con_y = y + 1
+    offset_x = 1
+    offset_y = 3
+
+
+    # place room in center of map...ish
+    load_prefab(x, y, 'Test', 'None')
+    coords = Prefabs.get_size('Test', 'None')
+
+
+
+
+    while attempts <= max_attempts:
+
+        direction = random.choice(directions)
+        direction = 'Up'
+        rotation = random.choice(rotations)
+        rotation = 'None'
+
+        fab_choice = random.choice(Prefabs.get_keys())
+        fab_choice = '+hall'
+
+        fab_size = Prefabs.get_size(fab_choice, rotation)
+        print attempts
+        print "Builder Loc: {0}, {1}".format(con_x, con_y)
+        print direction, rotation, fab_size, fab_choice
+
+        if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1], direction=direction): # Needs direction
+            if direction == 'Right':
+                offset_x = 1
+                offset_y = 3
+                load_prefab(con_x + offset_x, con_y-offset_y+1, fab_choice, rotation)
+                try:
+                    spawn_door_at(con_x, con_y, 'Door')
+                    create_ground(con_x + 1, con_y)
+                    create_ground(con_x + 2, con_y)
+                except:
+                    print "Door/Ground FAIL"
+                    pass
+                con_x += fab_size[0] + 1
+            elif direction == 'Left':
+                offset_x = fab_size[0]
+                offset_y = 3
+                load_prefab(con_x - offset_x - 2 , con_y-offset_y+1, fab_choice, rotation)
+                try:
+                    spawn_door_at(con_x, con_y, 'Door')
+                    create_ground(con_x - 1, con_y)
+                    create_ground(con_x - 2, con_y)
+                except:
+                    print "BAIL!"
+                    pass
+                con_x -= offset_x + 1
+            elif direction == 'Up':
+                offset_x = 3
+                offset_y = fab_size[1] + 2
+                load_prefab(con_x - offset_x, con_y-offset_y+1, fab_choice, rotation)
+                try:
+                    spawn_door_at(con_x, con_y, 'Door')
+                    create_ground(con_x, con_y-1)
+                    create_ground(con_x, con_y-2)
+                except:
+                    pass
+                con_y -= fab_size[1] - 1
+            elif direction == 'Down':
+                offset_x = 2
+                offset_y = 1
+                load_prefab(con_x - offset_x, con_y+1, fab_choice, rotation)
+                try:
+                    spawn_door_at(con_x, con_y, 'Door')
+                    create_ground(con_x, con_y+1)
+                    create_ground(con_x, con_y+2)
+                except:
+                    passx
+                con_y += fab_size[1] + 1
+        else:
+            print "Blocked"
+
+        attempts += 1
+
+
+
+
+
+def can_fit(map_x, map_y, pf_x, pf_y, pf_w, pf_h, direction='Right'):
+    global level_map
+    if direction == 'Right':
+        for x in range(map_x + 1, map_x + 1 + pf_w):
+            for y in range(map_y - pf_y + 1, map_y - pf_y + 1 + pf_h):
+                try:
+                    if level_map[x][y].blocked is False:
+                        print "Blocked Right!"
+                        return True
+                except:
+                    return False
+    elif direction == 'Left':
+        for x in range(map_x - 1, map_x - 1 - pf_w):
+            for y in range(map_y - pf_y + 1, map_y - pf_y + 1 + pf_h):
+                try:
+                    if level_map[x][y].blocked is False:
+                        print "Blocked!"
+                        return False
+                except:
+                    return False
+    elif direction == 'Up':
+        for x in range(map_x - pf_x - 1 , map_x - 1 + pf_w ):
+            for y in range(map_y - 1 - pf_h - pf_y, map_y - pf_y - 1):
+                try:
+                    if level_map[x][y].blocked is False:
+                        print "Blocked!"
+                        return False
+                except:
+                    return False
+    elif direction == 'Up':
+        for x in range(map_x - pf_x - 1, map_x - 1 + pf_w):
+            for y in range(map_y + 1, map_y + pf_h + 1):
+                try:
+                    if level_map[x][y].blocked is False:
+                        print "Blocked!"
+                        return False
+                except:
+                    return False
+
+    return True
 
 
 
@@ -760,6 +924,24 @@ def create_wall(x, y):
                            char=Themes.wall_char(),
                            f_color=Themes.wall_color(),
                            b_color=Themes.wall_bcolor())
+
+
+def create_shroud(x, y):
+    global level_map
+    level_map[x][y] = Tile(False,
+                           block_sight=True,
+                           char=Themes.shroud_char(),
+                           f_color=Themes.shroud_color(),
+                           b_color=Themes.shroud_bcolor())
+
+
+def create_glass(x, y):
+    global level_map
+    level_map[x][y] = Tile(True,
+                           block_sight=False,
+                           char=Themes.glass_char(),
+                           f_color=Themes.glass_color(),
+                           b_color=Themes.glass_bcolor())
 
 def create_tunnel(start, end):
     global level_map
@@ -902,6 +1084,7 @@ def spawn_npc_at(x, y, npc):
 
 def spawn_door_at(x, y, npc):
     import Schedule
+    create_ground(x, y)
     fighter_component = None
     ai_component = None
     if 'fighter_component' in GameState.imported_npc_list[npc]:

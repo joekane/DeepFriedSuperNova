@@ -1,4 +1,6 @@
 import libtcodpy as libtcod
+import Themes
+import Map
 
 ##################################
 # In-memory XP format is as follows:
@@ -80,28 +82,90 @@ def load_layer_to_console(console, xp_file_layer):
 			libtcod.console_put_char_ex(console, x, y, cell_data['keycode'], fore_color, back_color)
 
 
-def load_layer_to_map(map, x1, y1, xp_file_layer):
+def load_layer_to_map(map, x1, y1, xp_file_layer, rotation='None'):
 	if not xp_file_layer['width'] or not xp_file_layer['height']:
 		raise AttributeError('Attempted to call load_layer_to_console on data that didn\'t have a width or height key, check your data')
 
-	for x in range(xp_file_layer['width']):
-		for y in range(xp_file_layer['height']):
+	width = xp_file_layer['width'] - 2
+	height = xp_file_layer['height'] - 2
+
+	for x in range(1, width + 1):
+		for y in range(1, height + 1):
 			cell_data = xp_file_layer['cells'][x][y]
-			fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
-			back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
+			# fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
+			# back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
 			# libtcod.console_put_char_ex(console, x, y, cell_data['keycode'], fore_color, back_color)
 			char = cell_data['keycode']
-			map[x1 + x][y1 + y].char = cell_data['keycode']
-			map[x1 + x][y1 + y].f_color = fore_color
-			map[x1 + x][y1 + y].b_color = back_color
+			#print char
+			#map[x1 + x][y1 + y].char = cell_data['keycode']
+			#map[x1 + x][y1 + y].f_color = fore_color
+			#map[x1 + x][y1 + y].b_color = back_color
+
+			if rotation == '90':
+		 		temp_y = x
+				temp_x = -y
+				temp_x += height + 1
+			elif rotation == '270':
+				temp_y = -x
+				temp_x = y
+				temp_y += width + 1
+			elif rotation == '180':
+				temp_y = -y
+				temp_x = -x
+				temp_y += height + 1
+				temp_x += width + 1
+			elif rotation == 'None':
+				temp_y = y
+				temp_x = x
+
 			if char == 206:
-				map[x1 + x][y1 + y].blocked = True
-				map[x1 + x][y1 + y].block_sight = True
+				Map.create_wall(x1 + temp_x, y1 + temp_y)
+			elif char == 83:
+				Map.create_shroud(x1 + temp_x, y1 + temp_y)
+			elif char == 71:
+				Map.create_glass(x1 + temp_x, y1 + temp_y)
 			else:
-				map[x1 + x][y1 + y].blocked = False
-				map[x1 + x][y1 + y].block_sight = False
+				Map.create_ground(x1 + temp_x, y1 + temp_y)
 
 	return map
+
+def load_layer_to_objects(map, x1, y1, xp_file_layer, rotation='None'):
+	objects = []
+	if not xp_file_layer['width'] or not xp_file_layer['height']:
+		raise AttributeError('Attempted to call load_layer_to_console on data that didn\'t have a width or height key, check your data')
+
+	width = xp_file_layer['width'] - 2
+	height = xp_file_layer['height'] - 2
+
+	for x in range(1, xp_file_layer['width'] - 1):
+		for y in range(1, xp_file_layer['height'] - 1):\
+
+			cell_data = xp_file_layer['cells'][x][y]
+			char = cell_data['keycode']
+
+			if rotation == '90':
+				temp_y = x
+				temp_x = -y
+				temp_x += width + 1
+			elif rotation == '270':
+				temp_y = -x
+				temp_x = y
+				temp_y += height + 1
+			elif rotation == '180':
+				temp_y = -y
+				temp_x = -x
+				temp_y += height + 1
+				temp_x += width + 1
+			elif rotation == 'None':
+				temp_y = y
+				temp_x = x
+
+			if char == 43: # '+' DOOR
+				# print "Doors!"
+				objects.append( ('door', (x1 + temp_x, y1 + temp_y)))
+				Map.create_ground(x1 + temp_x, y1 + temp_y)
+
+	return objects
 
 
 def get_position_key_xy(xp_file_layer, poskey_color):

@@ -52,7 +52,7 @@ recur_count = 0
 recur_max = 900
 
 
-rnd = random.seed(666)
+# rnd = random.seed(666)
 Neighbours = 4  # Openess 3 or 4
 Interations = 15000   #
 
