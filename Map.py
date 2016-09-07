@@ -183,12 +183,10 @@ def generate_map():
     if level == 'BSP':
         #bsp_dungeon()
         #basic_dungeon()
-        #rooms_only_dungeon()
+        rooms_only_dungeon()
         #drunk_walk()
         #spawn_doors()
-        # load_prefab(9, 4, 'blank_room')
-        # load_prefab(5, 2, 'plus_hallway')
-        pre_fabs_v2()
+        # pre_fabs_v2()
         Fov.require_recompute()
     elif level == 'WILD':
         CaveGen.build()
@@ -749,7 +747,7 @@ def pre_fabs_v2():
 
     # place room in center of map...ish
 
-    start_room = '+hall'
+    start_room = 'Room'
 
     load_prefab(x, y, start_room, 'None')
     fab_size = Prefabs.get_size(start_room, 'None')
