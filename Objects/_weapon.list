@@ -1,0 +1,70 @@
+[Hand Axe]
+tag = PRE
+equipment_component = True
+slot = hand
+attack_dice = 1d3
+char = /
+name = hand axe
+color = libtcod.grey
+desc = basically just a sharp rock
+freq = 80:1
+
+[Tomahawk]
+tag = PRE
+equipment_component = True
+slot = hand
+attack_dice = 1d5
+char = /
+name = tomahawk
+color = libtcod.grey
+desc = stone axe with red feathers
+freq = 80:1
+
+[Bone club]
+tag = PRE
+equipment_component = True
+slot = hand
+attack_dice = 1d6
+char = !
+name = bone club
+color = libtcod.white
+desc = war club carved from the bone of an unknown beast
+freq = 80:1
+
+[Jagged Maul]
+tag = PRE
+equipment_component = True
+slot = 2hand
+attack_dice = 2d4
+attack_bonus = 1
+char = /
+name = jagged maul
+color = libtcod.sepia
+desc = massive spikey bashy thing
+freq = 80:1
+
+[Leather Sling]
+tag = PRE
+equipment_component = True
+slot = hand
+attack_dice = 1d3
+attack_bonus = 0
+range = 3
+char = Y
+name = leather sling
+color = libtcod.sepia
+desc = slingshot made from soft animal skin
+freq = 80:1
+
+[Hunter's Bow]
+tag = PRE
+equipment_component = True
+slot = 2hand
+attack_dice = 1d6
+range = 5
+char = }
+name = hunter's bow
+color = libtcod.sepia
+desc = medium sized bow made from yew
+freq = 80:1
+

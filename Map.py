@@ -68,19 +68,32 @@ def load_prefab(x, y, key, rotation):
     # xp_loader.load_layer_to_console(layer_0_console, xp_data['layer_data'][0])
     # xp_loader.load_layer_to_console(layer_1_console, xp_data['layer_data'][1])
 
+    print "XP:"
+    print len(xp_data['layer_data'])
+
     map_x = x
     map_y = y
 
 
-    try:
-        level_map = xp_loader.load_layer_to_map(level_map, map_x, map_y, xp_data['layer_data'][0], rotation=rotation)
-        xp_objects = xp_loader.load_layer_to_objects(level_map, map_x, map_y, xp_data['layer_data'][1], rotation=rotation)
-
+    level_map = xp_loader.load_layer_to_map(level_map, map_x, map_y, xp_data['layer_data'][0],
+                                            rotation=rotation)
+    if len(xp_data['layer_data']) >= 2:
+        xp_objects = xp_loader.load_layer_to_objects(level_map, map_x, map_y, xp_data['layer_data'][1],
+                                                     rotation=rotation)
         for obj in xp_objects:
             if obj[0] == 'door':
-                spawn_door_at(obj[1][0], obj[1][1], 'Door')
-    except:
-        pass
+                # TODO: Randomly Select +'s for doors and spit it back out for connection data
+
+                # spawn_door_at(obj[1][0], obj[1][1], 'Door')
+                create_ground(obj[1][0], obj[1][1])
+                pass
+
+    if len(xp_data['layer_data']) >= 3:
+        level_map = xp_loader.load_layer_to_map_cosmetic(level_map, map_x, map_y, xp_data['layer_data'][2],
+                                                         rotation=rotation)
+    else:
+        print "3 is None"
+
     return
 
 
@@ -175,7 +188,7 @@ def generate_map():
         #spawn_doors()
         # load_prefab(9, 4, 'blank_room')
         # load_prefab(5, 2, 'plus_hallway')
-        pre_fabs()
+        pre_fabs_v2()
         Fov.require_recompute()
     elif level == 'WILD':
         CaveGen.build()
@@ -718,6 +731,148 @@ def drunk_walk():
         walk_attempts += 1
 
 
+def pre_fabs_v2():
+    global level_map, objects, stairs, bsp_rooms
+    import Prefabs
+
+    player = GameState.get_player()
+    directions = ['Up', 'Down', 'Left', 'Right']
+    rotations = ['90', '180', '270', 'None']
+    objects = [player]
+
+    builders = []
+    max_attempts = 10000
+    attempts = 1
+
+    x = Constants.MAP_WIDTH / 2
+    y = Constants.MAP_HEIGHT / 2
+
+    # place room in center of map...ish
+
+    start_room = '+hall'
+
+    load_prefab(x, y, start_room, 'None')
+    fab_size = Prefabs.get_size(start_room, 'None')
+    fab_pos = x, y
+
+    old_size = fab_size
+    old_pos = fab_pos
+
+    fits = False
+
+    while attempts <= max_attempts:
+
+        if fits:
+            old_size = fab_size
+            old_pos = fab_pos
+
+        direction = random.choice(directions)
+        # direction = 'Up'
+        rotation = random.choice(rotations)
+        # rotation = '90'
+        fab_choice = random.choice(Prefabs.get_keys())
+        # fab_choice = '+hall'
+
+        fab_size = Prefabs.get_size(fab_choice, rotation)
+        print fab_size
+
+        if direction == 'Right':
+            # shoud come from PFloader
+            connector_pos = old_pos[0] + old_size[0] - 1, old_pos[1] + 1
+
+            # calculate position of new PreFab
+            fab_pos = old_pos[0] + old_size[0] + 1, old_pos[1]
+
+            if can_fit(fab_pos[0], fab_pos[1], fab_size[0], fab_size[1]):
+                # Draw Prefab at new Pos
+                load_prefab(fab_pos[0], fab_pos[1], fab_choice, rotation)
+
+                # Draw connective elements Between
+                #spawn_door_at(con_x, con_y, 'Door')
+                create_ground(connector_pos[0], connector_pos[1])
+                create_ground(connector_pos[0]+1, connector_pos[1])
+                create_ground(connector_pos[0]+2, connector_pos[1])
+
+                fits = True
+                print "Fit Right!"
+            else:
+                fits = False
+                print "Cannot Fit Right!"
+
+        elif direction == 'Left':
+            # shoud come from PFloader
+            connector_pos = old_pos[0], old_pos[1] + 1
+
+            # calculate position of new PreFab
+            fab_pos = old_pos[0] - fab_size[0] - 1, old_pos[1]
+
+            if can_fit(fab_pos[0], fab_pos[1], fab_size[0], fab_size[1]):
+                # Draw Prefab at new Pos
+                load_prefab(fab_pos[0], fab_pos[1], fab_choice, rotation)
+
+                # Draw connective elements Between
+                # spawn_door_at(con_x, con_y, 'Door')
+                create_ground(connector_pos[0], connector_pos[1])
+                create_ground(connector_pos[0] - 1, connector_pos[1])
+                create_ground(connector_pos[0] - 2, connector_pos[1])
+
+                fits = True
+                print "Fit Left!"
+            else:
+                fits = False
+                print "Cannot Fit Left!"
+
+        elif direction == 'Down':
+            # shoud come from PFloader
+            connector_pos = old_pos[0] + 1, old_pos[1] + old_size[1] - 1
+
+            # calculate position of new PreFab
+            fab_pos = old_pos[0], old_pos[1] + old_size[1] + 1
+
+            if can_fit(fab_pos[0], fab_pos[1], fab_size[0], fab_size[1]):
+                # Draw Prefab at new Pos
+                load_prefab(fab_pos[0], fab_pos[1], fab_choice, rotation)
+
+                # Draw connective elements Between
+                # spawn_door_at(con_x, con_y, 'Door')
+                create_ground(connector_pos[0], connector_pos[1])
+                create_ground(connector_pos[0], connector_pos[1]+1)
+                create_ground(connector_pos[0], connector_pos[1]+2)
+
+                fits = True
+                print "Fit Down!"
+            else:
+                fits = False
+                print "Cannot Fit Down!"
+
+        elif direction == 'Up':
+            # shoud come from PFloader
+            connector_pos = old_pos[0] + 1, old_pos[1]
+
+            # calculate position of new PreFab
+            fab_pos = old_pos[0], old_pos[1] - fab_size[1] - 1
+
+            if can_fit(fab_pos[0], fab_pos[1], fab_size[0], fab_size[1]):
+                # Draw Prefab at new Pos
+                load_prefab(fab_pos[0], fab_pos[1], fab_choice, rotation)
+
+                # Draw connective elements Between
+                # spawn_door_at(con_x, con_y, 'Door')
+                create_ground(connector_pos[0], connector_pos[1])
+                create_ground(connector_pos[0], connector_pos[1]-1)
+                create_ground(connector_pos[0], connector_pos[1]-2)
+
+                fits = True
+                print "Fit Up!"
+            else:
+                fits = False
+                print "Cannot Fit Up!"
+
+
+        attempts += 1
+
+
+
 def pre_fabs():
     global level_map, objects, stairs, bsp_rooms
     import Prefabs
@@ -735,16 +890,14 @@ def pre_fabs():
     attempts = 1
 
     x = 15
-    y = 25
-    con_x = x + 3
-    con_y = y + 1
-    offset_x = 1
-    offset_y = 3
+    y = 15
+
+
 
 
     # place room in center of map...ish
-    load_prefab(x, y, 'Test', 'None')
-    coords = Prefabs.get_size('Test', 'None')
+    load_prefab(x, y, 'Room', 'None')
+    fab_size = Prefabs.get_size('Room', 'None')
 
 
 
@@ -752,23 +905,44 @@ def pre_fabs():
     while attempts <= max_attempts:
 
         direction = random.choice(directions)
-        direction = 'Up'
+        # direction = 'Down'
         rotation = random.choice(rotations)
         rotation = 'None'
 
         fab_choice = random.choice(Prefabs.get_keys())
-        fab_choice = '+hall'
+        fab_choice = 'Room'
+
+        last_fab_size = fab_size
 
         fab_size = Prefabs.get_size(fab_choice, rotation)
+
+        if attempts == 1:
+            if direction == 'Right':
+                con_x = x + last_fab_size[0]
+                con_y = y + 2
+            elif direction == 'Left':
+                con_x = x + 1
+                con_y = y + 2
+            elif direction == 'Up':
+                con_x = x + 2
+                con_y = y + 1
+            elif direction == 'Down':
+                con_x = x + 2
+                con_y = y + last_fab_size[1]
+
         print attempts
         print "Builder Loc: {0}, {1}".format(con_x, con_y)
         print direction, rotation, fab_size, fab_choice
 
-        if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1], direction=direction): # Needs direction
-            if direction == 'Right':
-                offset_x = 1
-                offset_y = 3
-                load_prefab(con_x + offset_x, con_y-offset_y+1, fab_choice, rotation)
+        if direction == 'Right':
+            offset_x = 1
+            offset_y = 2
+            con_x = x + last_fab_size[0]
+            con_y = y + 2
+
+            if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1],
+                       direction=direction):  # Needs direction
+                load_prefab(con_x + offset_x, con_y-offset_y, fab_choice, rotation)
                 try:
                     spawn_door_at(con_x, con_y, 'Door')
                     create_ground(con_x + 1, con_y)
@@ -776,11 +950,13 @@ def pre_fabs():
                 except:
                     print "Door/Ground FAIL"
                     pass
-                con_x += fab_size[0] + 1
-            elif direction == 'Left':
-                offset_x = fab_size[0]
-                offset_y = 3
-                load_prefab(con_x - offset_x - 2 , con_y-offset_y+1, fab_choice, rotation)
+                #con_x += fab_size[0] + 1
+        elif direction == 'Left':
+            offset_x = fab_size[0]
+            offset_y = 2
+            if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1],
+                       direction=direction): # Needs direction
+                load_prefab(con_x - offset_x - 2 , con_y-offset_y, fab_choice, rotation)
                 try:
                     spawn_door_at(con_x, con_y, 'Door')
                     create_ground(con_x - 1, con_y)
@@ -788,29 +964,33 @@ def pre_fabs():
                 except:
                     print "BAIL!"
                     pass
-                con_x -= offset_x + 1
-            elif direction == 'Up':
-                offset_x = 3
-                offset_y = fab_size[1] + 2
-                load_prefab(con_x - offset_x, con_y-offset_y+1, fab_choice, rotation)
+                #con_x -= offset_x + 1
+        elif direction == 'Up':
+            offset_x = 2
+            offset_y = fab_size[1] + 1
+            if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1],
+                       direction=direction): # Needs direction
+                load_prefab(con_x - offset_x, con_y - offset_y - 1, fab_choice, rotation)
                 try:
                     spawn_door_at(con_x, con_y, 'Door')
                     create_ground(con_x, con_y-1)
                     create_ground(con_x, con_y-2)
                 except:
                     pass
-                con_y -= fab_size[1] - 1
-            elif direction == 'Down':
-                offset_x = 2
-                offset_y = 1
-                load_prefab(con_x - offset_x, con_y+1, fab_choice, rotation)
+                #con_y -= fab_size[1] + 1
+        elif direction == 'Down':
+            offset_x = 2
+            offset_y = 1
+            if can_fit(con_x, con_y, offset_x, offset_y, fab_size[0], fab_size[1],
+                           direction=direction): # Needs direction
+                load_prefab(con_x - offset_x , con_y+1, fab_choice, rotation)
                 try:
                     spawn_door_at(con_x, con_y, 'Door')
                     create_ground(con_x, con_y+1)
                     create_ground(con_x, con_y+2)
                 except:
                     passx
-                con_y += fab_size[1] + 1
+                #con_y += fab_size[1] + 1
         else:
             print "Blocked"
 
@@ -818,47 +998,18 @@ def pre_fabs():
 
 
 
-
-
-def can_fit(map_x, map_y, pf_x, pf_y, pf_w, pf_h, direction='Right'):
+def can_fit(fab_x, fab_y, w, h):
     global level_map
-    if direction == 'Right':
-        for x in range(map_x + 1, map_x + 1 + pf_w):
-            for y in range(map_y - pf_y + 1, map_y - pf_y + 1 + pf_h):
-                try:
-                    if level_map[x][y].blocked is False:
-                        print "Blocked Right!"
-                        return True
-                except:
-                    return False
-    elif direction == 'Left':
-        for x in range(map_x - 1, map_x - 1 - pf_w):
-            for y in range(map_y - pf_y + 1, map_y - pf_y + 1 + pf_h):
-                try:
-                    if level_map[x][y].blocked is False:
-                        print "Blocked!"
-                        return False
-                except:
-                    return False
-    elif direction == 'Up':
-        for x in range(map_x - pf_x - 1 , map_x - 1 + pf_w ):
-            for y in range(map_y - 1 - pf_h - pf_y, map_y - pf_y - 1):
-                try:
-                    if level_map[x][y].blocked is False:
-                        print "Blocked!"
-                        return False
-                except:
-                    return False
-    elif direction == 'Up':
-        for x in range(map_x - pf_x - 1, map_x - 1 + pf_w):
-            for y in range(map_y + 1, map_y + pf_h + 1):
-                try:
-                    if level_map[x][y].blocked is False:
-                        print "Blocked!"
-                        return False
-                except:
-                    return False
+    # print fab_x, fab_y, w, h
 
+    if fab_x < 1 or (fab_x + w) > Constants.MAP_WIDTH - 1 or fab_y < 1 or (fab_y + h) > Constants.MAP_HEIGHT - 1:
+        return False
+
+    for x in range(fab_x, fab_x + w):
+        for y in range(fab_y, fab_y + h):
+            if level_map[x][y].blocked is False:
+                # print "Blocked!"
+                return False
     return True
 
 
@@ -909,11 +1060,15 @@ def create_room(room):
         for y in range(room.y1 + 1, room.y2):
             create_ground(x, y)
 
-def create_ground(x, y):
+def create_ground(x, y, id=None):
     global level_map
+    if id is not None:
+        char = 48 + id
+    else:
+        char = Themes.ground_char()
     level_map[x][y] = Tile(False,
                            block_sight=False,
-                           char=Themes.ground_char(),
+                           char=char,
                            f_color=Themes.ground_color(),
                            b_color=Themes.ground_bcolor())
 
