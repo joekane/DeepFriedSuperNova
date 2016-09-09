@@ -53,6 +53,23 @@ class Button:
         # libtcod.console_blit(self.target, 0, 0, self.rect.width, self.rect.height, 0 , min_x + 1 , min_y , 1.0, 1.0)
 
 
+
+def load_from_xp(x, y, filename, console):
+    import gzip
+    import xp_loader
+
+    xp_file = gzip.open('UI\_' + filename + '.xp')
+    raw_data = xp_file.read()
+    xp_file.close()
+
+    xp_data = xp_loader.load_xp_string(raw_data)
+
+    xp_loader.load_layer_to_console(console, xp_data['layer_data'][0])
+
+
+
+
+
 def menu(header, options, width):
     key = libtcod.Key()
     mouse = libtcod.Mouse()

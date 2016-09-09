@@ -36,6 +36,7 @@ def process():
                 # print obj.name, obj.delay
                 obj.delay -= obj.speed
             else:
+                obj.pass_time()
                 value = obj.ai.take_turn()
                 if value == 0:
                     player_turn = True

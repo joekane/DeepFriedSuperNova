@@ -55,7 +55,7 @@ def initialize():
     # create object representing the player
     fighter_component = Components.Fighter(hp=10000,
                                            defense=100,
-                                           power=200,
+                                           power='1d3',
                                            xp=0,
                                            death_function=Components.player_death)
     player = Entity.Entity(0, 0, '@', 'player', libtcod.white,
@@ -65,6 +65,10 @@ def initialize():
 
     starting_equipment()
     player.speed = 10
+
+    player.status.append( ['Blessed', 100])
+
+
 
     player.level = 1
     player.action_points = 100

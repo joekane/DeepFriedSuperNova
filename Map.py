@@ -1205,7 +1205,7 @@ def spawn_npc_at(x, y, npc):
     if 'fighter_component' in GameState.imported_npc_list[npc]:
         fighter_component = Components.Fighter(hp=int(GameState.imported_npc_list[npc]['hp']),
                                     defense=int(GameState.imported_npc_list[npc]['defense']),
-                                    power=int(GameState.imported_npc_list[npc]['power']),
+                                    power=str(GameState.imported_npc_list[npc]['power']),
                                     xp=int(GameState.imported_npc_list[npc]['xp']),
                                     death_function=eval('Components.' + GameState.imported_npc_list[npc]['death_function']))
 

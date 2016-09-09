@@ -29,6 +29,8 @@ def initialize(map_console, entity_console, panel_console, side_panel_console, a
     consoles['entity_console'] = entity_console
     consoles['animation_console'] = animation_console
 
+    UI.load_from_xp(0, 0, 'Side_panel', consoles['side_panel_console'])
+
     # libtcod.console_set_default_background(consoles['animation_console'], libtcod.Color(255,255,255))
     # libtcod.console_set_background_flag(consoles['animation_console'], libtcod.BKGND_MULTIPLY)
 
@@ -107,8 +109,8 @@ def ui():
     libtcod.console_clear(consoles['panel_console'])
 
     # prepare to render the GUI panel
-    libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-    libtcod.console_clear(consoles['side_panel_console'])
+    #libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+    #libtcod.console_clear(consoles['side_panel_console'])
 
     #render_hoz_line(0, 0, Constants.SCREEN_WIDTH, libtcod.Color(30, 30, 30), consoles['panel_console'])
 
@@ -136,25 +138,15 @@ def ui():
         y += 1
 
     # show the player's stats
-    render_bar(1, 2, Constants.BAR_WIDTH, 'HP', GameState.get_player().fighter.hp,
-               GameState.get_player().fighter.max_hp,
-               libtcod.light_red,
-               libtcod.darker_red,
-               consoles['panel_console'])
+    render_box_bar(4, 35, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.max_hp,
+                   libtcod.Color(178, 0, 45),
+                   libtcod.Color(64, 0, 16), consoles['side_panel_console'])
+    render_box_bar(4, 36, 14, '', 90, 100,
+                   libtcod.Color(0, 0, 217),
+                   libtcod.Color(0, 0, 64), consoles['side_panel_console'])
 
-    # render_vert_line(0, 0, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT, libtcod.Color(30, 30, 100),
-    #                 consoles['side_panel_console'])
 
-    # print the Side Panel, with auto-wrap
-    libtcod.console_set_default_foreground(consoles['side_panel_console'], Constants.UI_Fore)
-    libtcod.console_set_default_background(consoles['side_panel_console'], Constants.UI_Back)
-    libtcod.console_print_frame(consoles['side_panel_console'], 0, 0,
-                                Constants.SCREEN_WIDTH-Constants.MAP_CONSOLE_WIDTH,
-                                Constants.SCREEN_HEIGHT-Constants.PANEL_HEIGHT,
-                                clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt=None)
-
+    # DEBUG STUFF
     libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'FPS ' +
                              str(libtcod.sys_get_fps()))
     libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
@@ -163,18 +155,39 @@ def ui():
                              str(GameState.get_dungeon_level()))
 
     # RENDER HEALTH BARS
-    temp_y = 2
+    temp_y = 3
+    # CLEAR HP AREA
+    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
+    libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+    libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
+
+    sx = 1
+    sy = 25
+    print GameState.player.status
+    for st in GameState.player.status:
+        libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+        libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(51, 51, 51))
+        libtcod.console_print(consoles['side_panel_console'], sx, sy, st[0] + " (" + str(st[1]) + ")")
+        sy += 1
+
+    # RENDER BARS NEW STYLE
     for object in Map.get_all_objects():
         if object.fighter and Fov.is_visible(obj=object) and (object is not GameState.get_player()):
-            render_bar(2, temp_y, 17, '', object.fighter.hp, object.fighter.max_hp, libtcod.dark_green,
-                       libtcod.darker_red, consoles['side_panel_console'])
-            if object in Utils.get_fighters_under_mouse():
-                libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.white)
-            else:
-                libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
-            libtcod.console_print_ex(consoles['side_panel_console'], 3, temp_y, libtcod.BKGND_NONE, libtcod.LEFT,
-                                     object.name)
-            temp_y += 1
+            if temp_y < 17:
+                render_box_bar(1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp, libtcod.Color(0, 255, 0),
+                               libtcod.Color(0, 64, 0), consoles['side_panel_console'])
+                # print "Rendering {0}".format(object.name)
+
+                #if object in Utils.get_fighters_under_mouse():
+                #    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.white)
+                #else:
+                #    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
+                #libtcod.console_print_ex(consoles['side_panel_console'], 3, temp_y, libtcod.BKGND_NONE, libtcod.LEFT,
+                #                         object.name)
+                temp_y += 2
+
+
+
 
 
 def update():
@@ -229,12 +242,34 @@ def draw_object(obj, visible=True):
     x, y = Map.to_camera_coordinates(obj.x, obj.y)
 
     if visible:
-
         libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
         libtcod.console_set_char_background(consoles['entity_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
     else:
         libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, libtcod.darker_gray,
                                     libtcod.BKGND_NONE)
+
+
+
+
+def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
+    # render a bar (HP, experience, etc). first calculate the width of the bar
+    bar_width = int(float(value) / maximum * total_width)
+    #print "Box Bar!"
+    if name != '':
+        libtcod.console_set_default_background(target, libtcod.black)
+        libtcod.console_set_default_foreground(target, libtcod.Color(51, 51, 51))
+        libtcod.console_print(target, x, y, name)
+        y += 1
+    # render the background first
+    libtcod.console_set_default_background(target, back_color)
+    libtcod.console_set_default_foreground(target, bar_color)
+    for x1 in range(x, x+total_width):
+        libtcod.console_put_char(target, x1, y, 255, libtcod.BKGND_SET)
+    for x1 in range(x, x+bar_width):
+        libtcod.console_put_char(target, x1, y, 254, libtcod.BKGND_SET)
+
+
+
 
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):

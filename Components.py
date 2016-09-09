@@ -241,9 +241,10 @@ class Fighter:
         self.base_power = power
         self.owner = owner
 
+
     @property
     def damage(self):
-        return Combat.dice('1d4')
+        return Combat.dice(self.power)
 
     @property
     def save(self):
@@ -253,12 +254,13 @@ class Fighter:
 
     @property
     def damage_reduction(self):
-        return Combat.dice('1d1')
+        return Combat.dice('1d2')
 
     @property
     def power(self):
-        bonus = sum(equipment.power_bonus for equipment in GameState.get_all_equipped(self.owner))
-        return self.base_power + bonus
+        #bonus = sum(equipment.power_bonus for equipment in GameState.get_all_equipped(self.owner))
+        bonus = 1
+        return self.base_power + "+" + str(bonus)
 
     @property
     def defense(self):  # return actual defense, by summing up the bonuses from all equipped items
@@ -600,7 +602,7 @@ class SpawningMonster:
             if 'fighter_component' in GameState.imported_npc_list[self.new_monster]:
                 fighter_component = Fighter(hp=int(GameState.imported_npc_list[self.new_monster]['hp']),
                                             defense=int(GameState.imported_npc_list[self.new_monster]['defense']),
-                                            power=int(GameState.imported_npc_list[self.new_monster]['power']),
+                                            power=str(GameState.imported_npc_list[self.new_monster]['power']),
                                             xp=int(GameState.imported_npc_list[self.new_monster]['xp']),
                                             death_function=eval(
                                                 GameState.imported_npc_list[self.new_monster]['death_function']))

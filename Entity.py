@@ -38,12 +38,13 @@ class Entity:
         self.x = x
         self.y = y
         self.delay = delay
-        self.CT = random.randint(0, 50)
         self.speed = speed
         self.char = char
         self.color = color
         self.always_visible = always_visible
         self.path = None
+        self.status = []
+
 
         # Optional Components
         self.fighter = fighter
@@ -67,6 +68,12 @@ class Entity:
             self.equipment.owner = self
             self.item = Components.Item()
             self.item.owner = self
+
+    def pass_time(self):
+        for st in self.status:
+            st[1] -= 1
+            if st[1] < 0:
+                self.status.remove(st)
 
     def send_to_back(self):
         # make this object be drawn first, so all others appear above it if they're in the same tile.
