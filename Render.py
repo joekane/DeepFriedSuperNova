@@ -138,16 +138,16 @@ def ui():
         y += 1
 
     # show the player's stats
-    render_box_bar(4, 35, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.max_hp,
+    render_box_bar(4, 35, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
                    libtcod.Color(178, 0, 45),
                    libtcod.Color(64, 0, 16), consoles['side_panel_console'])
-    render_box_bar(4, 36, 14, '', 90, 100,
+    render_box_bar(4, 36, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
                    libtcod.Color(0, 0, 217),
                    libtcod.Color(0, 0, 64), consoles['side_panel_console'])
 
 
     # DEBUG STUFF
-    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'FPS ' +
+    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, str(GameState.get_player().fighter.hp) + ' -> FPS' +
                              str(libtcod.sys_get_fps()))
     libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
                              str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
@@ -156,18 +156,21 @@ def ui():
 
     # RENDER HEALTH BARS
     temp_y = 3
-    # CLEAR HP AREA
+    sx = 1
+    sy = 25
+    # CLEAR HP AREA / Status Area
     libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
     libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
     libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
+    libtcod.console_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
 
-    sx = 1
-    sy = 25
-    print GameState.player.status
+
+    # print GameState.player.status
+
     for st in GameState.player.status:
         libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-        libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(51, 51, 51))
-        libtcod.console_print(consoles['side_panel_console'], sx, sy, st[0] + " (" + str(st[1]) + ")")
+        libtcod.console_set_default_foreground(consoles['side_panel_console'], st['color'])
+        libtcod.console_print(consoles['side_panel_console'], sx, sy, st['name']) #  + " (" + str(st[1]) + ")")
         sy += 1
 
     # RENDER BARS NEW STYLE
@@ -176,14 +179,6 @@ def ui():
             if temp_y < 17:
                 render_box_bar(1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp, libtcod.Color(0, 255, 0),
                                libtcod.Color(0, 64, 0), consoles['side_panel_console'])
-                # print "Rendering {0}".format(object.name)
-
-                #if object in Utils.get_fighters_under_mouse():
-                #    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.white)
-                #else:
-                #    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
-                #libtcod.console_print_ex(consoles['side_panel_console'], 3, temp_y, libtcod.BKGND_NONE, libtcod.LEFT,
-                #                         object.name)
                 temp_y += 2
 
 

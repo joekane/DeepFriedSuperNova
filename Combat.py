@@ -28,4 +28,5 @@ def damage_calc(attacker, target):
     if target.fighter.save:
         return False
     else:
-        return attacker.damage - target.fighter.damage_reduction
+        dmg = attacker.damage - target.fighter.damage_reduction
+        return dmg

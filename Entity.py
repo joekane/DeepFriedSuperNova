@@ -38,13 +38,12 @@ class Entity:
         self.x = x
         self.y = y
         self.delay = delay
-        self.speed = speed
+        self.base_speed = speed
         self.char = char
         self.color = color
         self.always_visible = always_visible
         self.path = None
         self.status = []
-
 
         # Optional Components
         self.fighter = fighter
@@ -69,10 +68,26 @@ class Entity:
             self.item = Components.Item()
             self.item.owner = self
 
+
+    @property
+    def speed(self):
+        spd = self.base_speed
+        for st in self.status:
+            if 'speed' in st.keys():
+                spd += st['speed']
+        return spd
+
+
     def pass_time(self):
         for st in self.status:
-            st[1] -= 1
-            if st[1] < 0:
+            st['duration'] -= 1
+
+            if '-HP' in st.keys() and self.fighter is not None:
+                self.fighter.take_damage(st['-HP'])
+            if '+HP' in st.keys() and self.fighter is not None:
+                self.fighter.heal(st['+HP'])
+
+            if st['duration'] < 0:
                 self.status.remove(st)
 
     def send_to_back(self):
@@ -188,5 +203,5 @@ class Entity:
         Render.blank(self.x, self.y)
 
     def change_CT(self, value):
-        self.CT += value * (int(self.speed) / 10)
+        self.CT += value * (int(self.base_speed) / 10)
 

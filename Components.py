@@ -232,15 +232,16 @@ class PlayeControlled:
 
 class Fighter:
     # combat-related properties and methods (monster, player, NPC).
-    def __init__(self, hp, defense, power, xp, death_function=None, owner=None):
+    def __init__(self, hp, defense, power, xp, sp=10, death_function=None, owner=None):
         self.xp = xp
         self.death_function = death_function
         self.base_max_hp = hp
         self.hp = hp
+        self.base_max_sp = sp
+        self.sp = sp
         self.base_defense = defense
         self.base_power = power
         self.owner = owner
-
 
     @property
     def damage(self):
@@ -254,12 +255,18 @@ class Fighter:
 
     @property
     def damage_reduction(self):
-        return Combat.dice('1d2')
+        for st in self.owner.status:
+            if 'damage_reduction' in st.keys():
+                return Combat.dice(st['damage_reduction'])
+        return 0
 
     @property
     def power(self):
         #bonus = sum(equipment.power_bonus for equipment in GameState.get_all_equipped(self.owner))
-        bonus = 1
+        bonus = 0
+        for st in self.owner.status:
+            if 'damage_bonus' in st.keys():
+                bonus += st['damage_bonus']
         return self.base_power + "+" + str(bonus)
 
     @property

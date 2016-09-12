@@ -1231,7 +1231,7 @@ def spawn_npc_at(x, y, npc):
     objects.append(monster)
     monster.action_points = 0
 
-    if monster.speed > 0:
+    if monster.base_speed > 0:
         Schedule.register(monster)
 
 

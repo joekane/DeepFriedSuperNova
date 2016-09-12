@@ -21,6 +21,7 @@ import Utils
 import Fov
 import Render
 import SoundEffects
+import Status
 
 
 imported_items_list = {}
@@ -53,10 +54,11 @@ def initialize():
     read_external_quests()
 
     # create object representing the player
-    fighter_component = Components.Fighter(hp=10000,
+    fighter_component = Components.Fighter(hp=500,
                                            defense=100,
                                            power='1d3',
                                            xp=0,
+                                           sp=100,
                                            death_function=Components.player_death)
     player = Entity.Entity(0, 0, '@', 'player', libtcod.white,
                            blocks=True,
@@ -64,9 +66,16 @@ def initialize():
                            fighter=fighter_component)
 
     starting_equipment()
-    player.speed = 10
+    player.base_speed = 10
 
-    player.status.append( ['Blessed', 100])
+    # bless = { 'name' : 'Blessed', 'color' : libtcod.yellow, 'duration': 100, }
+    # poison = {'name': 'Poisoned', 'color': libtcod.light_green, 'duration': 10, '-HP' : 0.5}
+    player.status.append(Status.status_list['Rage'])
+    player.status.append(Status.status_list['Blessed'])
+    player.status.append(Status.status_list['Haste'])
+    player.status.append(Status.status_list['Poisoned'])
+
+    # player.status.append(Status.status_list['Poisoned'])
 
 
 
