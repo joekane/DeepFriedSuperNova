@@ -30,6 +30,7 @@ def initialize(map_console, entity_console, panel_console, side_panel_console, a
     consoles['animation_console'] = animation_console
 
     UI.load_from_xp(0, 0, 'Side_panel', consoles['side_panel_console'])
+    UI.load_from_xp(0, 0, 'Panel', consoles['panel_console'])
 
     # libtcod.console_set_default_background(consoles['animation_console'], libtcod.Color(255,255,255))
     # libtcod.console_set_background_flag(consoles['animation_console'], libtcod.BKGND_MULTIPLY)
@@ -43,18 +44,10 @@ def full_map():
     import Noise
 
     if Fov.recompute():
-
-        # print "Draw Map"
-
         map = Map.current_map()
         player = GameState.get_player()
-
         Map.move_camera(player.x, player.y)
-
         camera_x, camera_y = Map.get_camera()
-    # print "cx: " + str(camera_x) + " | cy: " + str(camera_y)
-
-    # go through all tiles, and set their background color
         for y in range(Constants.MAP_CONSOLE_HEIGHT):
             for x in range(Constants.MAP_CONSOLE_WIDTH):
                 map_x, map_y = (camera_x + x, camera_y + y)
@@ -62,8 +55,6 @@ def full_map():
                 visible = Fov.is_visible(pos=(map_x, map_y))
 
                 if Constants.DEBUG:
-                    # print tile.char, tile.f_color, tile.b_color
-                    # offset_color = get_offset_color(map_x, map_y)
                     offset_color = libtcod.Color(0,0,0)
                     libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                                 tile.f_color - offset_color, libtcod.BKGND_SET)
@@ -71,7 +62,6 @@ def full_map():
                                                         tile.b_color - offset_color, flag=libtcod.BKGND_SET)
                 else:
                     if not visible:
-                        # if it's not visible right now, the player can only see it if it's explored
                         if tile.explored:
                             if tile.blocked:
                                 char = 206
@@ -81,7 +71,6 @@ def full_map():
                                                         Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
 
                     else:
-                        # print tile.char, tile.f_color, tile.b_color
                         offset_color = get_offset_color(map_x, map_y)
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)
@@ -108,81 +97,31 @@ def ui():
     libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
     libtcod.console_clear(consoles['panel_console'])
 
-    # prepare to render the GUI panel
-    #libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-    #libtcod.console_clear(consoles['side_panel_console'])
-
-    #render_hoz_line(0, 0, Constants.SCREEN_WIDTH, libtcod.Color(30, 30, 30), consoles['panel_console'])
-
     # print the Side Panel, with auto-wrap
-    libtcod.console_set_default_foreground(consoles['panel_console'], Constants.UI_Fore)
-    libtcod.console_set_default_background(consoles['panel_console'], Constants.UI_Back)
-    libtcod.console_print_frame(consoles['panel_console'], 0, 0,
-                                Constants.SCREEN_WIDTH,
-                                Constants.PANEL_HEIGHT,
-                                clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt=None)
+    # libtcod.console_set_default_foreground(consoles['panel_console'], Constants.UI_Fore)
+    # libtcod.console_set_default_background(consoles['panel_console'], Constants.UI_Back)
+    #libtcod.console_print_frame(consoles['panel_console'], 0, 0,
+    #                            Constants.SCREEN_WIDTH,
+    #                            Constants.PANEL_HEIGHT,
+    #                            clear=True,
+    #                            flag=libtcod.BKGND_SET,
+    #                            fmt=None)
 
+    render_messages()
 
-    # display names of objects under the mouse
-    libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.purple)
-    libtcod.console_print_ex(consoles['panel_console'], 1, 1, libtcod.BKGND_NONE, libtcod.LEFT,
-                             Utils.get_names_under_mouse())
+    render_status()
 
-    # print the game messages, one line at a time
-    y = 1
-    for (line, color) in GameState.get_msg_queue():
-        libtcod.console_set_default_foreground(consoles['panel_console'], color)
-        libtcod.console_print_ex(consoles['panel_console'], Constants.MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
-        y += 1
+    render_stat_bars()
 
-    # show the player's stats
-    render_box_bar(4, 35, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                   libtcod.Color(178, 0, 45),
-                   libtcod.Color(64, 0, 16), consoles['side_panel_console'])
-    render_box_bar(4, 36, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                   libtcod.Color(0, 0, 217),
-                   libtcod.Color(0, 0, 64), consoles['side_panel_console'])
 
 
     # DEBUG STUFF
-    libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, str(GameState.get_player().fighter.hp) + ' -> FPS' +
-                             str(libtcod.sys_get_fps()))
-    libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
-                             str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
-    libtcod.console_print_ex(consoles['panel_console'], 1, 6, libtcod.BKGND_NONE, libtcod.LEFT, 'Level: ' +
-                             str(GameState.get_dungeon_level()))
-
-    # RENDER HEALTH BARS
-    temp_y = 3
-    sx = 1
-    sy = 25
-    # CLEAR HP AREA / Status Area
-    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
-    libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-    libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
-    libtcod.console_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
-
-
-    # print GameState.player.status
-
-    for st in GameState.player.status:
-        libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-        libtcod.console_set_default_foreground(consoles['side_panel_console'], st['color'])
-        libtcod.console_print(consoles['side_panel_console'], sx, sy, st['name']) #  + " (" + str(st[1]) + ")")
-        sy += 1
-
-    # RENDER BARS NEW STYLE
-    for object in Map.get_all_objects():
-        if object.fighter and Fov.is_visible(obj=object) and (object is not GameState.get_player()):
-            if temp_y < 17:
-                render_box_bar(1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp, libtcod.Color(0, 255, 0),
-                               libtcod.Color(0, 64, 0), consoles['side_panel_console'])
-                temp_y += 2
-
-
-
+    # libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, str(GameState.get_player().fighter.hp) + ' -> FPS' +
+    #                         str(libtcod.sys_get_fps()))
+    #libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
+    #                         str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
+    #libtcod.console_print_ex(consoles['panel_console'], 1, 6, libtcod.BKGND_NONE, libtcod.LEFT, 'Level: ' +
+    #                         str(GameState.get_dungeon_level()))
 
 
 def update():
@@ -216,7 +155,6 @@ def update_animations():
     libtcod.console_flush()
 
 
-
 def blank(x, y):
     x, y = Map.to_camera_coordinates(x, y)
     libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
@@ -244,17 +182,80 @@ def draw_object(obj, visible=True):
                                     libtcod.BKGND_NONE)
 
 
+def render_messages():
+    # print the game messages, one line at a time
+    y = 2
+    for (line, color) in GameState.get_msg_queue():
+        libtcod.console_set_default_foreground(consoles['panel_console'], color)
+        libtcod.console_print_ex(consoles['panel_console'], Constants.MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
+        y += 1
+
+
+def render_status():
+    # RENDER HEALTH BARS
+    sx = 1
+    sy = 25
+    # CLEAR HP AREA / Status Area
+    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
+    libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+    libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
+    libtcod.console_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
+
+    # print GameState.player.status
+
+    num_of_status = 0
+
+    for st in GameState.player.status:
+        if num_of_status == 9:
+            libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+            libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(51,51,51))
+            libtcod.console_print(consoles['side_panel_console'], sx, sy-1,
+                                  "...             ")  # + " (" + str(st[1]) + ")")
+            return
+        libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+        libtcod.console_set_default_foreground(consoles['side_panel_console'], st['color'])
+        if Utils.is_mouse_in(Constants.MAP_CONSOLE_WIDTH + sx, sy, 17, 1):
+            libtcod.console_print(consoles['side_panel_console'], sx, sy, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
+        else:
+            libtcod.console_print(consoles['side_panel_console'], sx, sy, st['name'])  # + " (" + str(st[1]) + ")")
+        num_of_status += 1
+        sy += 1
+
+
+def render_stat_bars():
+
+    # SHOW PLAYER STAT BARS
+    render_box_bar(4, 35, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
+                   libtcod.Color(178, 0, 45),
+                   libtcod.Color(64, 0, 16), consoles['side_panel_console'])
+    render_box_bar(4, 36, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
+                   libtcod.Color(0, 0, 217),
+                   libtcod.Color(0, 0, 64), consoles['side_panel_console'])
+
+    # RENDER MONSTER HEALTH BARS
+    temp_y = 3
+    for object in Map.get_visible_objects():
+        if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
+            if temp_y < 17:
+                render_box_bar(1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
+                               libtcod.Color(0, 255, 0),
+                               libtcod.Color(0, 64, 0),
+                               consoles['side_panel_console'])
+                temp_y += 2
 
 
 def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
     bar_width = int(float(value) / maximum * total_width)
+    og_y = y
+    height = 1
     #print "Box Bar!"
     if name != '':
         libtcod.console_set_default_background(target, libtcod.black)
         libtcod.console_set_default_foreground(target, libtcod.Color(51, 51, 51))
         libtcod.console_print(target, x, y, name)
         y += 1
+        height += 1
     # render the background first
     libtcod.console_set_default_background(target, back_color)
     libtcod.console_set_default_foreground(target, bar_color)
@@ -263,8 +264,8 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
     for x1 in range(x, x+bar_width):
         libtcod.console_put_char(target, x1, y, 254, libtcod.BKGND_SET)
 
-
-
+    if Utils.is_mouse_in(Constants.MAP_CONSOLE_WIDTH + x, og_y, total_width, height):
+        libtcod.console_print_ex(target, x, y, libtcod.BKGND_SET, libtcod.LEFT, str(value) + "/" + str(maximum))
 
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
@@ -301,119 +302,10 @@ def render_hoz_line(x, y, length, color, target):
     libtcod.console_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
-def pop_up(width=None, height=None, title=None, text=None):
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
-
-    # calculate total height for the header (after auto-wrap) and one line per option
-    if width is None:
-        width = Constants.MAP_CONSOLE_WIDTH - 30
-
-    if height is None:
-        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
-
-    pop = libtcod.console_new(width, height)
-    # print the header, with auto-wrap
-    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-
-    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt=title)
-
-    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
-
-
-    # blit the contents of "window" to the root console
-    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
-    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
-
-
-    button_text = 'Click to Continue'
-    button = UI.Button(button_text,
-                       width / 2,
-                       height - 3,
-                       function=UI.close_window,
-                       target=pop,
-                       length=len(button_text))
-
-    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
-
-    while True:
-        libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, 0.0)
-        libtcod.console_flush()
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-
-        if button.draw(key, mouse) == 'close':
-            return
-
-        if key.vk == libtcod.KEY_ENTER and key.lalt:
-            # Alt+Enter: toggle fullscreen
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
-            return
-
-
-def beastiary(width=None, height=None, title=None, text=None):
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
-
-    # calculate total height for the header (after auto-wrap) and one line per option
-    if width is None:
-        width = Constants.MAP_CONSOLE_WIDTH - 10
-
-    if height is None:
-        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
-
-    pop = libtcod.console_new(width, height)
-    # print the header, with auto-wrap
-    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-
-    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt=title)
-
-
-
-
-    # blit the contents of "window" to the root console
-    x = 0
-    y = 0
-
-
-    button_text = '[ Click to Continue ]'
-    button = UI.Button(button_text,
-                       width / 2,
-                       height - 2,
-                       function=UI.close_window)
-
-    img = libtcod.image_load('cipher_warden_80x80_test_01.png')
-    libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
-    # show the background image, at twice the regular console resolution
-    libtcod.image_blit_2x(img, pop, 9, 2)
-
-    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-    libtcod.console_print_rect(pop, 3, 3, width - 6, height, text)
-
-
-    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
-
-    while True:
-
-        libtcod.console_flush()
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-
-        if button.draw(key, mouse) == 'close':
-            return
-
-        if key.vk == libtcod.KEY_ENTER and key.lalt:
-            # Alt+Enter: toggle fullscreen
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
-            return
-
+def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constants.SCREEN_HEIGHT,
+         f_alpha=1.0,
+         b_alpha=1.0):
+    libtcod.console_blit(source, 0, 0, width, height, target, x, y, f_alpha, b_alpha)
 
 
 def render_all():

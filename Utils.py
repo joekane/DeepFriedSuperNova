@@ -44,8 +44,10 @@ def distance_to(self, other):
     dy = other.y - self.y
     return math.sqrt(dx ** 2 + dy ** 2)
 
+
 def get_drunk_line(start, end):
     pass
+
 
 def get_line(start, end):
 
@@ -203,6 +205,7 @@ def find_path(source, target):
     libtcod.path_compute(path, source[0], source[1], target[0], target[1])
     return path
 
+
 def connected_cells(source, target):
 
     my_path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
@@ -214,4 +217,13 @@ def connected_cells(source, target):
     else:
         return False
 
-    libtcod.path_delete(my_path)
+
+def is_mouse_in(con_x, con_y, width, height):
+    import Input
+    mouse = Input.mouse
+
+
+    if con_x <= mouse.cx <= con_x + width - 1 and con_y <= mouse.cy <= con_y + height - 1:
+        return True
+    else:
+        return False

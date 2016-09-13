@@ -68,16 +68,15 @@ def initialize():
     starting_equipment()
     player.base_speed = 10
 
-    # bless = { 'name' : 'Blessed', 'color' : libtcod.yellow, 'duration': 100, }
-    # poison = {'name': 'Poisoned', 'color': libtcod.light_green, 'duration': 10, '-HP' : 0.5}
-    player.status.append(Status.status_list['Rage'])
-    player.status.append(Status.status_list['Blessed'])
-    player.status.append(Status.status_list['Haste'])
-    player.status.append(Status.status_list['Poisoned'])
+    # TODO: Create Entity.ApplyStatus(status) as to not apply multiple copies of a status, but perhaps refresh
+    # TODO: duration(AKA replace old one) or make stacking ones that allow this.....)
+
+    player.status.append(Status.new_status('Rage'))
+    player.status.append(Status.new_status('Blessed'))
+    player.status.append(Status.new_status('Poisoned'))
+    player.status.append(Status.new_status('Slow'))
 
     # player.status.append(Status.status_list['Poisoned'])
-
-
 
     player.level = 1
     player.action_points = 100

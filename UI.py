@@ -4,16 +4,21 @@ import Map
 import GameState
 import Render
 import Animate
+import Input
+import Utils
 
 
 class Button:
 
-    def __init__(self, text, x, y, function=None, length=16, target=0):
+    def __init__(self, text, x, y, function=None, length=None, target=0):
         self.text = text
         self.x = x
         self.y = y
         self.target = target
-        self.length = length
+        if length is None:
+            self.length = len(text)
+        else:
+            self.length = length
         self.fore = Constants.UI_Button_Fore
         self.back = Constants.UI_Button_Back
         self.fore_alt = Constants.UI_Button_Back
@@ -24,21 +29,15 @@ class Button:
         else:
             self.function = function
 
-    def draw(self, key, mouse):
+    def draw(self, offset_x, offset_y):
+        import Input
+        mouse = Input.mouse
 
-
-        # min_x = self.rect.x1 + self.offset_rect.x1 - 1 - (self.rect.width / 2)
-        # max_x = min_x + self.rect.width + 1
-        # min_y = self.rect.y1 + self.offset_rect.y1
-        #print self.length
-
-        min_x = self.x - (self.length / 2) - 2
-        max_x = min_x + self.length + 3
-
-        if min_x < mouse.cx < max_x and self.y - 1 <= mouse.cy <= self.y + 1:
+        min_x = offset_x - (self.length / 2)
+        if Utils.is_mouse_in(min_x + self.x - 1, offset_y + self.y - 1, self.length + 2, 3):
             # libtcod.console_set_default_foreground(self.target, self.fore_alt)
             # libtcod.console_set_default_background(self.target, self.back_alt)
-            Animate.large_button(self.x, self.y, self.text, True, length=self.length, target=self.target)
+            Animate.large_button(self.x + offset_x, self.y + offset_y, self.text, True, length=self.length, target=self.target)
             if mouse.lbutton_pressed:
                 # print "Func!"
                 return self.function()
@@ -46,12 +45,11 @@ class Button:
         else:
             # libtcod.console_set_default_foreground(self.target, self.fore)
             # libtcod.console_set_default_background(self.target, self.back)
-            Animate.large_button(self.x, self.y, self.text, False, length=self.length, target=self.target)
+            Animate.large_button(self.x + offset_x, self.y + offset_y, self.text, False, length=self.length, target=self.target)
 
         # libtcod.console_print_ex(self.target, 0, 0, libtcod.BKGND_SET, libtcod.LEFT, self.text)
 
         # libtcod.console_blit(self.target, 0, 0, self.rect.width, self.rect.height, 0 , min_x + 1 , min_y , 1.0, 1.0)
-
 
 
 def load_from_xp(x, y, filename, console):
@@ -65,9 +63,6 @@ def load_from_xp(x, y, filename, console):
     xp_data = xp_loader.load_xp_string(raw_data)
 
     xp_loader.load_layer_to_console(console, xp_data['layer_data'][0])
-
-
-
 
 
 def menu(header, options, width):
@@ -134,10 +129,8 @@ def menu(header, options, width):
             return
 
 
-
 def Display_MainMenu():
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
+
 
     # calculate total height for the header (after auto-wrap) and one line per option
     width = Constants.SCREEN_WIDTH
@@ -164,18 +157,21 @@ def Display_MainMenu():
     ng_button = Button(button_text,
                        width / 2,
                        height - 12,
+                       length=16,
                        function=new_game)
 
     button_text = 'Continue Game'
     ct_button = Button(button_text,
                        width / 2,
                        height - 9,
-                       function=close_window)
+                       length=16,
+                       function=continue_game)
 
     button_text = 'Quit'
     qt_button = Button(button_text,
                        width / 2,
                        height - 6,
+                       length=16,
                        function=close_window)
 
     img = libtcod.image_load('diner_logo_sm.png')
@@ -186,21 +182,142 @@ def Display_MainMenu():
     libtcod.console_blit(mm, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
 
     while True:
+        Input.update()
 
+        if qt_button.draw(0,0) == 'close':
+            return
+
+        if ct_button.draw(0,0) == 'continue':
+            return
+
+        ng_button.draw(0, 0)
+        libtcod.console_flush()
+
+
+
+
+def pop_up(width=None, height=None, title=None, text=None):
+    mouse = Input.mouse
+    key = Input.key
+
+    # calculate total height for the header (after auto-wrap) and one line per option
+    if width is None:
+        width = Constants.MAP_CONSOLE_WIDTH - 30
+
+    if height is None:
+        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
+
+    pop = libtcod.console_new(width, height)
+    # print the header, with auto-wrap
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+
+    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
+                                flag=libtcod.BKGND_SET,
+                                fmt=title)
+
+    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
+
+
+    # blit the contents of "window" to the root console
+    x = Constants.MAP_CONSOLE_WIDTH / 2 - width / 2
+    y = Constants.MAP_CONSOLE_HEIGHT / 2 - height / 2
+
+
+    button_text = 'Click to Continue'
+    button = Button(button_text,
+                    width / 2,
+                    height - 3,
+                    function=close_window,
+                    target=pop,
+                    length=len(button_text))
+
+    libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
+
+    while True:
+        libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, 0.0)
         libtcod.console_flush()
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
-        if qt_button.draw(key, mouse) == 'close':
+        if button.draw(x, y) == 'close':
             return
-
-        ct_button.draw(key, mouse)
-        ng_button.draw(key, mouse)
 
         if key.vk == libtcod.KEY_ENTER and key.lalt:
             # Alt+Enter: toggle fullscreen
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
         if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
             return
+
+
+
+def beastiary(width=10, height=10, title=None, text=None):
+
+    # calculate total height for the header (after auto-wrap) and one line per option
+    if width is None:
+        width = Constants.MAP_CONSOLE_WIDTH - 10
+
+    if height is None:
+        height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 7
+
+    pop = libtcod.console_new(width, height)
+    # print the header, with auto-wrap
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+
+    libtcod.console_print_frame(pop, 0, 0, width, height, clear=True,
+                                flag=libtcod.BKGND_SET,
+                                fmt=title)
+    # blit the contents of "window" to the root console
+
+    x = 0
+    y = 0
+
+    button_text = 'Click to Continue'
+    button = Button(button_text,
+                    width / 2,
+                    height - 20,
+                    function=close_window)
+
+    img = libtcod.image_load('Images//cipher_warden_80x80_test_01.png')
+    libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
+    # show the background image, at twice the regular console resolution
+    libtcod.image_blit_2x(img, pop, 9, 2)
+
+    libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+    libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+    libtcod.console_print_rect(pop, 3, 3, width - 6, height, text)
+
+    background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
+    libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
+
+    dragging = False
+
+    while True:
+        Input.update()
+        mouse = Input.mouse
+
+        Render.blit(background, 0)
+        # libtcod.console_blit(background, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 1.0)
+        libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
+
+
+
+        if mouse.lbutton and (mouse.cy == y or dragging):
+            x = mouse.cx - (width / 2)
+            y = mouse.cy
+            dragging = True
+        else:
+            dragging = False
+
+
+
+
+
+        if button.draw(x, y) == 'close':
+           return
+        libtcod.console_flush()
+
+
 
 
 def msgbox(text, width=50):
@@ -401,16 +518,9 @@ def skill_tree():
 
 
 
-        if ct_button.draw(key, mouse) == 'close':
+        if ct_button.draw(x, y) == 'close':
             return
 
-
-
-        if key.vk == libtcod.KEY_ENTER and key.lalt:
-            # Alt+Enter: toggle fullscreen
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-        if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE:
-            return
 
         libtcod.console_blit(st, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
 
@@ -421,8 +531,19 @@ def close_window():
     return 'close'
 
 
+def continue_game():
+    save_game = False
+    if not save_game and GameState.get_player() is None:
+        return 'nothing'
+    elif not save_game and GameState.get_player() is not None:
+        return 'continue'
+    else:
+        return 'load_save'
+
+
+
 def new_game():
-    print "NG?"
+    # print "NG?"
     return GameState.new_game()
 
 

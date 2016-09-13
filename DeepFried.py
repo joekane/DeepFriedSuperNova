@@ -25,6 +25,7 @@ libtcod.console_set_custom_font('Fonts/cp437_16x16.png', libtcod.FONT_TYPE_GREYS
 
 libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep Fried Supernova', False)
 libtcod.sys_set_fps(Constants.LIMIT_FPS)
+libtcod.sys_force_fullscreen_resolution(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
 
 SoundEffects.initilize()
 Themes.initialize()

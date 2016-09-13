@@ -22,6 +22,7 @@ import Animate
 import Render
 import Schedule
 import UI
+import Input
 import Themes
 
 
@@ -68,24 +69,20 @@ class PlayeControlled:
     # AI for a basic monster.
     def take_turn(self):
         while True:
+            Input.update()
+            mouse = Input.mouse
+            key = Input.key
             # Render.render_all()
 
             # print "looping"
-            key = libtcod.Key()
-            mouse = libtcod.Mouse()
+            # key = libtcod.Key()
+            # mouse = libtcod.Mouse()
 
-            libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+            # libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
             (x, y) = (mouse.cx, mouse.cy)
 
             player = GameState.get_player()
-
-            if key.vk == libtcod.KEY_ENTER and key.lalt:
-                # Alt+Enter: toggle fullscreen
-                libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
-            elif key.vk == libtcod.KEY_ESCAPE:
-                return 0  # exit game
 
             if self.process_mouse_clicks(mouse):
                 return 0
@@ -164,31 +161,23 @@ class PlayeControlled:
                     elif key_char == 'f':
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:
-                                obj.owner.ranged.fire()
-                                Constants.TURN_COST
+                                outcome = obj.owner.ranged.fire()
+                                if outcome == 'cancelled':
+                                    return 0
+                                else:
+                                    return Constants.TURN_COST
                         Utils.message("No ranged weapon equipped!", libtcod.light_amber)
                     elif key_char == 'h':
                         for obj in GameState.get_inventory():
                             if obj.name == 'healing potion':
                                 obj.item.use()
-                                return 0
+                                return 50
                         return Utils.message("No helaing potions.", libtcod.light_amber)
                     elif key_char == '<':
                         # go down stairs, if the player is on them
                         stairs = Map.get_stairs()
                         if stairs.x == player.x and stairs.y == player.y:
                             GameState.next_level()
-                    elif key_char == 'c':
-                        # show character information
-                        player = GameState.get_player()
-                        level_up_xp = Constants.LEVEL_UP_BASE + player.level * Constants.LEVEL_UP_FACTOR
-
-                        text = 'Character Information\n\nLevel: ' + str(player.level) + '\nExperience: ' + str(
-                            player.fighter.xp) + \
-                               '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(
-                            player.fighter.max_hp) + \
-                               '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense)
-                        Render.pop_up(width=40, title='Inventory Screen', text=text)
 
                     elif key_char == 'p':
 
@@ -204,14 +193,14 @@ class PlayeControlled:
                                '\n' \
                                'Keycard required.'
 
-                        Render.pop_up(title=title, text=text)
+                        UI.pop_up(title=title, text=text)
                     elif key_char == 'b':
 
                         title = "Beastiary"
 
                         text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
 
-                        Render.beastiary(width=50, height=45, title=title, text=text)
+                        UI.beastiary(width=50, height=45, title=title, text=text)
                     elif key_char == 's':
                         UI.skill_tree()
 
@@ -736,7 +725,38 @@ class Ranged:
         if source is None:
             source = GameState.get_player()
         if target is None:
-            target = Map.closest_monster(self.max_range)
+            # get target
+
+            # CLOSEST TARGET
+            # target = Map.closest_monster(self.max_range)
+
+            # CHOOSE TARGET
+            target = None
+            background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
+            libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
+
+            map_x, map_y = Map.to_camera_coordinates(source.x, source.y)
+
+            while True:
+                Input.update()
+                mouse = Input.mouse
+                Render.blit(background, 0)
+
+                target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
+                if Fov.is_visible(pos=(target_x, target_y)):
+                    line = Utils.get_line((map_x, map_y), (mouse.cx, mouse.cy))
+                    for point in line:
+                        # libtcod.console_set_default_background(0, libtcod.yellow)
+                        # libtcod.console_set_background_flag(0, libtcod.BKGND_SET)
+                        # libtcod.console_print(0, point[0], point[1], '')
+                        libtcod.console_set_char_background(0, point[0], point[1], libtcod.light_blue, libtcod.BKGND_SET)
+                if mouse.lbutton_pressed:
+                    target = Map.get_monster_at((target_x, target_y))
+                    break
+
+                libtcod.console_flush()
+
             if target is None:  # no enemy found within maximum range
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
                 return 'cancelled'
@@ -748,6 +768,7 @@ class Ranged:
         Utils.message('A shot rings out and ' + target.name + ' takes an arrow to the knee! The damage is ' + str(
             self.owner.equipment.power_bonus) + ' hit points.', libtcod.light_blue)
         target.fighter.take_damage(self.owner.equipment.power_bonus)
+        return 'fired'
 
 
 def player_death(player):

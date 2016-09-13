@@ -29,6 +29,7 @@ def process():
     if player_turn:
         value = GameState.get_player().ai.take_turn()
         if value != 0:
+            GameState.get_player().pass_time()
             player_turn = False
     else:
         for obj in time_travelers:
@@ -36,11 +37,12 @@ def process():
                 # print obj.name, obj.delay
                 obj.delay -= obj.speed
             else:
-                obj.pass_time()
+
                 value = obj.ai.take_turn()
                 if value == 0:
                     player_turn = True
                 else:
+
                     obj.delay = value
                     player_turn = False
 

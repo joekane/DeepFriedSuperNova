@@ -1,4 +1,5 @@
 import libtcodpy as libtcod
+import copy
 
 status_list = {
     'Rage': {
@@ -35,7 +36,12 @@ status_list = {
         'name': 'Slow',
         'color': libtcod.lighter_blue,
         'duration': 100,
-        'speed': -10
+        'speed': -5
     },
 }
+
+
+def new_status(status):
+    return copy.deepcopy(status_list[status])
+
 

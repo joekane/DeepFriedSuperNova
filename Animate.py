@@ -103,7 +103,7 @@ def inspect_banner(x, y, banner_text, new_animation=True):
             libtcod.console_put_char_ex(animation_console, x + z + 3, y + 1, libtcod.CHAR_HLINE, color, back)
             Render.update_animations()
             libtcod.console_flush()
-            time.sleep(0.05)
+            # time.sleep(0.05)
     else:
         for z in range(length):
             libtcod.console_put_char_ex(animation_console, x + z + 3, y - 1, libtcod.CHAR_HLINE, color, back)

@@ -68,8 +68,8 @@ def load_prefab(x, y, key, rotation):
     # xp_loader.load_layer_to_console(layer_0_console, xp_data['layer_data'][0])
     # xp_loader.load_layer_to_console(layer_1_console, xp_data['layer_data'][1])
 
-    print "XP:"
-    print len(xp_data['layer_data'])
+    # print "XP:"
+    # print len(xp_data['layer_data'])
 
     map_x = x
     map_y = y
@@ -92,7 +92,9 @@ def load_prefab(x, y, key, rotation):
         level_map = xp_loader.load_layer_to_map_cosmetic(level_map, map_x, map_y, xp_data['layer_data'][2],
                                                          rotation=rotation)
     else:
-        print "3 is None"
+        # print "3 is None"
+        pass
+
 
     return
 
@@ -538,7 +540,7 @@ def rooms_only_dungeon():
     for room in g.room_list:
         path = [room.center()]
         SpanningTree.shortest(room, path)
-        print 'The shortest path for %s : %s' % (room.center(), path[::-1])
+        # print 'The shortest path for %s : %s' % (room.center(), path[::-1])
 
         s_node = None
         for node in path:
@@ -772,7 +774,7 @@ def pre_fabs_v2():
         # fab_choice = '+hall'
 
         fab_size = Prefabs.get_size(fab_choice, rotation)
-        print fab_size
+        # print fab_size
 
         if direction == 'Right':
             # shoud come from PFloader
@@ -792,10 +794,10 @@ def pre_fabs_v2():
                 create_ground(connector_pos[0]+2, connector_pos[1])
 
                 fits = True
-                print "Fit Right!"
+                # print "Fit Right!"
             else:
                 fits = False
-                print "Cannot Fit Right!"
+                # print "Cannot Fit Right!"
 
         elif direction == 'Left':
             # shoud come from PFloader
@@ -815,10 +817,10 @@ def pre_fabs_v2():
                 create_ground(connector_pos[0] - 2, connector_pos[1])
 
                 fits = True
-                print "Fit Left!"
+                # print "Fit Left!"
             else:
                 fits = False
-                print "Cannot Fit Left!"
+                # print "Cannot Fit Left!"
 
         elif direction == 'Down':
             # shoud come from PFloader
@@ -838,10 +840,10 @@ def pre_fabs_v2():
                 create_ground(connector_pos[0], connector_pos[1]+2)
 
                 fits = True
-                print "Fit Down!"
+                # print "Fit Down!"
             else:
                 fits = False
-                print "Cannot Fit Down!"
+                # print "Cannot Fit Down!"
 
         elif direction == 'Up':
             # shoud come from PFloader
@@ -861,10 +863,10 @@ def pre_fabs_v2():
                 create_ground(connector_pos[0], connector_pos[1]-2)
 
                 fits = True
-                print "Fit Up!"
+                # print "Fit Up!"
             else:
                 fits = False
-                print "Cannot Fit Up!"
+                # print "Cannot Fit Up!"
 
 
         attempts += 1
@@ -928,9 +930,9 @@ def pre_fabs():
                 con_x = x + 2
                 con_y = y + last_fab_size[1]
 
-        print attempts
-        print "Builder Loc: {0}, {1}".format(con_x, con_y)
-        print direction, rotation, fab_size, fab_choice
+        # print attempts
+        # print "Builder Loc: {0}, {1}".format(con_x, con_y)
+        # print direction, rotation, fab_size, fab_choice
 
         if direction == 'Right':
             offset_x = 1
@@ -946,7 +948,7 @@ def pre_fabs():
                     create_ground(con_x + 1, con_y)
                     create_ground(con_x + 2, con_y)
                 except:
-                    print "Door/Ground FAIL"
+                    # print "Door/Ground FAIL"
                     pass
                 #con_x += fab_size[0] + 1
         elif direction == 'Left':
@@ -960,7 +962,7 @@ def pre_fabs():
                     create_ground(con_x - 1, con_y)
                     create_ground(con_x - 2, con_y)
                 except:
-                    print "BAIL!"
+                    # print "BAIL!"
                     pass
                 #con_x -= offset_x + 1
         elif direction == 'Up':
@@ -990,7 +992,8 @@ def pre_fabs():
                     passx
                 #con_y += fab_size[1] + 1
         else:
-            print "Blocked"
+            # print "Blocked"
+            pass
 
         attempts += 1
 
@@ -1468,6 +1471,13 @@ def to_map_coordinates(x, y):
 
 def get_all_objects():
     return objects
+
+
+def get_monster_at(pos):
+    for obj in visible_objects:
+        if obj.x == pos[0] and obj.y == pos[1] and obj.fighter is not None:
+            return obj
+
 
 
 def get_visible_objects():
