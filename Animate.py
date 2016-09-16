@@ -43,6 +43,8 @@ def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark
             time.sleep(0.01325)
 
 
+
+
 def explosion(target, radius=3):
     if Constants.ANIMATE_ON:
         x, y = Map.to_camera_coordinates(target.x, target.y)
@@ -69,7 +71,7 @@ def explosion(target, radius=3):
                 libtcod.console_put_char_ex(0, x-1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
                 print "3"
             libtcod.console_flush()
-            print "sleep"
+            # print "sleep"
             time.sleep(0.025)
 
 

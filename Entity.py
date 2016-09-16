@@ -82,10 +82,12 @@ class Entity:
         for st in self.status:
             st['duration'] -= 1
 
-            if '-HP' in st.keys() and self.fighter is not None:
-                self.fighter.take_damage(st['-HP'])
-            if '+HP' in st.keys() and self.fighter is not None:
-                self.fighter.heal(st['+HP'])
+            if 'HP' in st.keys() and self.fighter is not None:
+                amount = st['HP']
+                if amount < 0:
+                    self.fighter.take_damage(amount)
+                elif amount > 0:
+                    self.fighter.heal(abs(amount))
 
             if st['duration'] < 0:
                 self.status.remove(st)
@@ -104,6 +106,22 @@ class Entity:
             self.y += dy
             if self.name != 'player':
                 Fov.fov_change(self.x, self.y, 'Unchanged', True)
+                pass
+            return True
+        else:
+            return False
+
+    def move_to(self, x, y):
+        # move by the given amount, if the destination is not blocked
+        if not Map.is_blocked(x, y):
+            Fov.fov_change(self.x, self.y, 'Unchanged', False)
+            self.x = x
+            self.y = y
+            if self.name != 'player':
+                Fov.fov_change(self.x, self.y, 'Unchanged', True)
+                pass
+        else:
+            return False
 
     def move_towards(self, target_x, target_y):
         # vector from this object to the target, and distance
@@ -128,14 +146,37 @@ class Entity:
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def move_astar(self, target):
+
+        import astar
+
+        path = astar.astar( (self.x, self.y) , (target.x, target.y))
+
+        if path:
+            dest = path[0]
+            self.move_towards(dest[0], dest[1])
+            print "Path: " + str(path)
+        else:
+            print "No Path"
+        return
+
+
+
         self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.5)
         libtcod.path_compute(self.path, self.x, self.y, target.x, target.y)
 
-        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 25:
+        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 250:
             self.walk_path()
-
         else:
             self.move_towards(target.x, target.y)
+
+    def move_dijkstra(self, target):
+        self.path = libtcod.dijkstra_new(Fov.get_fov_map(), 1.41)
+
+        libtcod.dijkstra_compute(self.path,self.x, self.y)
+        libtcod.dijkstra_path_set(self.path, target.x, target.y)
+
+        self.walk_path()
+
 
     def move_astar_xy(self, target_x, target_y, force=False):
         if self.path is None or force:
@@ -180,15 +221,17 @@ class Entity:
             # print path
             # Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(self.path, True)
+            # print "{0}'s Path: {1}".format(self.name, libtcod.dijkstra_size(self.path))
+            #x, y = libtcod.dijkstra_path_walk(self.path)
             if x or y:
                 # Set self's coordinates to the next path tile
-                self.move_towards(x, y)
+                print "Moving To {0}, {1}".format(x, y)
+                self.move_to(x, y)
                 # print "Path Walk"
                 Fov.require_recompute()
                 return True
             self.path = None
             GameState.continue_walking = False
-
 
     def draw(self):
         # set the color and then draw the character that represents this object at its positionss
@@ -201,7 +244,4 @@ class Entity:
     def clear(self):
         # erase the character that represents this object
         Render.blank(self.x, self.y)
-
-    def change_CT(self, value):
-        self.CT += value * (int(self.base_speed) / 10)
 

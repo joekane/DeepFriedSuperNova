@@ -73,8 +73,6 @@ def initialize():
 
     player.status.append(Status.new_status('Rage'))
     player.status.append(Status.new_status('Blessed'))
-    player.status.append(Status.new_status('Poisoned'))
-    player.status.append(Status.new_status('Slow'))
 
     # player.status.append(Status.status_list['Poisoned'])
 
@@ -96,7 +94,7 @@ def starting_equipment():
 
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10)
+    ranged_component = Components.Ranged(10, aoe=8)
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
                         equipment=equipment_component,
                         ranged=ranged_component)

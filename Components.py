@@ -200,7 +200,11 @@ class PlayeControlled:
 
                         text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
 
-                        UI.beastiary(width=50, height=45, title=title, text=text)
+                        pal = UI.Palette(width=20, title='Title', text=text)
+
+                        pal.draw()
+
+                        # I.beastiary(width=50, height=45, title=title, text=text)
                     elif key_char == 's':
                         UI.skill_tree()
 
@@ -369,17 +373,35 @@ class MeleeMonster:
                 if dist <= 1.5 and player.fighter.hp > 0:
                     monster.fighter.attack(player)
                 else:
+                    #print "Attemnpting to Path"
                     monster.move_astar(player)
-
+                    # monster.move_dijkstra(player)
 
             # self.owner.action_points += 100
             # Schedule.add_to_pq((self.owner.action_points, self.owner))
             return Constants.TURN_COST
 
 
+class GaseusCloud:
+    def __init__(self, owner=None, s_vol=50):
+        self.owner = owner
+        self.active = True
+        self.sVol = s_vol
+        self.cVol = s_vol
+        self.radius = 3
+        self.spread = 100
+        self.points = []
+        self.points = Utils.get_circle_points(self.owner.x, self.owner.y, self.radius)
+
+    def take_turn(self):
+        pass
+
+
+
+
+
 class AssassinMonster:
     def __init__(self, owner=None):
-        self.given = False
         self.owner = owner
         self.active = True
 
@@ -395,13 +417,10 @@ class AssassinMonster:
                 self.active = True
                 GameState.continue_walking = False
             else:
-                if dist > 25:
+                if dist > 250:
                     self.active = False
                 else:
                     self.active = False
-
-
-
 
             if self.active:
                 # move towards player if far away
@@ -714,11 +733,12 @@ class Equipment:
 
 
 class Ranged:
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, owner=None):
+    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
         self.owner = owner
+        self.aoe = aoe
 
     def fire(self, source=None, target=None):
         # find closest enemy (inside a maximum range) and damage it
@@ -731,7 +751,8 @@ class Ranged:
             # target = Map.closest_monster(self.max_range)
 
             # CHOOSE TARGET
-            target = None
+            tile_effected = None
+            targets = []
             background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
             libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
 
@@ -747,12 +768,21 @@ class Ranged:
                 if Fov.is_visible(pos=(target_x, target_y)):
                     line = Utils.get_line((map_x, map_y), (mouse.cx, mouse.cy))
                     for point in line:
-                        # libtcod.console_set_default_background(0, libtcod.yellow)
-                        # libtcod.console_set_background_flag(0, libtcod.BKGND_SET)
-                        # libtcod.console_print(0, point[0], point[1], '')
-                        libtcod.console_set_char_background(0, point[0], point[1], libtcod.light_blue, libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
+                    if len(line) > 0:
+                        point = line[-1]
+
+                        circle = Utils.get_circle_points(point[0], point[1], self.aoe)
+                        tile_effected = set(circle)
+
+                        for points in circle:
+                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.light_blue,
+                                                                libtcod.BKGND_SCREEN)
+
                 if mouse.lbutton_pressed:
-                    target = Map.get_monster_at((target_x, target_y))
+                    # target_tile = (target_x, target_y)
+                    for target in tile_effected:
+                        targets.append(Map.get_monster_at((target[0], target[1])))
                     break
 
                 libtcod.console_flush()
@@ -761,7 +791,7 @@ class Ranged:
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
                 return 'cancelled'
 
-        Animate.follow_line(source, target)
+        Animate.follow_line(source, target_tile)
         # Animate.explosion(target)
 
         # zap it!
@@ -812,17 +842,10 @@ class Door:
         if self.status is 'closed':
             self.owner.blocks = True
             self.owner.blocks_sight = True
-            #Fov.fov_change(self.owner.x, self.owner.y, True, True)
-            # Map.level_map[self.owner.x][self.owner.y].blocked = True
-            # Map.level_map[self.owner.x][self.owner.y].block_sight = True
             self.owner.char = '+'
         elif self.status is 'open':
             self.owner.blocks = False
             self.owner.blocks_sight = False
-            #Fov.fov_change(self.owner.x, self.owner.y, False, False)
-            # Map.level_map[self.owner.x][self.owner.y].blocked = False
-            # Map.level_map[self.owner.x][self.owner.y].block_sight = False
-
             self.owner.char = '_'
         elif self.status is 'locked':
             self.owner.blocks = True

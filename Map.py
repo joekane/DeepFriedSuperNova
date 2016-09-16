@@ -29,6 +29,8 @@ stairs = None
 camera_x = 0
 camera_y = 0
 
+d_map = None
+
 
 def current_map():
     return level_map

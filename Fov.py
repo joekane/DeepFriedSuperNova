@@ -42,7 +42,6 @@ def fov_change(x,y, blocks_sight, blocks):
         libtcod.map_set_properties(fov_map, x, y, not blocks_sight, not blocks)
 
 
-
 def require_recompute():
     global fov_recompute
     fov_recompute = True
@@ -74,6 +73,10 @@ def is_visible(pos=None, obj=None, ):
         return libtcod.map_is_in_fov(fov_map, obj.x, obj.y)
     elif pos is not None and obj is None:
         return libtcod.map_is_in_fov(fov_map, pos[0], pos[1])
+
+
+def is_blocked(pos):
+    return not libtcod.map_is_walkable(fov_map, pos[0], pos[1])
 
 
 def get_fov_map():

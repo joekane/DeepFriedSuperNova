@@ -52,6 +52,76 @@ class Button:
         # libtcod.console_blit(self.target, 0, 0, self.rect.width, self.rect.height, 0 , min_x + 1 , min_y , 1.0, 1.0)
 
 
+class Palette:
+
+    def __init__(self, width=None, height=None, title='', text=''):
+        self.width = width
+        self.height = height
+        self.title = title
+        self.text = text
+        if width is None:
+            self.width = Constants.MAP_CONSOLE_WIDTH - 10
+        if height is None:
+            self.height = libtcod.console_get_height_rect(0, 0, 0, width, Constants.SCREEN_HEIGHT, text) + 10
+        self.opened = False
+
+    def draw(self):
+        self.opened = True
+        print self.width, self.height
+        pop = libtcod.console_new(self.width, self.height)
+        # print the header, with auto-wrap
+        libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+        libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+
+        libtcod.console_print_frame(pop, 0, 0, self.width, self.height, clear=True,
+                                    flag=libtcod.BKGND_SET,
+                                    fmt=self.title)
+        # blit the contents of "window" to the root console
+
+        x = 0
+        y = 0
+
+        button_text = 'Close'
+        button = Button(button_text,
+                        self.width / 2,
+                        self.height - 3,
+                        function=close_window)
+
+        libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
+        libtcod.console_set_default_background(pop, Constants.UI_PopBack)
+        libtcod.console_print_rect(pop, 3, 3, self.width, self.height, self.text)
+
+        background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
+        libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
+
+        dragging = False
+        click_x = None
+
+        while True:
+            Input.update()
+            mouse = Input.mouse
+
+            Render.blit(background, 0)
+            # libtcod.console_blit(background, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 1.0)
+            libtcod.console_blit(pop, 0, 0, self.width, self.height, 0, x, y, 1.0, .85)
+
+            if mouse.lbutton and x <= mouse.cx <= x + self.width and (mouse.cy == y or dragging):
+                if click_x is None:
+                    click_x = mouse.cx - x
+                x = mouse.cx - click_x    # (width / 2)
+                y = mouse.cy
+                dragging = True
+            else:
+                dragging = False
+                click_x = None
+
+            if button.draw(x, y) == 'close':
+                self.opened = False
+                return
+
+            libtcod.console_flush()
+
+
 def load_from_xp(x, y, filename, console):
     import gzip
     import xp_loader
@@ -275,7 +345,7 @@ def beastiary(width=10, height=10, title=None, text=None):
     button_text = 'Click to Continue'
     button = Button(button_text,
                     width / 2,
-                    height - 20,
+                    height - 3,
                     function=close_window)
 
     img = libtcod.image_load('Images//cipher_warden_80x80_test_01.png')
@@ -292,6 +362,8 @@ def beastiary(width=10, height=10, title=None, text=None):
 
     dragging = False
 
+    click_x = None
+
     while True:
         Input.update()
         mouse = Input.mouse
@@ -300,22 +372,21 @@ def beastiary(width=10, height=10, title=None, text=None):
         # libtcod.console_blit(background, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 1.0)
         libtcod.console_blit(pop, 0, 0, width, height, 0, x, y, 1.0, .85)
 
-
-
-        if mouse.lbutton and (mouse.cy == y or dragging):
-            x = mouse.cx - (width / 2)
+        if mouse.lbutton and x <= mouse.cx <= x + width and (mouse.cy == y or dragging):
+            if click_x is None:
+                click_x = mouse.cx - x
+            x = mouse.cx - click_x    # (width / 2)
             y = mouse.cy
             dragging = True
         else:
             dragging = False
-
-
-
-
+            click_x = None
 
         if button.draw(x, y) == 'close':
-           return
+            return
         libtcod.console_flush()
+
+
 
 
 
