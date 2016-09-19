@@ -207,6 +207,9 @@ class PlayeControlled:
                         # I.beastiary(width=50, height=45, title=title, text=text)
                     elif key_char == 's':
                         UI.skill_tree()
+                    elif key_char == 'k':
+                        import Keys
+                        Keys.generate_world_title()
 
 
                     elif key_char == 'x':

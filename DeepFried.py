@@ -30,5 +30,7 @@ libtcod.sys_force_fullscreen_resolution(Constants.SCREEN_WIDTH, Constants.SCREEN
 SoundEffects.initilize()
 Themes.initialize()
 
+import Keys
+
 UI.Display_MainMenu()
 
