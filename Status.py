@@ -18,13 +18,13 @@ status_list = {
         'name': 'Poisoned',
         'color': libtcod.green,
         'duration': 25,
-        '-HP': 1
+        'HP': -1
     },
     'Regen': {
         'name': 'Regen',
         'color': libtcod.light_green,
         'duration': 25,
-        '+HP': 1
+        'HP': 1
     },
     'Haste': {
         'name': 'Haste',

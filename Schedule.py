@@ -35,6 +35,7 @@ def process():
         for obj in time_travelers:
             if obj.delay > 0:
                 # print obj.name, obj.delay
+                # TODO: create method to handle speed/delay. Allowing for per tick proceesgin (Gasses, etc)
                 obj.delay -= obj.speed
             else:
 

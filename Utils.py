@@ -227,3 +227,39 @@ def is_mouse_in(con_x, con_y, width, height):
         return True
     else:
         return False
+
+
+def get_circle_points(x0, y0, radius, ring=False, size=2):
+    if ring:
+        x = radius - size + 1
+    else:
+        x = 0
+    y = 0
+    err = 0
+
+    points = []
+
+    start_x = x
+
+    while start_x <= radius:
+        x = start_x
+        y = 0
+        while x >= y:
+            points.append((x0 + x, y0 + y))
+            points.append((x0 + y, y0 + x))
+            points.append((x0 - y, y0 + x))
+            points.append((x0 - x, y0 + y))
+            points.append((x0 - x, y0 - y))
+            points.append((x0 - y, y0 - x))
+            points.append((x0 + y, y0 - x))
+            points.append((x0 + x, y0 - y))
+
+            y += 1
+            err += 1 + 2 * y
+            if 2 * (err - x) + 1 > 0:
+                x -= 1
+                err += 1 - 2 * x
+        start_x += 1
+
+    #return points
+    return list(set(points))
