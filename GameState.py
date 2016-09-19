@@ -68,15 +68,11 @@ def initialize():
     starting_equipment()
     player.base_speed = 10
 
-    # TODO: Create Entity.ApplyStatus(status) as to not apply multiple copies of a status, but perhaps refresh
-    # TODO: duration(AKA replace old one) or make stacking ones that allow this.....)
+    # TODO: Refresh duration(AKA replace old one) or make stacking ones that allow this.....)
 
-    player.status.append(Status.new_status('Rage'))
-    player.status.append(Status.new_status('Blessed'))
-    player.status.append(Status.new_status('Poisoned'))
-    player.status.append(Status.new_status('Slow'))
-
-    # player.status.append(Status.status_list['Poisoned'])
+    player.apply_status('Rage')
+    player.apply_status('Blessed')
+    player.apply_status('Poisoned')
 
     player.level = 1
     player.action_points = 100

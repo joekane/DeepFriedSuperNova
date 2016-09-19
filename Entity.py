@@ -77,6 +77,17 @@ class Entity:
                 spd += st['speed']
         return spd
 
+    def apply_status(self, effect):
+        import Status
+        for st in self.status:
+            if st['name'] == effect:
+                #effect exists. ignore, warn, etc
+                print "Dbl Effect"
+                return
+        try:
+            self.status.append(Status.new_status(effect))
+        except:
+            return
 
     def pass_time(self):
         for st in self.status:
@@ -201,7 +212,4 @@ class Entity:
     def clear(self):
         # erase the character that represents this object
         Render.blank(self.x, self.y)
-
-    def change_CT(self, value):
-        self.CT += value * (int(self.base_speed) / 10)
 
