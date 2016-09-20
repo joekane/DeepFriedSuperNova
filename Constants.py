@@ -38,9 +38,9 @@ MAP_HEIGHT = MAP_CONSOLE_HEIGHT * 2 # 150 # MIN 40
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
 
-MSG_X = 2
-MSG_WIDTH = SCREEN_WIDTH - 60
-MSG_HEIGHT = PANEL_HEIGHT - 2
+MSG_X = 1
+MSG_WIDTH = 57
+MSG_HEIGHT = PANEL_HEIGHT - 3
 # INVENTORY_WIDTH = 50
 # CHARACTER_SCREEN_WIDTH = 30
 # LEVEL_SCREEN_WIDTH = 40
@@ -71,7 +71,7 @@ FOV_ALGO = 2  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
 TORCH_RADIUS = 15  # 15 Def
 
-LIMIT_FPS = 0  # 20 frames-per-second maximum
+LIMIT_FPS = 120  # 20 frames-per-second maximum
 
 INSPECTION_DELAY = 0.5
 

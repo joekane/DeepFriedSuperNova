@@ -17,11 +17,16 @@ import Fov
 import time
 import Animate
 import Render
+import re
 
 map_old_x = 0
 map_old_y = 0
 delay = 0
 new_animation = True
+
+
+def remove_tags(text):
+    return re.sub('<[^>]*>', '', text)
 
 
 def message(new_msg, color=libtcod.white):

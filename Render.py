@@ -94,8 +94,8 @@ def objects():
 
 def ui():
     # prepare to render the GUI panel
-    libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
-    libtcod.console_clear(consoles['panel_console'])
+    # libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
+    # libtcod.console_clear(consoles['panel_console'])
 
     # print the Side Panel, with auto-wrap
     # libtcod.console_set_default_foreground(consoles['panel_console'], Constants.UI_Fore)
@@ -106,6 +106,8 @@ def ui():
     #                            clear=True,
     #                            flag=libtcod.BKGND_SET,
     #                            fmt=None)
+
+    render_common()
 
     render_messages()
 
@@ -183,12 +185,38 @@ def draw_object(obj, visible=True):
 
 
 def render_messages():
+    #clear old messages
+    libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.black)
+    libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
+    libtcod.console_rect(consoles['panel_console'], 1, 3, 57, Constants.PANEL_HEIGHT - 4, True, libtcod.BKGND_SET)
     # print the game messages, one line at a time
-    y = 2
+    y = 3
     for (line, color) in GameState.get_msg_queue():
-        libtcod.console_set_default_foreground(consoles['panel_console'], color)
-        libtcod.console_print_ex(consoles['panel_console'], Constants.MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
-        y += 1
+        if y < Constants.PANEL_HEIGHT - 1:
+            libtcod.console_set_default_foreground(consoles['panel_console'], color)
+            line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH,
+                                                            Constants.PANEL_HEIGHT - 3, line)
+            libtcod.console_print_rect(consoles['panel_console'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
+
+            y += line_height
+
+
+def render_common():
+    import Input
+
+    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(0,70,140))
+    libtcod.console_print_rect(consoles['side_panel_console'],1,1, 17,1, "Level 1".center(17, ' '))
+
+    libtcod.console_print_rect(consoles['side_panel_console'], 9, 18, 17, 2,
+                               "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
+
+
+
+    libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.Color(175,175,255))
+    libtcod.console_set_default_background(consoles['panel_console'], libtcod.Color(0,32,64))
+    libtcod.console_set_background_flag(consoles['panel_console'], libtcod.BKGND_SET)
+    libtcod.console_print_rect(consoles['panel_console'], 1, 1, Constants.SCREEN_WIDTH - 19, 1, GameState.dungeon_name.center(57, ' '))
+
 
 
 def render_status():
@@ -309,7 +337,7 @@ def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constant
 
 
 def render_all():
-    # libtcod.console_clear(0)
+    libtcod.console_clear(0)
     full_map()
     objects()
     ui()

@@ -27,6 +27,7 @@ def release(obj):
 def process():
     global player_turn
     if player_turn:
+        Render.render_all()
         value = GameState.get_player().ai.take_turn()
         if value != 0:
             GameState.get_player().pass_time()

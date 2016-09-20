@@ -32,6 +32,7 @@ player = None
 inventory = []
 game_msgs = []
 dungeon_level = 0
+dungeon_name = "Test"
 
 continue_walking = False
 
@@ -212,8 +213,8 @@ def new_game():
 
 
 def next_level():
-    global dungeon_level
-
+    global dungeon_level, dungeon_name
+    import Keys
 
     # advance to the next level
     add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
@@ -221,6 +222,9 @@ def next_level():
     get_player().action_points = 0
     add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
     dungeon_level += 1
+
+    # TODO: eventually set theme and other stats based on tags generated HERE.
+    dungeon_name = Keys.generate_world_title()
 
     Themes.set_theme('Shadow State Archive')
     # Themes.set_theme('Abyss of the Fish Men')
@@ -235,8 +239,9 @@ def play_game():
     Fov.require_recompute()
 
     while not libtcod.console_is_window_closed():
-        Render.render_all()
+
         Schedule.process()
+        #Render.render_all()
 
 
 def check_level_up():

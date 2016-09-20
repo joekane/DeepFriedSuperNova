@@ -152,12 +152,8 @@ class PlayeControlled:
                         #    chosen_item.use()
                         #    return 0
                         pass
-                    elif key_char == 'd':
-                        tile = random.choice(Map.get_open_tiles())
-                        # x,y  = Map.find_unexplored_tile( (self.owner.x, self.owner.y), [])
-                        # print x, y
-                        #GameState.continue_walking = GameState.get_player().move_astar_xy(tile.x, tile.y, True)
-                        pass
+                    elif key_char == '5':
+                        return self.end_turn(Constants.TURN_COST)
                     elif key_char == 'f':
                         for obj in GameState.get_all_equipped(player):
                             if obj.owner.ranged:
@@ -165,13 +161,13 @@ class PlayeControlled:
                                 if outcome == 'cancelled':
                                     return 0
                                 else:
-                                    return Constants.TURN_COST
+                                    return self.end_turn(Constants.TURN_COST)
                         Utils.message("No ranged weapon equipped!", libtcod.light_amber)
                     elif key_char == 'h':
                         for obj in GameState.get_inventory():
                             if obj.name == 'healing potion':
                                 obj.item.use()
-                                return 50
+                                self.end_turn(Constants.TURN_COST/2)
                         return Utils.message("No helaing potions.", libtcod.light_amber)
                     elif key_char == '<':
                         # go down stairs, if the player is on them
@@ -209,7 +205,7 @@ class PlayeControlled:
                         UI.skill_tree()
                     elif key_char == 'k':
                         import Keys
-                        Keys.generate_world_title()
+                        GameState.dungeon_name = Keys.generate_world_title()
 
 
                     elif key_char == 'x':
@@ -736,7 +732,7 @@ class Equipment:
 
 
 class Ranged:
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, owner=None):
+    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=3, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
@@ -745,6 +741,9 @@ class Ranged:
 
     def fire(self, source=None, target=None):
         # find closest enemy (inside a maximum range) and damage it
+
+        targets = []
+
         if source is None:
             source = GameState.get_player()
         if target is None:
@@ -755,7 +754,7 @@ class Ranged:
 
             # CHOOSE TARGET
             tile_effected = None
-            targets = []
+
             background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
             libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
 
@@ -779,28 +778,37 @@ class Ranged:
                         tile_effected = set(circle)
 
                         for points in circle:
-                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.light_blue,
-                                                                libtcod.BKGND_SCREEN)
+                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
+                                                                libtcod.BKGND_LIGHTEN)
 
                 if mouse.lbutton_pressed:
                     # target_tile = (target_x, target_y)
+                    print tile_effected
                     for target in tile_effected:
-                        targets.append(Map.get_monster_at((target[0], target[1])))
+                        target = Map.to_map_coordinates(target[0], target[1])
+                        monster = Map.get_monster_at((target[0], target[1]))
+                        print "Monster: " + str(monster) + " at " +  str(target)
+                        if monster is not None:
+                            targets.append(monster)
                     break
 
-                libtcod.console_flush()
 
-            if target is None:  # no enemy found within maximum range
+                libtcod.console_flush()
+            print "Targets: " + str(targets)
+            if not targets:  # no enemy found within maximum range
                 Utils.message('No enemy is close enough to fire.', libtcod.red)
                 return 'cancelled'
 
-        Animate.follow_line(source, target_tile)
+
+        # TODO: add animation back in when appropriate, Fix Target
+        #Animate.follow_line(source, target_tile)
         # Animate.explosion(target)
 
         # zap it!
-        Utils.message('A shot rings out and ' + target.name + ' takes an arrow to the knee! The damage is ' + str(
-            self.owner.equipment.power_bonus) + ' hit points.', libtcod.light_blue)
-        target.fighter.take_damage(self.owner.equipment.power_bonus)
+        for target in targets:
+            Utils.message('{0} takes {1} damage.'.format(target.name, self.owner.equipment.power_bonus),
+                          libtcod.light_blue)
+            target.fighter.take_damage(self.owner.equipment.power_bonus)
         return 'fired'
 
 

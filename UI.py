@@ -126,7 +126,7 @@ def load_from_xp(x, y, filename, console):
     import gzip
     import xp_loader
 
-    xp_file = gzip.open('UI\_' + filename + '.xp')
+    xp_file = gzip.open('Assets\_' + filename + '.xp')
     raw_data = xp_file.read()
     xp_file.close()
 
