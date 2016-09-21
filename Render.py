@@ -56,19 +56,42 @@ def full_map():
 
                 if Constants.DEBUG:
                     offset_color = libtcod.Color(0,0,0)
-                    libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                                                tile.f_color - offset_color, libtcod.BKGND_SET)
-                    libtcod.console_set_char_background(consoles['map_console'], x, y,
-                                                        tile.b_color - offset_color, flag=libtcod.BKGND_SET)
+                    #libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                    #                            tile.f_color - offset_color, libtcod.BKGND_SET)
+                    #libtcod.console_set_char_background(consoles['map_console'], x, y,
+                    #                                    tile.b_color - offset_color, flag=libtcod.BKGND_SET)
+
+                    #if Fov.is_blocked((map_x,map_y)):
+                    #    libtcod.console_put_char_ex(consoles['map_console'], x, y,'F',
+                    #                                tile.f_color - offset_color, libtcod.BKGND_SET)
+                    #else:
+                    #    libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
+                    #                                tile.f_color - offset_color, libtcod.BKGND_SET)
+                    if Map.is_blocked(map_x,map_y):
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y,'M',
+                                                    tile.f_color - offset_color, libtcod.BKGND_SET)
+                    else:
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
+                                                    tile.f_color - offset_color, libtcod.BKGND_SET)
+
                 else:
                     if not visible:
                         if tile.explored:
                             if tile.blocked:
-                                char = 206
+                                char =  tile.char
+                                f_color = libtcod.Color(50, 50, 50)
+                                b_color = libtcod.Color(10, 10, 10)
                             else:
                                 char = '.'
+                                f_color = libtcod.Color(50,50,50)
+                                b_color = libtcod.Color(0,0,0)
+
                             libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                        Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
+                                                        f_color, libtcod.BKGND_SET)
+                            libtcod.console_set_char_background(consoles['map_console'], x, y,
+                                                                b_color, flag=libtcod.BKGND_SET)
+                            #libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
+                            #                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
 
                     else:
                         offset_color = get_offset_color(map_x, map_y)
@@ -257,8 +280,11 @@ def render_stat_bars():
                    libtcod.Color(178, 0, 45),
                    libtcod.Color(64, 0, 16), consoles['side_panel_console'])
     render_box_bar(4, 36, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                   libtcod.Color(0, 0, 217),
-                   libtcod.Color(0, 0, 64), consoles['side_panel_console'])
+                   libtcod.Color(0, 30, 255),
+                   libtcod.Color(0, 10, 64), consoles['side_panel_console'])
+    render_box_bar(4, 37, 14, '', GameState.get_player().fighter.xp, 150,   # will be NEXT_LVL_XP
+                   libtcod.Color(255, 255, 0),
+                   libtcod.Color(65, 65, 0), consoles['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3

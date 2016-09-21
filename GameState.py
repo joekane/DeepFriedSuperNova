@@ -93,7 +93,7 @@ def starting_equipment():
 
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10)
+    ranged_component = Components.Ranged(5)
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
                         equipment=equipment_component,
                         ranged=ranged_component)
@@ -239,9 +239,9 @@ def play_game():
     Fov.require_recompute()
 
     while not libtcod.console_is_window_closed():
-
+        # Render.render_all()
         Schedule.process()
-        #Render.render_all()
+
 
 
 def check_level_up():

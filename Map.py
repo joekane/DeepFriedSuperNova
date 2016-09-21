@@ -1329,7 +1329,7 @@ def is_blocked(x, y):
         return True
 
     # now check for any blocking objects
-    for object in get_visible_objects():
+    for object in get_all_objects():
         if object.blocks and object.x == x and object.y == y:
             # print "Blocked by Object!"
             return True

@@ -758,7 +758,14 @@ class Ranged:
             background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
             libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
 
-            map_x, map_y = Map.to_camera_coordinates(source.x, source.y)
+            source_x, source_y = Map.to_camera_coordinates(source.x, source.y)
+
+            target_x = source_x
+            target_y = source_y
+            old_target_x = target_x
+            old_target_y = target_y
+
+            # TODO: Make range finder follow curosr as best as possible. Sh9ortening when apprpriate
 
             while True:
                 Input.update()
@@ -767,19 +774,28 @@ class Ranged:
 
                 target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
 
-                if Fov.is_visible(pos=(target_x, target_y)):
-                    line = Utils.get_line((map_x, map_y), (mouse.cx, mouse.cy))
-                    for point in line:
-                        libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
-                    if len(line) > 0:
-                        point = line[-1]
+                if not Fov.is_visible(pos=(target_x, target_y)) or Utils.distance_between(target_x,target_y, source.x, source.y) > self.max_range:
+                    target_x, target_y = Map.to_camera_coordinates(target_x, target_y)
+                    target_x = old_target_x
+                    target_y = old_target_y
+                else:
+                    target_x, target_y = Map.to_camera_coordinates(target_x, target_y)
+                    old_target_x = target_x
+                    old_target_y = target_y
 
-                        circle = Utils.get_circle_points(point[0], point[1], self.aoe)
-                        tile_effected = set(circle)
 
-                        for points in circle:
-                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
-                                                                libtcod.BKGND_LIGHTEN)
+                line = Utils.get_line((source_x, source_y), (target_x, target_y))
+
+                for point in line:
+                    libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
+                if len(line) > 0:
+                    point = line[-1]
+                    circle = Utils.get_circle_points(point[0], point[1], self.aoe)
+                    tile_effected = set(circle)
+
+                    for points in circle:
+                        libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
+                                                            libtcod.BKGND_LIGHTEN)
 
                 if mouse.lbutton_pressed:
                     # target_tile = (target_x, target_y)

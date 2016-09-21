@@ -69,12 +69,12 @@ def astar(start, goal, use_fov=True):
                 heappush(oheap, (fscore[neighbor], neighbor))
 
         if use_fov:
-            if len(oheap) > 25:
+            if len(oheap) > 35:
                 #print "Fov Break!"
                 oheap = None
                 break
         else:
-            if len(oheap) > 25:
+            if len(oheap) > 35:
                 #print "Map Break!"
                 return False
 

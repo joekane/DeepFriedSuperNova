@@ -8,8 +8,8 @@ rules = {
     'story' : ['#mp#', '#pre#', '#mod#', '#ia#'],
 
     'mp'  : [
-        'M+ | #M+_names.capitalize# of #suffix.capitalize#',
-        'M+ | #prefix.capitalize# #M+_names.capitalize#'],
+        'M+ | #M+_names.c# of #suffix.c#',
+        'M+ | #prefix.c# #M+_names.c#'],
 
     'mod' : [
         'M | #mod_names.capitalize# #mod_suffix.capitalize#',

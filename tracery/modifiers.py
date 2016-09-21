@@ -27,7 +27,7 @@ def firstS(text, *params):
 
 
 def s(text, *params):
-    if text[-1] in 'shx':
+    if text[-1] in 'sx':
         return text + "es"
     elif text[-1] == 'y':
         if text[-2] not in "aeiou":
@@ -51,6 +51,7 @@ base_english = {
     'replace': replace,
     'capitalizeAll': capitalizeAll,
     'capitalize': capitalize_,
+    'c': capitalize_,
     'a': a,
     'firstS': firstS,
     's': s,

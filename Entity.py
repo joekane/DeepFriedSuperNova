@@ -128,6 +128,7 @@ class Entity:
             Fov.fov_change(self.x, self.y, 'Unchanged', False)
             self.x = x
             self.y = y
+            print "Moved"
             if self.name != 'player':
                 Fov.fov_change(self.x, self.y, 'Unchanged', True)
                 pass
@@ -144,7 +145,20 @@ class Entity:
         # convert to integer so the movement is restricted to the map grid
         dx = int(round(dx / distance))
         dy = int(round(dy / distance))
-        self.move(dx, dy)
+
+        if not self.move(dx, dy):
+            if dy == 0:
+                if not self.move(dx, dy + 1):
+                    if not self.move(dx, dy - 1):
+                        if not self.move(0, dy + 1):
+                            if not self.move(0, dy - 1):
+                                pass
+            elif dx == 0:
+                if not self.move(dx-1, dy):
+                    if not self.move(dx+1, dy):
+                        if not self.move(dx - 1, 0):
+                            if not self.move(dx + 1, 0):
+                                pass
 
     def distance_to(self, other):
         # return the distance to another object
@@ -164,18 +178,17 @@ class Entity:
 
         if path:
             dest = path[0]
-            self.move_towards(dest[0], dest[1])
             print "Path: " + str(path)
+            #self.move_towards(dest[0], dest[1])
+
         else:
-            print "No Path"
-        return
+            #print "No Path"
+            return False
 
-
-
-        self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.5)
+        self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
         libtcod.path_compute(self.path, self.x, self.y, target.x, target.y)
 
-        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 250:
+        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 25:
             self.walk_path()
         else:
             self.move_towards(target.x, target.y)
@@ -187,7 +200,6 @@ class Entity:
         libtcod.dijkstra_path_set(self.path, target.x, target.y)
 
         self.walk_path()
-
 
     def move_astar_xy(self, target_x, target_y, force=False):
         if self.path is None or force:
