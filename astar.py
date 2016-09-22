@@ -15,13 +15,13 @@ def heuristic(a, b):
 def astar(start, goal, use_fov=True):
     neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
-    map = Map.current_map()
-
     close_set = set()
     came_from = {}
     gscore = {start: 0}
     fscore = {start: heuristic(start, goal)}
     oheap = []
+
+    closest_match = []
 
     heappush(oheap, (fscore[start], start))
 
@@ -37,6 +37,7 @@ def astar(start, goal, use_fov=True):
                 data.append(current)
                 current = came_from[current]
             data.reverse()
+            #print "Path Found! (" + str(use_fov) + ")"
             return data
 
         close_set.add(current)
@@ -50,7 +51,7 @@ def astar(start, goal, use_fov=True):
                             continue
                             # print "FOV: {0}, MAP: {1}".format(Fov.is_blocked(neighbor), map[neighbor[0]][neighbor[1]].blocked)
                     else:
-                        if map[neighbor[0]][neighbor[1]].blocked:  # == 1:6 # map[x][y]
+                        if Map.is_blocked(neighbor[0], neighbor[1], ignore_mobs=True):  # == 1:6 # map[x][y]
                             continue
                 else:
                     # array bound y walls
@@ -60,10 +61,12 @@ def astar(start, goal, use_fov=True):
                 continue
 
             if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
+                closest_match = [current]
                 continue
 
             if tentative_g_score < gscore.get(neighbor, 0) or neighbor not in [i[1] for i in oheap]:
                 came_from[neighbor] = current
+
                 gscore[neighbor] = tentative_g_score
                 fscore[neighbor] = tentative_g_score + heuristic(neighbor, goal)
                 heappush(oheap, (fscore[neighbor], neighbor))
@@ -78,11 +81,12 @@ def astar(start, goal, use_fov=True):
                 #print "Map Break!"
                 return False
 
+
     second_try = astar(start, goal, use_fov=False)
     print second_try
     if second_try:
         return second_try
     else:
-        #print "Failed!"
+        print "Failed! " + str(use_fov)
         return False
 

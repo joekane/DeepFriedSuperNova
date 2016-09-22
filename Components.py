@@ -204,9 +204,7 @@ class PlayeControlled:
                     elif key_char == 's':
                         UI.skill_tree()
                     elif key_char == 'k':
-                        import Keys
-                        GameState.dungeon_name = Keys.generate_world_title()
-
+                        GameState.next_level()
 
                     elif key_char == 'x':
                         Fov.require_recompute()
@@ -443,6 +441,7 @@ class SentinelMonster:
         self.active = False
 
 
+
     # AI for a basic monster.
     def take_turn(self):
             # a basic monster takes its turn. If you can see it, it can see you
@@ -450,7 +449,10 @@ class SentinelMonster:
             player = GameState.get_player()
 
             if Fov.is_visible(obj=monster):
-                self.active = True
+                if not self.active:
+                    self.active = True
+                    self.post_x = self.owner.x
+                    self.post_y = self.owner.y
                 GameState.continue_walking = False
 
             if self.active:
@@ -528,7 +530,7 @@ class RangedMonster:
                     monster.move_astar(player)
                     self.reload -= 1
                 # close enough, attack! (if the player is still alive.)
-                elif player.fighter.hp > 0 and self.reload <= 0:
+                elif player.fighter.hp > 0 and self.reload <= 0 and Fov.is_visible(obj=monster):
                     Animate.follow_line(self.owner, player)
                     monster.fighter.attack(player)
                     self.reload = 3
@@ -565,7 +567,7 @@ class RangedTurretMonster:
                 # monster.move_astar(player)
                 self.reload -= 1
             # close enough, attack! (if the player is still alive.)
-            elif player.fighter.hp > 0 and self.reload <= 0:
+            elif player.fighter.hp > 0 and self.reload <= 0 and Fov.is_visible(obj=monster):
                 Animate.follow_line(self.owner, player)
                 monster.fighter.attack(player)
                 self.reload = 3
@@ -595,7 +597,8 @@ class SpawningMonster:
                 chance_to_spawn = libtcod.random_get_int(0, 0, 10)
 
                 if chance_to_spawn >= 7:
-                    self.split()
+                    # self.split()
+                    pass
                 else:
                     if monster.distance_to(player) >= 2:
                         monster.move_astar(player)
@@ -732,7 +735,7 @@ class Equipment:
 
 
 class Ranged:
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=3, owner=None):
+    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
@@ -740,32 +743,19 @@ class Ranged:
         self.aoe = aoe
 
     def fire(self, source=None, target=None):
-        # find closest enemy (inside a maximum range) and damage it
 
         targets = []
 
         if source is None:
             source = GameState.get_player()
         if target is None:
-            # get target
 
-            # CLOSEST TARGET
-            # target = Map.closest_monster(self.max_range)
-
-            # CHOOSE TARGET
             tile_effected = None
+            Utils.message('Choose Target. Right Click to cancel.', libtcod.gold)
+            Render.render_all()
 
             background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
             libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
-
-            source_x, source_y = Map.to_camera_coordinates(source.x, source.y)
-
-            target_x = source_x
-            target_y = source_y
-            old_target_x = target_x
-            old_target_y = target_y
-
-            # TODO: Make range finder follow curosr as best as possible. Sh9ortening when apprpriate
 
             while True:
                 Input.update()
@@ -773,46 +763,54 @@ class Ranged:
                 Render.blit(background, 0)
 
                 target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
-
-                if not Fov.is_visible(pos=(target_x, target_y)) or Utils.distance_between(target_x,target_y, source.x, source.y) > self.max_range:
-                    target_x, target_y = Map.to_camera_coordinates(target_x, target_y)
-                    target_x = old_target_x
-                    target_y = old_target_y
-                else:
-                    target_x, target_y = Map.to_camera_coordinates(target_x, target_y)
-                    old_target_x = target_x
-                    old_target_y = target_y
-
-
-                line = Utils.get_line((source_x, source_y), (target_x, target_y))
+                print source.x, source.y
+                line = Utils.get_line((source.x, source.y),
+                                      (target_x, target_y),
+                                      walkable=True,
+                                      ignore_mobs=True,
+                                      max_length=self.max_range)
 
                 for point in line:
+                    if point == (None, None):
+                        break
+                    point = Map.to_camera_coordinates(point[0], point[1])
                     libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
                 if len(line) > 0:
-                    point = line[-1]
-                    circle = Utils.get_circle_points(point[0], point[1], self.aoe)
-                    tile_effected = set(circle)
+                    index = Utils.find_element_in_list((None, None), line)
 
-                    for points in circle:
-                        libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
-                                                            libtcod.BKGND_LIGHTEN)
+                    if index is None:
+                        point = line[-1]
+                    else:
+                        point = line[index-1]
+
+                    circle = Utils.get_circle_points(point[0], point[1], self.aoe)
+                    if circle:
+                        tile_effected = set(circle)
+
+                        for points in circle:
+                            points = Map.to_camera_coordinates(points[0], points[1])
+                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
+                                                                libtcod.BKGND_LIGHTEN)
 
                 if mouse.lbutton_pressed:
                     # target_tile = (target_x, target_y)
                     print tile_effected
                     for target in tile_effected:
-                        target = Map.to_map_coordinates(target[0], target[1])
+                        #target = Map.to_map_coordinates(target[0], target[1])
                         monster = Map.get_monster_at((target[0], target[1]))
                         print "Monster: " + str(monster) + " at " +  str(target)
                         if monster is not None:
                             targets.append(monster)
                     break
 
+                if mouse.rbutton_pressed:
+                    break
 
                 libtcod.console_flush()
+
             print "Targets: " + str(targets)
             if not targets:  # no enemy found within maximum range
-                Utils.message('No enemy is close enough to fire.', libtcod.red)
+                Utils.message('Cancelled.', libtcod.red)
                 return 'cancelled'
 
 

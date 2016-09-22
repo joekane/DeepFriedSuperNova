@@ -20,14 +20,17 @@ import CaveGen
 import Spells
 import gzip
 import xp_loader
+import sys
 
 
 level_map = None
 objects = None
+dmap = None
 visible_objects = None
 stairs = None
 camera_x = 0
 camera_y = 0
+
 
 d_map = None
 
@@ -36,8 +39,47 @@ def current_map():
     return level_map
 
 
+def create_d_map():
+    global d_map
+    d_map = [[sys.maxint for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    for x in range(Constants.MAP_WIDTH):
+        for y in range(Constants.MAP_HEIGHT):
+            if is_blocked(x,y, ignore_mobs=True):
+                d_map[x][y] = sys.maxint
+            else:
+                d_map[x][y] = 250
+    update_d_map()
+
+
+def update_d_map():
+    player = GameState.get_player()
+    floodfill( (player.x, player.y), 0 )
+
+
+def floodfill(cell, distance=0):
+    global d_map
+    print distance
+    # print "Cell: " + str(cell)
+    x, y = cell
+
+    if d_map[x][y] == sys.maxint: # the base case
+        return
+    if d_map[x][y] < distance: # the base case
+        return
+    if distance >= 20:
+        return
+    if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
+        d_map[x][y] = distance
+        distance += 1
+        floodfill( (x + 1, y), distance=distance) # right
+        floodfill( (x - 1, y), distance=distance) # left
+        floodfill((x, y + 1), distance=distance)
+        floodfill((x, y - 1), distance=distance) # up
+
+
+
 def new_map(solid=True):
-    global level_map
+    global level_map, d_map
 
     if solid:
         level_map = [[Tile(True,
@@ -205,6 +247,7 @@ def generate_map():
         basic_dungeon()
     Fov.initialize()
     SoundEffects.play_music('SSA')
+    # create_d_map()
 
 
 def caves(style='DEFAULT'):
@@ -1322,17 +1365,18 @@ def is_explored(x,y):
     return False
 
 
-def is_blocked(x, y):
+def is_blocked(x, y, ignore_mobs=False):
     # first test the map tile
     if level_map[x][y].blocked:
         # print "Blocked By Map!"
         return True
 
     # now check for any blocking objects
-    for object in get_all_objects():
-        if object.blocks and object.x == x and object.y == y:
-            # print "Blocked by Object!"
-            return True
+    if not ignore_mobs:
+        for object in get_all_objects():
+            if object.blocks and object.x == x and object.y == y:
+               #print "Blocked by Object!"
+                return True
 
     return False
 

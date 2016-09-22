@@ -29,6 +29,11 @@ def remove_tags(text):
     return re.sub('<[^>]*>', '', text)
 
 
+def get_tags(text):
+    return re.findall("[<].*?[>]", text)
+
+
+
 def message(new_msg, color=libtcod.white):
     import textwrap
     # split the message if necessary, among multiple lines
@@ -54,7 +59,10 @@ def get_drunk_line(start, end):
     pass
 
 
-def get_line(start, end):
+def get_line(start, end, walkable=False, ignore_mobs=False, max_length=99999):
+
+    if start == (None, None) or end == (None, None):
+        return []
 
     # Setup initial conditions
     x1, y1 = start
@@ -90,17 +98,24 @@ def get_line(start, end):
     points = []
     for x in range(x1, x2 + 1):
         coord = (y, x) if is_steep else (x, y)
-        points.append(coord)
+        if  Map.is_blocked(coord[0], coord[1], ignore_mobs) and walkable is True:
+            points.append((None, None))
+            #max_length += 1
+        else:
+            points.append(coord)
+
         error -= abs(dy)
         if error < 0:
             y += ystep
             error += dx
 
+
     # Reverse the list if the coordinates were swapped
     if swapped:
         points.reverse()
-    points.remove(start)
-    return points
+    # points.remove(start)
+    # print points, max_length
+    return points[0:max_length+1]
 
 
 def distance_between(x1, y1, x2, y2):
@@ -164,7 +179,7 @@ def random_choice(chances_dict):
     # choose one option from dictionary of chances, returning its key
     chances = chances_dict.values()
     strings = chances_dict.keys()
-    print chances
+    # print chances
     return strings[random_choice_index(chances)]
 
 
@@ -235,36 +250,46 @@ def is_mouse_in(con_x, con_y, width, height):
 
 
 def get_circle_points(x0, y0, radius, ring=False, size=2):
-    if ring:
-        x = radius - size + 1
-    else:
-        x = 0
-    y = 0
-    err = 0
-
-    points = []
-
-    start_x = x
-
-    while start_x <= radius:
-        x = start_x
+    if x0 is not None and y0 is not None:
+        if ring:
+            x = radius - size + 1
+        else:
+            x = 0
         y = 0
-        while x >= y:
-            points.append((x0 + x, y0 + y))
-            points.append((x0 + y, y0 + x))
-            points.append((x0 - y, y0 + x))
-            points.append((x0 - x, y0 + y))
-            points.append((x0 - x, y0 - y))
-            points.append((x0 - y, y0 - x))
-            points.append((x0 + y, y0 - x))
-            points.append((x0 + x, y0 - y))
+        err = 0
 
-            y += 1
-            err += 1 + 2 * y
-            if 2 * (err - x) + 1 > 0:
-                x -= 1
-                err += 1 - 2 * x
-        start_x += 1
+        points = []
 
-    #return points
-    return list(set(points))
+        start_x = x
+
+        while start_x <= radius:
+            x = start_x
+            y = 0
+            while x >= y:
+                points.append((x0 + x, y0 + y))
+                points.append((x0 + y, y0 + x))
+                points.append((x0 - y, y0 + x))
+                points.append((x0 - x, y0 + y))
+                points.append((x0 - x, y0 - y))
+                points.append((x0 - y, y0 - x))
+                points.append((x0 + y, y0 - x))
+                points.append((x0 + x, y0 - y))
+
+                y += 1
+                err += 1 + 2 * y
+                if 2 * (err - x) + 1 > 0:
+                    x -= 1
+                    err += 1 - 2 * x
+            start_x += 1
+
+        #return points
+        return list(set(points))
+    return False
+
+
+def find_element_in_list(element, list_element):
+    try:
+        index_element = list_element.index(element)
+        return index_element
+    except ValueError:
+        return None

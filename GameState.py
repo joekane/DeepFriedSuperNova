@@ -20,6 +20,7 @@ import UI
 import Utils
 import Fov
 import Render
+import Schedule
 import SoundEffects
 import Status
 
@@ -33,6 +34,7 @@ inventory = []
 game_msgs = []
 dungeon_level = 0
 dungeon_name = "Test"
+dungeon_tags = []
 
 continue_walking = False
 
@@ -93,7 +95,7 @@ def starting_equipment():
 
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(5)
+    ranged_component = Components.Ranged(10)
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
                         equipment=equipment_component,
                         ranged=ranged_component)
@@ -213,7 +215,7 @@ def new_game():
 
 
 def next_level():
-    global dungeon_level, dungeon_name
+    global dungeon_level, dungeon_name, dungeon_tags
     import Keys
 
     # advance to the next level
@@ -224,18 +226,31 @@ def next_level():
     dungeon_level += 1
 
     # TODO: eventually set theme and other stats based on tags generated HERE.
-    dungeon_name = Keys.generate_world_title()
+    key = Keys.generate_world_title()
+    dungeon_name = Utils.remove_tags(key)
+    dungeon_tags = Utils.get_tags(key)
+
+    if '<M+>' in dungeon_tags:
+        Themes.set_theme('Shadow State Archive')
+    elif '<PRE>' in dungeon_tags:
+        Themes.set_theme('Forest')
+    else:
+        Themes.set_theme('Valley of Devils')
+    # Themes.set_theme('Abyss of the Fish Men')
 
     Themes.set_theme('Shadow State Archive')
-    # Themes.set_theme('Abyss of the Fish Men')
-    # Themes.set_theme('Valley of Devils')
+
+    Schedule.reset()
     Map.generate_map()
+    print "Objects: " + str(len(Map.objects))
+    print "VisObjects: " + str(len(Map.get_visible_objects()))
+    print "Dungeon Lvl: " + str(dungeon_level)
 
 
 
 
 def play_game():
-    import Schedule
+
     Fov.require_recompute()
 
     while not libtcod.console_is_window_closed():

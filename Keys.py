@@ -8,30 +8,30 @@ rules = {
     'story' : ['#mp#', '#pre#', '#mod#', '#ia#'],
 
     'mp'  : [
-        'M+ | #M+_names.c# of #suffix.c#',
-        'M+ | #prefix.c# #M+_names.c#'],
+        '<M+>#M+_names.c# of #suffix.c#',
+        '<M+>#prefix.c# #M+_names.c#'],
 
     'mod' : [
-        'M | #mod_names.capitalize# #mod_suffix.capitalize#',
-        'M | #mod_prefix.capitalize# #mod_names.capitalize#'],
+        '<M>#mod_names.capitalize# #mod_suffix.capitalize#',
+        '<M>#mod_prefix.capitalize# #mod_names.capitalize#'],
 
     'emod': [
-        'EM | #emod_names.capitalize# at the #emod_suffix.capitalize#',
-        'EM | #emod_prefix.capitalize# #emod_names.capitalize#'],
+        '<EM>#emod_names.capitalize# at the #emod_suffix.capitalize#',
+        '<EM>#emod_prefix.capitalize# #emod_names.capitalize#'],
 
     'ia' : [
-        'IA | #moods.capitalize# #ia_names.capitalize# of #ia_suffix.capitalize#',
-        'IA | #ia_prefix.capitalize# #ia_names.capitalize#'],
+        '<IA>#moods.capitalize# #ia_names.capitalize# of #ia_suffix.capitalize#',
+        '<IA>#ia_prefix.capitalize# #ia_names.capitalize#'],
 
     'pre'  : [
-        'PRE | #pre_names.capitalize# of the #pre_suffix.capitalize#',
-        'PRE | #pre_prefix.capitalize# #pre_names.capitalize#',
-        'PRE | #pre_names.capitalize# #pre_prop_suffix.capitalize#'],
+        '<PRE>#pre_names.capitalize# of the #pre_suffix.capitalize#',
+        '<PRE>#pre_prefix.capitalize# #pre_names.capitalize#',
+        '<PRE>#pre_names.capitalize# #pre_prop_suffix.capitalize#'],
 
 
     'M+_names': ['data library', 'archives', 'laboratory', 'orbital Station', 'prison', 'asteroid mining colony'],
     'suffix' : ['The Moon', 'Mars', 'Ios', 'Titan'],
-    'prefix' : ['#moods#', '#passages#','shadow state', 'secluded', 'nano', 'ruined', 'evil', 'floating', 'forgotten'],
+    'prefix' : ['#moods#', '#passages#', 'shadow state<S><T>', 'secluded<W>', 'nano<S>', 'ruined', 'evil<H>', 'floating', 'forgotten'],
 
     'mod_names' : ['hotel', 'graveyard', 'temple', 'warehouse', 'nuclear test site'],
     'mod_suffix': ['overlook', 'pass', 'on the hill', 'of #numbers# #passages.s#'],
@@ -236,9 +236,9 @@ grammar.add_modifiers(base_english)
 
 
 def generate_world_title():
+    import re
     world_name = grammar.flatten("#origin#")
     key_name = grammar.flatten("#key_material.capitalize# Key")
-    print key_name + " -> " + world_name
     return world_name
 
 

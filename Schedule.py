@@ -16,12 +16,19 @@ player_turn = False
 
 
 def register(obj):
+    global time_travelers
     time_travelers.append(obj)
     obj.action_points = 0
 
 
 def release(obj):
+    global time_travelers
     time_travelers.remove(obj)
+
+
+def reset():
+    global time_travelers
+    time_travelers = [GameState.get_player()]
 
 
 def process():

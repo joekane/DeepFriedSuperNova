@@ -152,13 +152,21 @@ class Entity:
                     if not self.move(dx, dy - 1):
                         if not self.move(0, dy + 1):
                             if not self.move(0, dy - 1):
-                                pass
+                                if not self.move(-dx, dy - 1):
+                                    if not self.move(-dx, dy + 1):
+                                        if not self.move(-dx, dy):
+                                            pass
+
+
             elif dx == 0:
                 if not self.move(dx-1, dy):
                     if not self.move(dx+1, dy):
                         if not self.move(dx - 1, 0):
                             if not self.move(dx + 1, 0):
-                                pass
+                                if not self.move(dx - 1, -dy):
+                                    if not self.move(dx + 1, -dy):
+                                        if not self.move(dx, -dy):
+                                            pass
 
     def distance_to(self, other):
         # return the distance to another object
@@ -173,22 +181,17 @@ class Entity:
     def move_astar(self, target):
 
         import astar
+        print "Astar for " + self.name
 
         path = astar.astar( (self.x, self.y) , (target.x, target.y))
 
-        if path:
-            dest = path[0]
-            print "Path: " + str(path)
-            #self.move_towards(dest[0], dest[1])
-
-        else:
-            #print "No Path"
+        if not path:
             return False
 
         self.path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
         libtcod.path_compute(self.path, self.x, self.y, target.x, target.y)
 
-        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 25:
+        if not libtcod.path_is_empty(self.path) and libtcod.path_size(self.path) < 75:
             self.walk_path()
         else:
             self.move_towards(target.x, target.y)
@@ -241,11 +244,7 @@ class Entity:
         if self.path is None:
             GameState.continue_walking = False
         else:
-            # print path
-            # Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(self.path, True)
-            # print "{0}'s Path: {1}".format(self.name, libtcod.dijkstra_size(self.path))
-            #x, y = libtcod.dijkstra_path_walk(self.path)
             if x or y:
                 # Set self's coordinates to the next path tile
                 print "Moving To {0}, {1}".format(x, y)

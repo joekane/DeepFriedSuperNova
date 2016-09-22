@@ -282,7 +282,7 @@ def render_stat_bars():
     render_box_bar(4, 36, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
                    libtcod.Color(0, 30, 255),
                    libtcod.Color(0, 10, 64), consoles['side_panel_console'])
-    render_box_bar(4, 37, 14, '', GameState.get_player().fighter.xp, 150,   # will be NEXT_LVL_XP
+    render_box_bar(4, 37, 14, '', GameState.get_player().fighter.xp, 1000,   # TODO: will be NEXT_LVL_XP
                    libtcod.Color(255, 255, 0),
                    libtcod.Color(65, 65, 0), consoles['side_panel_console'])
 

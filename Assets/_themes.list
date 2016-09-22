@@ -23,6 +23,8 @@ SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_gray
 
+
+
 [Shadow State Archive]
 LEVEL_STYLE = BSP
 GROUND_CHAR = libtcod.CHAR_SE
@@ -48,8 +50,10 @@ SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_gray
 
+
+
 [Valley of Devils]
-LEVEL_STYLE = CA
+LEVEL_STYLE = CAVE_TIGHT
 GROUND_CHAR = 056 054 047
 GROUND_COLOR = libtcod.dark_green
 GROUND_BCOLOR = libtcod.darker_sepia
@@ -75,15 +79,15 @@ OUT_OF_FOV_COLOR = libtcod.darker_sepia
 
 
 
-[Valley of Devils]
+[Forest]
 LEVEL_STYLE = CAVE_OPEN
 GROUND_CHAR = 056 054 047
-GROUND_COLOR = libtcod.dark_green
-GROUND_BCOLOR = libtcod.darker_sepia
+GROUND_COLOR = libtcod.light_green
+GROUND_BCOLOR = libtcod.darker_green
 
-WALL_CHAR = libtcod.CHAR_ARROW2_N
-WALL_COLOR = libtcod.sepia
-WALL_BCOLOR = libtcod.darkest_green
+WALL_CHAR = 006
+WALL_COLOR = libtcod.green
+WALL_BCOLOR = libtcod.dark_green
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 213
@@ -99,6 +103,8 @@ SHROUD_COLOR = libtcod.lightest_blue
 SHROUD_BCOLOR = libtcod.black
 
 OUT_OF_FOV_COLOR = libtcod.darker_sepia
+
+
 
 [Abyss of the Fish Men]
 LEVEL_STYLE = CAVE_TIGHT
