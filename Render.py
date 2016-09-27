@@ -48,11 +48,17 @@ def full_map():
         player = GameState.get_player()
         Map.move_camera(player.x, player.y)
         camera_x, camera_y = Map.get_camera()
+
+        # Map.d_map[player.x][player.y] = 0
+
         for y in range(Constants.MAP_CONSOLE_HEIGHT):
             for x in range(Constants.MAP_CONSOLE_WIDTH):
                 map_x, map_y = (camera_x + x, camera_y + y)
                 tile = map[map_x][map_y]
                 visible = Fov.is_visible(pos=(map_x, map_y))
+
+                # dist = Utils.distance_between(player.x, player.y, map_x, map_y)
+                # Map.d_map[map_x][map_y] = int(dist)
 
                 if Constants.DEBUG:
                     offset_color = libtcod.Color(0,0,0)
@@ -71,7 +77,9 @@ def full_map():
                         libtcod.console_put_char_ex(consoles['map_console'], x, y,'M',
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)
                     else:
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
+                        char = '.'
+                        char = chr(min(Map.d_map[map_x][map_y] + 48, 200))
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)
 
                 else:
@@ -95,6 +103,7 @@ def full_map():
 
                     else:
                         offset_color = get_offset_color(map_x, map_y)
+
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)
                         libtcod.console_set_char_background(consoles['map_console'], x, y,

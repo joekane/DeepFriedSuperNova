@@ -138,6 +138,7 @@ class PlayeControlled:
                                 object.item.pick_up()
                                 break
                     elif key_char == 'i':
+                        Map.update_d_map()
                         # show the inventory; if an item is selected, use it
                         # img = libtcod.image_load('orc.png')
                         # libtcod.image_blit_2x(img, 0, 0, 0)

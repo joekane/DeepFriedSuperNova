@@ -118,6 +118,11 @@ class Entity:
             if self.name != 'player':
                 Fov.fov_change(self.x, self.y, 'Unchanged', True)
                 pass
+            else:
+                pass
+                # print "d_Map Start."
+                # Map.update_d_map()
+                # print "d_Map End."
             return True
         else:
             return False
@@ -179,7 +184,6 @@ class Entity:
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def move_astar(self, target):
-
         import astar
         print "Astar for " + self.name
 

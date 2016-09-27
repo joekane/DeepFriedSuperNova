@@ -31,7 +31,7 @@ stairs = None
 camera_x = 0
 camera_y = 0
 
-
+d_count = 0
 d_map = None
 
 
@@ -40,41 +40,100 @@ def current_map():
 
 
 def create_d_map():
-    global d_map
+    global d_map, d_count
+
     d_map = [[sys.maxint for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-    for x in range(Constants.MAP_WIDTH):
-        for y in range(Constants.MAP_HEIGHT):
-            if is_blocked(x,y, ignore_mobs=True):
-                d_map[x][y] = sys.maxint
-            else:
-                d_map[x][y] = 250
-    update_d_map()
+    #for x in range(Constants.MAP_WIDTH):
+    #    for y in range(Constants.MAP_HEIGHT):
+    #        if is_blocked(x,y, ignore_mobs=True):
+    #            d_map[x][y] = sys.maxint
+    #        else:
+    #            d_map[x][y] = 200
 
 
-def update_d_map():
+    d_count = 0
     player = GameState.get_player()
-    floodfill( (player.x, player.y), 0 )
+
+
+
+    floodfill_op( (player.x, player.y), 0 )
+    print "D-Count: " + str(d_count)
+    Fov.require_recompute()
 
 
 def floodfill(cell, distance=0):
-    global d_map
-    print distance
-    # print "Cell: " + str(cell)
+    global d_map, d_count
+    player = GameState.get_player()
+    d_count += 1
     x, y = cell
 
-    if d_map[x][y] == sys.maxint: # the base case
+
+    # print "Cell: " + str(cell)
+
+    if distance > 10:
+        #d_map[x][y] = 100
+        return
+    if (x, y) != (player.x, player.y) and is_blocked(x,y, ignore_mobs=False): # the base case
         return
     if d_map[x][y] < distance: # the base case
-        return
-    if distance >= 20:
+        #d_map[x][y] = 100
         return
     if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
+        #print distance, d_map[x][y], cell
         d_map[x][y] = distance
         distance += 1
         floodfill( (x + 1, y), distance=distance) # right
+
         floodfill( (x - 1, y), distance=distance) # left
+
         floodfill((x, y + 1), distance=distance)
+
         floodfill((x, y - 1), distance=distance) # up
+
+
+def floodfill_op(cell, distance=0):
+    global d_map, d_count
+    player = GameState.get_player()
+
+    x, y = cell
+    dist = 0
+    visited_tiles = set([])
+    tiles_to_proces = []
+    tiles_to_proces.append( ((x, y), 0))
+
+    while tiles_to_proces:
+        # print tiles_to_proces[0]
+        x = tiles_to_proces[0][0][0]
+        y = tiles_to_proces[0][0][1]
+        dist = tiles_to_proces[0][1]
+        if dist > 15:
+            break
+        visited_tiles.add(tiles_to_proces.pop(0)[0])
+        if d_map[x][y] >= dist:
+            d_map[x][y] = dist
+            if not is_blocked(x + 1,y): # RIGHT
+                if (x+1, y) not in visited_tiles:
+                    tiles_to_proces.append( ((x+1,y), dist + 1))
+            if not is_blocked(x - 1, y):  # RIGHT
+                if (x - 1, y) not in visited_tiles:
+                    tiles_to_proces.append( ((x -1,y), dist+ 1))
+            if not is_blocked(x, y+1):  # RIGHT
+                if (x , y + 1) not in visited_tiles:
+                    tiles_to_proces.append( ((x, y+1), dist + 1 ))
+            if not is_blocked(x, y-1):  # RIGHT
+                if (x, y - 1) not in visited_tiles:
+                    tiles_to_proces.append( ((x, y-1), dist + 1))
+        # print tiles_to_proces
+
+        # libtcod.console_wait_for_keypress(True)
+
+
+
+
+
+    # print "Cell: " + str(cell)
+
+
 
 
 
@@ -86,14 +145,18 @@ def new_map(solid=True):
                            block_sight=True,
                            char=Themes.wall_char(),
                            f_color=Themes.wall_color(),
-                           b_color=Themes.wall_bcolor())
+                           b_color=Themes.wall_bcolor(),
+                           pos_x=x,
+                           pos_y=y)
                       for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
     else:
         level_map = [[Tile(False,
                            block_sight=False,
                            char=Themes.wall_char(),
                            f_color=Themes.wall_color(),
-                           b_color=Themes.wall_bcolor())
+                           b_color=Themes.wall_bcolor(),
+                           pos_x=x,
+                           pos_y=y)
                       for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
 
 
@@ -148,7 +211,11 @@ def load_prefab(x, y, key, rotation):
 
 class Tile:
     # a tile of the map and its properties
-    def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black):
+    def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black,
+                 pos_x=0,
+                 pos_y=0):
+        self.x = pos_x
+        self.y = pos_y
         self.blocked = blocked
         self.explored = False
         self.char = char
@@ -247,7 +314,6 @@ def generate_map():
         basic_dungeon()
     Fov.initialize()
     SoundEffects.play_music('SSA')
-    # create_d_map()
 
 
 def caves(style='DEFAULT'):
@@ -291,61 +357,81 @@ def wilderness():
                                        block_sight=False,
                                        char='~',
                                        f_color=libtcod.darker_blue,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.1 <= pre_value < 0.2:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='~',
                                        f_color=libtcod.dark_blue,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.2 <= pre_value < 0.3:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='~',
                                        f_color=libtcod.blue,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.3 <= pre_value < 0.4:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='%',
                                        f_color=libtcod.blue,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.4 <= pre_value < 0.5:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='~',
                                        f_color=libtcod.light_blue,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.5 <= pre_value < 0.6:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char=';',
                                        f_color=libtcod.light_green,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.6 <= pre_value < 0.7:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char=',',
                                        f_color=libtcod.green,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.7 <= pre_value < 0.90:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='*',
                                        f_color=libtcod.dark_green,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             elif 0.90 <= pre_value < 0.999:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='^',
                                        f_color=libtcod.dark_sepia,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             else:
                 level_map[x][y] = Tile(False,
                                        block_sight=False,
                                        char='^',
                                        f_color=libtcod.dark_grey,
-                                       b_color=libtcod.black)
+                                       b_color=libtcod.black,
+                                       pos_x=x,
+                                       pos_y=y)
             level_map[x][y].explored = True
 
 
@@ -367,7 +453,9 @@ def read_cavegen_data(): # OBSOLETE?
                                        block_sight=False,
                                        char='x',
                                        f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                                       b_color=Themes.ground_bcolor(),
+                                       pos_x=x,
+                                       pos_y=y)
             elif data[x][y] == 4:
                 player.x, player.y = x, y
 
@@ -375,7 +463,9 @@ def read_cavegen_data(): # OBSOLETE?
                                        block_sight=False,
                                        char='c',
                                        f_color=Themes.ground_color(),
-                                       b_color=Themes.ground_bcolor())
+                                       b_color=Themes.ground_bcolor(),
+                                       pos_x=x,
+                                       pos_y=y)
             level_map[x][y].explored = False
 
     return level_map
@@ -1116,7 +1206,9 @@ def create_ground(x, y, id=None):
                            block_sight=False,
                            char=char,
                            f_color=Themes.ground_color(),
-                           b_color=Themes.ground_bcolor())
+                           b_color=Themes.ground_bcolor(),
+                           pos_x=x,
+                           pos_y=y)
 
 def create_wall(x, y):
     global level_map
@@ -1124,7 +1216,9 @@ def create_wall(x, y):
                            block_sight=True,
                            char=Themes.wall_char(),
                            f_color=Themes.wall_color(),
-                           b_color=Themes.wall_bcolor())
+                           b_color=Themes.wall_bcolor(),
+                           pos_x=x,
+                           pos_y=y)
 
 
 def create_shroud(x, y):
@@ -1133,7 +1227,9 @@ def create_shroud(x, y):
                            block_sight=True,
                            char=Themes.shroud_char(),
                            f_color=Themes.shroud_color(),
-                           b_color=Themes.shroud_bcolor())
+                           b_color=Themes.shroud_bcolor(),
+                           pos_x = x,
+                           pos_y = y)
 
 
 def create_glass(x, y):
@@ -1142,7 +1238,9 @@ def create_glass(x, y):
                            block_sight=False,
                            char=Themes.glass_char(),
                            f_color=Themes.glass_color(),
-                           b_color=Themes.glass_bcolor())
+                           b_color=Themes.glass_bcolor(),
+                           pos_x=x,
+                           pos_y=y)
 
 def create_tunnel(start, end):
     global level_map
