@@ -255,6 +255,8 @@ def play_game():
 
     while not libtcod.console_is_window_closed():
         # Render.render_all()
+        Map.update_dmap()
+        Render.render_all()
         Schedule.process()
 
 

@@ -34,12 +34,13 @@ def reset():
 def process():
     global player_turn
     if player_turn:
+        #Render.render_all()
 
-        Render.render_all()
         value = GameState.get_player().ai.take_turn()
         if value != 0:
-            print "Player Turn"
-            Map.create_d_map()
+            # print "Player Turn"
+            # Map.create_d_map()
+
             GameState.get_player().pass_time()
             player_turn = False
     else:

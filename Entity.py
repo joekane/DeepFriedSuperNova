@@ -119,7 +119,9 @@ class Entity:
                 Fov.fov_change(self.x, self.y, 'Unchanged', True)
                 pass
             else:
-                pass
+
+                Map.recalc_dmap = True
+
                 # print "d_Map Start."
                 # Map.update_d_map()
                 # print "d_Map End."

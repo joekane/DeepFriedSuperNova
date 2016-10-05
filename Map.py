@@ -30,6 +30,7 @@ visible_objects = None
 stairs = None
 camera_x = 0
 camera_y = 0
+recalc_dmap = True
 
 d_count = 0
 d_map = None
@@ -37,6 +38,69 @@ d_map = None
 
 def current_map():
     return level_map
+
+
+def new_dmap():
+    global d_map
+    d_map = [[sys.maxint for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+    player = GameState.get_player()
+    d_map[player.x][player.y] = 0
+
+
+def calc_dmap():
+    changes = 0
+
+    player = GameState.get_player()
+
+    start_x = 1
+    end_x = Constants.MAP_WIDTH - 1
+    start_y = 1
+    end_y = Constants.MAP_HEIGHT - 1
+
+    start_x = player.x - 25
+    end_x = player.x + 25
+    start_y = player.y - 25
+    end_y = player.y + 25
+
+
+    for x in range(start_x, end_x):
+        for y in range(start_y, end_y):
+            if not is_blocked(x, y, ignore_mobs=True):
+                lowestvalue = sys.maxint
+                # print "New Tile:"
+                for i in range (x - 1, x + 2):
+                    for j in range (y - 1, y + 2):
+                        # print "Neighbor Value: {0}".format(d_map[i][j])
+                        if d_map[i][j] < lowestvalue and not (x == i and y == j):
+                            lowestvalue = d_map[i][j]
+                if d_map[x][y] > lowestvalue + 1:
+                    d_map[x][y] = lowestvalue + 1
+                    changes += 1
+    for x in range(end_x, start_x, -1):
+        for y in range(end_y, start_y, -1):
+            if not is_blocked(x, y, ignore_mobs=True):
+                lowestvalue = sys.maxint
+                # print "New Tile:"
+                for i in range(x - 1, x + 2):
+                    for j in range(y - 1, y + 2):
+                        # print "Neighbor Value: {0}".format(d_map[i][j])
+                        if d_map[i][j] < lowestvalue and not (x == i and y == j):
+                            lowestvalue = d_map[i][j]
+                if d_map[x][y] > lowestvalue + 1:
+                    d_map[x][y] = lowestvalue + 1
+                    changes += 1
+    # print "Changes: {0}".format(changes)
+    return changes
+
+def update_dmap():
+    global recalc_dmap
+    if recalc_dmap:
+        recalc_dmap = False
+        new_dmap()
+        changetomap = 1000
+        while changetomap > 0:
+            changetomap = calc_dmap()
+
 
 
 def create_d_map():
@@ -313,6 +377,8 @@ def generate_map():
         caves(style='OPEN')
         basic_dungeon()
     Fov.initialize()
+
+    update_dmap()
     SoundEffects.play_music('SSA')
 
 
