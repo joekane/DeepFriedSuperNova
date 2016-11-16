@@ -8,8 +8,63 @@ import Constants
 from heapq import *
 
 
+def reset():
+    map = Map.current_map()
+    for x in range(Constants.MAP_WIDTH):
+        for y in range(Constants.MAP_HEIGHT):
+            map[x][y].distance_to_player = -1
+
+
 def heuristic(a, b):
     return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+
+
+
+def BFS(source, max_distance=10):
+    map = Map.current_map()
+    x, y = source.x, source.y
+    # dest_x, dest_y = dest
+
+    reset()
+
+
+    visited_tiles = set([])
+    tiles_to_proces = []
+
+    tiles_to_proces.append( ((x, y), 0) )
+
+    count = 0
+
+    while tiles_to_proces:
+        # print tiles_to_proces
+        # print tiles_to_proces[0]
+        x, y = tiles_to_proces[0][0]
+        dist = tiles_to_proces[0][1]
+
+        if dist > 50:
+            break
+        count += 1
+
+        map[x][y].distance_to_player = dist
+        visited_tiles.add(tiles_to_proces.pop(0)[0])
+
+        if not Map.is_blocked(x + 1, y): # RIGHT
+            if (x + 1, y) not in visited_tiles:
+                visited_tiles.add((x + 1, y))
+                tiles_to_proces.append( ((x + 1, y), dist + 1))
+        if not Map.is_blocked(x - 1, y):  # RIGHT
+            if (x - 1, y) not in visited_tiles:
+                visited_tiles.add((x - 1, y))
+                tiles_to_proces.append( ((x - 1, y), dist + 1))
+        if not Map.is_blocked(x, y + 1):  # RIGHT
+            if (x , y + 1) not in visited_tiles:
+                visited_tiles.add((x, y + 1))
+                tiles_to_proces.append( ((x, y + 1), dist + 1))
+        if not Map.is_blocked(x, y - 1):  # RIGHT
+            if (x, y - 1) not in visited_tiles:
+                visited_tiles.add((x, y - 1))
+                tiles_to_proces.append( ((x, y - 1), dist + 1))
+    # print "Loop Count: {0}  Visted Size: {1}".format(count, len(visited_tiles))
 
 
 def astar(start, goal, use_fov=True):
@@ -89,4 +144,40 @@ def astar(start, goal, use_fov=True):
     else:
         print "Failed! " + str(use_fov)
         return False
+
+
+def get_lowest_neighbor(x, y):
+    map = Map.current_map()
+
+    options = []
+
+    # options.append(((x - 1, y - 1), d_map[x - 1][y - 1]))
+    options.append(((x, y - 1), map[x][y - 1].distance_to_player))
+    # options.append(((x + 1, y - 1), d_map[x + 1][y - 1]))
+    options.append(((x - 1, y), map[x - 1][y].distance_to_player))
+
+    # options.append(((x, y), map[x][y].distance_to_player))
+
+    options.append(((x + 1, y), map[x + 1][y].distance_to_player))
+    # options.append(((x - 1, y + 1), d_map[x - 1][y + 1]))
+    options.append(((x, y + 1), map[x - 1][y + 1].distance_to_player))
+    # options.append(((x + 1, y + 1), d_map[x - 1][y + 1]))
+
+        # print "Unsorted:"
+        # print options
+
+        # data.sort(key=lambda tup: tup[1])
+    options.sort(key=lambda tup: tup[1])
+
+    while options:
+        if options[0][1] < 1:
+            options.pop(0)
+        else:
+            break
+    if options:
+        return options[0][0]
+    else:
+        return (x,y)
+
+
 

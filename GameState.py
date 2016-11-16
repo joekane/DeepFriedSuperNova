@@ -21,6 +21,7 @@ import Utils
 import Fov
 import Render
 import Schedule
+import Pathing
 import SoundEffects
 import Status
 
@@ -35,6 +36,8 @@ game_msgs = []
 dungeon_level = 0
 dungeon_name = "Test"
 dungeon_tags = []
+
+goals = [((20, 20), 0)]
 
 continue_walking = False
 
@@ -238,7 +241,7 @@ def next_level():
         Themes.set_theme('Valley of Devils')
     # Themes.set_theme('Abyss of the Fish Men')
 
-    Themes.set_theme('Shadow State Archive')
+    # 644444444Themes.set_theme('Shadow State Archive')
 
     Schedule.reset()
     Map.generate_map()
@@ -252,10 +255,10 @@ def next_level():
 def play_game():
 
     Fov.require_recompute()
+    Pathing.BFS(player)
+    Render.render_all()
 
     while not libtcod.console_is_window_closed():
-        # Render.render_all()
-        Map.update_dmap()
         Render.render_all()
         Schedule.process()
 

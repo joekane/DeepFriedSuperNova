@@ -23,19 +23,19 @@ import Render
 import Schedule
 import UI
 import Input
+import Pathing
 import Themes
-
 
 
 class PlayeControlled:
     def __init__(self, owner=None):
         self.owner = owner
 
-
     def end_turn(self, cost):
         # self.owner.action_points += 100
         # Schedule.add_to_pq((self.owner.action_points, self.owner))
         self.owner.delay += cost
+        # print cost
         return cost
 
     def process_mouse_clicks(self, mouse):
@@ -49,11 +49,10 @@ class PlayeControlled:
                 GameState.continue_walking = GameState.get_player().move_astar_xy(map_x, map_y, True)
                 return self.end_turn(Constants.TURN_COST)
             if mouse.rbutton_pressed:
+
                 # print "Mouse Pressed!"
                 x, y = Map.to_map_coordinates(mouse.cx, mouse.cy)
-                GameState.get_player().x = x
-                GameState.get_player().y = y
-                Fov.require_recompute()
+
                 return 0
         return 0
 
@@ -64,23 +63,11 @@ class PlayeControlled:
             # libtcod.console_set_char_background(0, mouse.cx, mouse.cy, libtcod.Color(10, 10, 240), libtcod.BKGND_SET)
             Utils.inspect_tile(mouse.cx, mouse.cy)
 
-
-
-    # AI for a basic monster.
     def take_turn(self):
         while True:
             Input.update()
             mouse = Input.mouse
             key = Input.key
-            # Render.render_all()
-
-            # print "looping"
-            # key = libtcod.Key()
-            # mouse = libtcod.Mouse()
-
-            # libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-
-            (x, y) = (mouse.cx, mouse.cy)
 
             player = GameState.get_player()
 
@@ -91,16 +78,14 @@ class PlayeControlled:
                 return 0
 
             if GameState.continue_walking:
-                #print "Auto-Walking"
                 self.owner.walk_path()
+                print "Auto-Walking"
                 return self.end_turn(Constants.TURN_COST)
             elif not GameState.continue_walking:
                 GameState.get_player().clear_path()
 
             # movement keys
             if True:
-                # movement keys
-                # movement keys
                 if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
                     Map.player_move_or_interact(0, -1)
                     return self.end_turn(Constants.TURN_COST)
@@ -138,7 +123,7 @@ class PlayeControlled:
                                 object.item.pick_up()
                                 break
                     elif key_char == 'i':
-                        Map.update_d_map()
+                        # Map.update_d_map()
                         # show the inventory; if an item is selected, use it
                         # img = libtcod.image_load('orc.png')
                         # libtcod.image_blit_2x(img, 0, 0, 0)
@@ -210,6 +195,7 @@ class PlayeControlled:
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
+                        Render.render_all()
 
             return 0
                 # print "took turn"
@@ -371,8 +357,10 @@ class MeleeMonster:
                 if dist <= 1.5 and player.fighter.hp > 0:
                     monster.fighter.attack(player)
                 else:
-                    #print "Attemnpting to Path"
-                    monster.move_astar(player)
+                    dest = Pathing.get_lowest_neighbor(monster.x, monster.y)
+                    print dest
+                    monster.move_to(dest[0], dest[1])
+                    # monster.move_astar(player)
                     # monster.move_dijkstra(player)
 
             # self.owner.action_points += 100
@@ -528,7 +516,7 @@ class RangedMonster:
                 dist = monster.distance_to(player)
 
                 if dist > self.attack_range:
-                    monster.move_astar(player)
+                    # monster.move_astar(player)
                     self.reload -= 1
                 # close enough, attack! (if the player is still alive.)
                 elif player.fighter.hp > 0 and self.reload <= 0 and Fov.is_visible(obj=monster):
@@ -809,7 +797,7 @@ class Ranged:
 
                 libtcod.console_flush()
 
-            print "Targets: " + str(targets)
+
             if not targets:  # no enemy found within maximum range
                 Utils.message('Cancelled.', libtcod.red)
                 return 'cancelled'

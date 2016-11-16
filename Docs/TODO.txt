@@ -1,6 +1,1 @@
-BUGS:
-
-* Ranged interface crashes when no monster selected. Need to test for no monsters and cancel accordingly.
-
-
 

@@ -33,7 +33,6 @@ def get_tags(text):
     return re.findall("[<].*?[>]", text)
 
 
-
 def message(new_msg, color=libtcod.white):
     import textwrap
     # split the message if necessary, among multiple lines

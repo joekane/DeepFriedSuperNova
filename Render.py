@@ -20,6 +20,46 @@ import UI
 consoles = {}
 gameState = None
 
+hm_colors = [libtcod.yellow,
+             libtcod.color_lerp(libtcod.yellow, libtcod.amber, 0.5),
+             libtcod.color_lerp(libtcod.yellow, libtcod.amber, 0.5),
+             libtcod.amber,
+             libtcod.color_lerp(libtcod.amber, libtcod.orange, 0.5),
+             libtcod.color_lerp(libtcod.amber, libtcod.orange, 0.5),
+             libtcod.orange,
+             libtcod.color_lerp(libtcod.orange, libtcod.flame, 0.5),
+             libtcod.color_lerp(libtcod.orange, libtcod.flame, 0.5),
+             libtcod.flame,
+             libtcod.color_lerp(libtcod.flame, libtcod.red, 0.5),
+             libtcod.color_lerp(libtcod.flame, libtcod.red, 0.5),
+             libtcod.red,
+             libtcod.color_lerp(libtcod.red, libtcod.crimson, 0.5),
+             libtcod.color_lerp(libtcod.red, libtcod.crimson, 0.5),
+             libtcod.crimson,
+             libtcod.color_lerp(libtcod.crimson, libtcod.pink, 0.5),
+             libtcod.color_lerp(libtcod.crimson, libtcod.pink, 0.5),
+             libtcod.pink,
+             libtcod.color_lerp(libtcod.pink, libtcod.magenta, 0.5),
+             libtcod.color_lerp(libtcod.pink, libtcod.magenta, 0.5),
+             libtcod.magenta,
+             libtcod.color_lerp(libtcod.magenta, libtcod.fuchsia, 0.5),
+             libtcod.color_lerp(libtcod.magenta, libtcod.fuchsia, 0.5),
+             libtcod.fuchsia,
+             libtcod.color_lerp(libtcod.fuchsia, libtcod.purple, 0.5),
+             libtcod.color_lerp(libtcod.fuchsia, libtcod.purple, 0.5),
+             libtcod.purple,
+             libtcod.color_lerp(libtcod.purple, libtcod.violet, 0.5),
+             libtcod.color_lerp(libtcod.purple, libtcod.violet, 0.5),
+             libtcod.violet,
+             libtcod.color_lerp(libtcod.violet, libtcod.han, 0.5),
+             libtcod.color_lerp(libtcod.violet, libtcod.han, 0.5),
+             libtcod.han,
+             libtcod.color_lerp(libtcod.han, libtcod.blue, 0.5),
+             libtcod.color_lerp(libtcod.han, libtcod.blue, 0.5),
+             libtcod.blue]
+
+hm_values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 def initialize(map_console, entity_console, panel_console, side_panel_console, animation_console):
     global consoles, gameState
@@ -61,26 +101,20 @@ def full_map():
                 # Map.d_map[map_x][map_y] = int(dist)
 
                 if Constants.DEBUG:
-                    offset_color = libtcod.Color(0,0,0)
-                    #libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
-                    #                            tile.f_color - offset_color, libtcod.BKGND_SET)
-                    #libtcod.console_set_char_background(consoles['map_console'], x, y,
-                    #                                    tile.b_color - offset_color, flag=libtcod.BKGND_SET)
-
-                    #if Fov.is_blocked((map_x,map_y)):
-                    #    libtcod.console_put_char_ex(consoles['map_console'], x, y,'F',
-                    #                                tile.f_color - offset_color, libtcod.BKGND_SET)
-                    #else:
-                    #    libtcod.console_put_char_ex(consoles['map_console'], x, y, '.',
-                    #                                tile.f_color - offset_color, libtcod.BKGND_SET)
                     if Map.is_blocked(map_x,map_y):
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y,'M',
-                                                    tile.f_color - offset_color, libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '*',
+                                                    tile.f_color, libtcod.BKGND_SET)
                     else:
-                        char = '.'
-                        char = chr(min(Map.d_map[map_x][map_y] + 48, 200))
+                        dist = Map.current_map()[map_x][map_y].distance_to_player
+
+                        char = chr(min(dist + 48, 200)) # chr(min(Map.d_map[map_x][map_y] + 48, 200))
+                        c_value = max(dist, 0)   # max(Map.d_map[map_x][map_y] , 0)
+
+                        # char = hm_values[min(c_value, len(hm_values) - 1)]
+                        db_color = hm_colors[min(c_value, len(hm_colors) - 1)]
+
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                    tile.f_color - offset_color, libtcod.BKGND_SET)
+                                                    db_color, libtcod.BKGND_SET)
 
                 else:
                     if not visible:
@@ -91,8 +125,8 @@ def full_map():
                                 b_color = libtcod.Color(10, 10, 10)
                             else:
                                 char = '.'
-                                f_color = libtcod.Color(50,50,50)
-                                b_color = libtcod.Color(0,0,0)
+                                f_color = libtcod.Color(50, 50, 50)
+                                b_color = libtcod.Color(0, 0, 0)
 
                             libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
                                                         f_color, libtcod.BKGND_SET)
@@ -150,8 +184,7 @@ def ui():
 
 
     # DEBUG STUFF
-    # libtcod.console_print_ex(consoles['panel_console'], 1, 4, libtcod.BKGND_NONE, libtcod.LEFT, str(GameState.get_player().fighter.hp) + ' -> FPS' +
-    #                         str(libtcod.sys_get_fps()))
+    libtcod.console_print_ex(consoles['panel_console'], 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, ' -> FPS' + str(libtcod.sys_get_fps()) + '   ')
     #libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
     #                         str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
     #libtcod.console_print_ex(consoles['panel_console'], 1, 6, libtcod.BKGND_NONE, libtcod.LEFT, 'Level: ' +

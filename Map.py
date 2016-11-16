@@ -40,165 +40,6 @@ def current_map():
     return level_map
 
 
-def new_dmap():
-    global d_map
-    d_map = [[sys.maxint for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-    player = GameState.get_player()
-    d_map[player.x][player.y] = 0
-
-
-def calc_dmap():
-    changes = 0
-
-    player = GameState.get_player()
-
-    start_x = 1
-    end_x = Constants.MAP_WIDTH - 1
-    start_y = 1
-    end_y = Constants.MAP_HEIGHT - 1
-
-    start_x = player.x - 25
-    end_x = player.x + 25
-    start_y = player.y - 25
-    end_y = player.y + 25
-
-
-    for x in range(start_x, end_x):
-        for y in range(start_y, end_y):
-            if not is_blocked(x, y, ignore_mobs=True):
-                lowestvalue = sys.maxint
-                # print "New Tile:"
-                for i in range (x - 1, x + 2):
-                    for j in range (y - 1, y + 2):
-                        # print "Neighbor Value: {0}".format(d_map[i][j])
-                        if d_map[i][j] < lowestvalue and not (x == i and y == j):
-                            lowestvalue = d_map[i][j]
-                if d_map[x][y] > lowestvalue + 1:
-                    d_map[x][y] = lowestvalue + 1
-                    changes += 1
-    for x in range(end_x, start_x, -1):
-        for y in range(end_y, start_y, -1):
-            if not is_blocked(x, y, ignore_mobs=True):
-                lowestvalue = sys.maxint
-                # print "New Tile:"
-                for i in range(x - 1, x + 2):
-                    for j in range(y - 1, y + 2):
-                        # print "Neighbor Value: {0}".format(d_map[i][j])
-                        if d_map[i][j] < lowestvalue and not (x == i and y == j):
-                            lowestvalue = d_map[i][j]
-                if d_map[x][y] > lowestvalue + 1:
-                    d_map[x][y] = lowestvalue + 1
-                    changes += 1
-    # print "Changes: {0}".format(changes)
-    return changes
-
-def update_dmap():
-    global recalc_dmap
-    if recalc_dmap:
-        recalc_dmap = False
-        new_dmap()
-        changetomap = 1000
-        while changetomap > 0:
-            changetomap = calc_dmap()
-
-
-
-def create_d_map():
-    global d_map, d_count
-
-    d_map = [[sys.maxint for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
-    #for x in range(Constants.MAP_WIDTH):
-    #    for y in range(Constants.MAP_HEIGHT):
-    #        if is_blocked(x,y, ignore_mobs=True):
-    #            d_map[x][y] = sys.maxint
-    #        else:
-    #            d_map[x][y] = 200
-
-
-    d_count = 0
-    player = GameState.get_player()
-
-
-
-    floodfill_op( (player.x, player.y), 0 )
-    print "D-Count: " + str(d_count)
-    Fov.require_recompute()
-
-
-def floodfill(cell, distance=0):
-    global d_map, d_count
-    player = GameState.get_player()
-    d_count += 1
-    x, y = cell
-
-
-    # print "Cell: " + str(cell)
-
-    if distance > 10:
-        #d_map[x][y] = 100
-        return
-    if (x, y) != (player.x, player.y) and is_blocked(x,y, ignore_mobs=False): # the base case
-        return
-    if d_map[x][y] < distance: # the base case
-        #d_map[x][y] = 100
-        return
-    if 0 < x < Constants.MAP_WIDTH-1 and 0 < y < Constants.MAP_HEIGHT - 1:
-        #print distance, d_map[x][y], cell
-        d_map[x][y] = distance
-        distance += 1
-        floodfill( (x + 1, y), distance=distance) # right
-
-        floodfill( (x - 1, y), distance=distance) # left
-
-        floodfill((x, y + 1), distance=distance)
-
-        floodfill((x, y - 1), distance=distance) # up
-
-
-def floodfill_op(cell, distance=0):
-    global d_map, d_count
-    player = GameState.get_player()
-
-    x, y = cell
-    dist = 0
-    visited_tiles = set([])
-    tiles_to_proces = []
-    tiles_to_proces.append( ((x, y), 0))
-
-    while tiles_to_proces:
-        # print tiles_to_proces[0]
-        x = tiles_to_proces[0][0][0]
-        y = tiles_to_proces[0][0][1]
-        dist = tiles_to_proces[0][1]
-        if dist > 15:
-            break
-        visited_tiles.add(tiles_to_proces.pop(0)[0])
-        if d_map[x][y] >= dist:
-            d_map[x][y] = dist
-            if not is_blocked(x + 1,y): # RIGHT
-                if (x+1, y) not in visited_tiles:
-                    tiles_to_proces.append( ((x+1,y), dist + 1))
-            if not is_blocked(x - 1, y):  # RIGHT
-                if (x - 1, y) not in visited_tiles:
-                    tiles_to_proces.append( ((x -1,y), dist+ 1))
-            if not is_blocked(x, y+1):  # RIGHT
-                if (x , y + 1) not in visited_tiles:
-                    tiles_to_proces.append( ((x, y+1), dist + 1 ))
-            if not is_blocked(x, y-1):  # RIGHT
-                if (x, y - 1) not in visited_tiles:
-                    tiles_to_proces.append( ((x, y-1), dist + 1))
-        # print tiles_to_proces
-
-        # libtcod.console_wait_for_keypress(True)
-
-
-
-
-
-    # print "Cell: " + str(cell)
-
-
-
 
 
 def new_map(solid=True):
@@ -222,6 +63,9 @@ def new_map(solid=True):
                            pos_x=x,
                            pos_y=y)
                       for y in range(Constants.MAP_HEIGHT)] for x in range(Constants.MAP_WIDTH)]
+
+
+
 
 
 def load_prefab(x, y, key, rotation):
@@ -290,6 +134,7 @@ class Tile:
         if block_sight is None:
             block_sight = blocked
         self.block_sight = block_sight
+        self.distance_to_player = -1
 
 
 class Rect:
@@ -378,7 +223,7 @@ def generate_map():
         basic_dungeon()
     Fov.initialize()
 
-    update_dmap()
+    # update_dmap()
     SoundEffects.play_music('SSA')
 
 
@@ -1531,17 +1376,18 @@ def is_explored(x,y):
 
 def is_blocked(x, y, ignore_mobs=False):
     # first test the map tile
-    if level_map[x][y].blocked:
-        # print "Blocked By Map!"
+    try:
+        if level_map[x][y].blocked:
+            # print "Blocked By Map!"
+            return True
+        # now check for any blocking objects
+        if not ignore_mobs:
+            for object in get_all_objects():
+                if object.blocks and object.x == x and object.y == y:
+                   #print "Blocked by Object!"
+                    return True
+    except:
         return True
-
-    # now check for any blocking objects
-    if not ignore_mobs:
-        for object in get_all_objects():
-            if object.blocks and object.x == x and object.y == y:
-               #print "Blocked by Object!"
-                return True
-
     return False
 
 
@@ -1564,6 +1410,7 @@ def directly_adjacent_open_tiles(obj):
     choice = random.choice(open_tiles)
     # print(choice)
     return choice
+
 
 
 def adjacent_open_tiles(obj):

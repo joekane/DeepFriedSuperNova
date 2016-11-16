@@ -16,9 +16,9 @@ import Themes
 import UI
 
 
-#############################################
-# Initialization & Main Loop
-#############################################
+################
+# Initialization
+################
 
 # libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_set_custom_font('Fonts/cp437_16x16.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)

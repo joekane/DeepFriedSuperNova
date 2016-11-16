@@ -186,10 +186,10 @@ class Entity:
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def move_astar(self, target):
-        import astar
+        import Pathing
         print "Astar for " + self.name
 
-        path = astar.astar( (self.x, self.y) , (target.x, target.y))
+        path = Pathing.astar((self.x, self.y), (target.x, target.y))
 
         if not path:
             return False
