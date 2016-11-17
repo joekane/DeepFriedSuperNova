@@ -199,6 +199,9 @@ def read_external_quests():
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
 
+def main_menu():
+    UI.Display_MainMenu()
+
 
 def new_game():
     initialize()
@@ -250,8 +253,6 @@ def next_level():
     print "Dungeon Lvl: " + str(dungeon_level)
 
 
-
-
 def play_game():
 
     Fov.require_recompute()
@@ -260,11 +261,7 @@ def play_game():
     vCount = 0
 
     while not libtcod.console_is_window_closed():
-        # print "playgame Render: " + str(vCount)
-        # Render.render_all()
         Schedule.process()
-        # vCount+=1
-
 
 
 def check_level_up():

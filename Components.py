@@ -15,7 +15,6 @@ import Constants
 import Entity
 import GameState
 import Map
-import random
 import Fov
 import Utils
 import Animate
@@ -24,7 +23,6 @@ import Schedule
 import UI
 import Input
 import Pathing
-import Themes
 
 
 class PlayeControlled:
@@ -72,7 +70,9 @@ class PlayeControlled:
     def take_turn(self):
         Render.render_all()
         while True:
-            # print "Waiting...."
+            """
+            On player turn this loops continuasouly waiting for user input
+            """
 
             Render.render_UI()
             Input.update()
@@ -213,7 +213,6 @@ class PlayeControlled:
                         return 0
 
             # return 0
-
 
 
 class Fighter:
@@ -392,9 +391,6 @@ class GaseusCloud:
 
     def take_turn(self):
         pass
-
-
-
 
 
 class AssassinMonster:
