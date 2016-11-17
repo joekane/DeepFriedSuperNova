@@ -5,6 +5,7 @@
 import Fov
 import Map
 import Constants
+from random import shuffle
 from heapq import *
 
 
@@ -17,7 +18,6 @@ def reset():
 
 def heuristic(a, b):
     return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
-
 
 
 def BFS(source, max_distance=10):
@@ -48,22 +48,41 @@ def BFS(source, max_distance=10):
         map[x][y].distance_to_player = dist
         visited_tiles.add(tiles_to_proces.pop(0)[0])
 
-        if not Map.is_blocked(x + 1, y): # RIGHT
+        if not Map.is_blocked(x + 1, y, True): # RIGHT
             if (x + 1, y) not in visited_tiles:
                 visited_tiles.add((x + 1, y))
                 tiles_to_proces.append( ((x + 1, y), dist + 1))
-        if not Map.is_blocked(x - 1, y):  # RIGHT
+        if not Map.is_blocked(x - 1, y, True):  # RIGHT
             if (x - 1, y) not in visited_tiles:
                 visited_tiles.add((x - 1, y))
                 tiles_to_proces.append( ((x - 1, y), dist + 1))
-        if not Map.is_blocked(x, y + 1):  # RIGHT
+        if not Map.is_blocked(x, y + 1, True):  # RIGHT
             if (x , y + 1) not in visited_tiles:
                 visited_tiles.add((x, y + 1))
                 tiles_to_proces.append( ((x, y + 1), dist + 1))
-        if not Map.is_blocked(x, y - 1):  # RIGHT
+        if not Map.is_blocked(x, y - 1, True):  # RIGHT
             if (x, y - 1) not in visited_tiles:
                 visited_tiles.add((x, y - 1))
                 tiles_to_proces.append( ((x, y - 1), dist + 1))
+
+        if not Map.is_blocked(x + 1, y + 1, True): #
+            if (x + 1, y + 1) not in visited_tiles:
+                visited_tiles.add((x + 1, y + 1))
+                tiles_to_proces.append( ((x + 1, y + 1), dist + 1))
+        if not Map.is_blocked(x - 1, y - 1, True):  # RIGHT DOWN
+            if (x - 1, y - 1) not in visited_tiles:
+                visited_tiles.add((x - 1, y - 1))
+                tiles_to_proces.append( ((x - 1, y - 1), dist + 1))
+        if not Map.is_blocked(x - 1, y + 1, True):  # RIGHT
+            if (x - 1, y + 1) not in visited_tiles:
+                visited_tiles.add((x - 1, y + 1))
+                tiles_to_proces.append( ((x - 1, y + 1), dist + 1))
+        if not Map.is_blocked(x + 1, y - 1, True):  # RIGHT
+            if (x + 1, y - 1) not in visited_tiles:
+                visited_tiles.add((x + 1, y - 1))
+                tiles_to_proces.append( ((x + 1, y - 1), dist + 1))
+
+
     # print "Loop Count: {0}  Visted Size: {1}".format(count, len(visited_tiles))
 
 
@@ -147,37 +166,53 @@ def astar(start, goal, use_fov=True):
 
 
 def get_lowest_neighbor(x, y):
+
     map = Map.current_map()
 
     options = []
 
-    # options.append(((x - 1, y - 1), d_map[x - 1][y - 1]))
-    options.append(((x, y - 1), map[x][y - 1].distance_to_player))
-    # options.append(((x + 1, y - 1), d_map[x + 1][y - 1]))
-    options.append(((x - 1, y), map[x - 1][y].distance_to_player))
+    """
+    Check Neighbors for lowest D-Value
+    """
+    if not Map.is_blocked(x, y - 1) and map[x][y - 1].distance_to_player != -1:
+        options.append(((x, y - 1), map[x][y - 1].distance_to_player))
+    if not Map.is_blocked(x - 1, y) and map[x - 1][y].distance_to_player != -1:
+        options.append(((x - 1, y), map[x - 1][y].distance_to_player))
+    if not Map.is_blocked(x + 1, y) and map[x + 1][y].distance_to_player != -1:
+        options.append(((x + 1, y), map[x + 1][y].distance_to_player))
+    if not Map.is_blocked(x, y + 1) and map[x][y + 1].distance_to_player != -1:
+        options.append(((x, y + 1), map[x][y + 1].distance_to_player))
 
-    # options.append(((x, y), map[x][y].distance_to_player))
+    if not Map.is_blocked(x - 1, y - 1) and map[x - 1][y - 1].distance_to_player != -1:
+        options.append(((x - 1, y - 1), map[x - 1][y - 1].distance_to_player))
+    if not Map.is_blocked(x - 1, y + 1) and map[x - 1][y + 1].distance_to_player != -1:
+        options.append(((x - 1, y + 1), map[x - 1][y + 1].distance_to_player))
+    if not Map.is_blocked(x + 1, y - 1) and map[x + 1][y - 1].distance_to_player != -1:
+        options.append(((x + 1, y - 1), map[x + 1][y - 1].distance_to_player))
+    if not Map.is_blocked(x + 1, y + 1) and map[x + 1][y + 1].distance_to_player != -1:
+        options.append(((x + 1, y + 1), map[x + 1][y + 1].distance_to_player))
 
-    options.append(((x + 1, y), map[x + 1][y].distance_to_player))
-    # options.append(((x - 1, y + 1), d_map[x - 1][y + 1]))
-    options.append(((x, y + 1), map[x - 1][y + 1].distance_to_player))
-    # options.append(((x + 1, y + 1), d_map[x - 1][y + 1]))
-
-        # print "Unsorted:"
-        # print options
-
-        # data.sort(key=lambda tup: tup[1])
+    """
+    Randomize results and sort lowest to hieghest. Return lowest Coords.
+    """
+    shuffle(options)
+    print "Options: {0}".format(options)
     options.sort(key=lambda tup: tup[1])
 
-    while options:
-        if options[0][1] < 1:
-            options.pop(0)
-        else:
-            break
+    """
+    if no Valud Coords, stay put.
+    """
     if options:
         return options[0][0]
     else:
         return (x,y)
 
+
+def find_path_to_player():
+    # Use B-Line to see if area is open.
+    # If line is unobstructed, travel that line.
+    # this will speed up open area monster navigation, as well as making monster following look better.
+    # if line is obstructed, use BFS to determine appriopriate direction
+    pass
 
 

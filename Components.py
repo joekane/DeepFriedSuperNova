@@ -36,6 +36,12 @@ class PlayeControlled:
         # Schedule.add_to_pq((self.owner.action_points, self.owner))
         self.owner.delay += cost
         # print cost
+        if cost > 0:
+            print "Recalc BFS"
+            Pathing.BFS(GameState.player)
+            GameState.get_player().pass_time()
+            Render.render_all()
+
         return cost
 
     def process_mouse_clicks(self, mouse):
@@ -64,13 +70,17 @@ class PlayeControlled:
             Utils.inspect_tile(mouse.cx, mouse.cy)
 
     def take_turn(self):
+        Render.render_all()
         while True:
+            # print "Waiting...."
+
+            Render.render_UI()
             Input.update()
             mouse = Input.mouse
             key = Input.key
 
             player = GameState.get_player()
-
+            # TODO: Move moveing does not follow normal time step. Hrmmmm.
             if self.process_mouse_clicks(mouse):
                 return 0
 
@@ -111,6 +121,7 @@ class PlayeControlled:
                     Map.player_move_or_interact(1, 1)
                     return self.end_turn(Constants.TURN_COST)
                 elif key.vk == libtcod.KEY_KP5:
+                    return self.end_turn(Constants.TURN_COST)
                     pass  # do nothing ie wait for the monster to come to you
                 else:
                     # test for other keys
@@ -190,21 +201,19 @@ class PlayeControlled:
                     elif key_char == 's':
                         UI.skill_tree()
                     elif key_char == 'k':
+                        print "Pressed 'K'"
                         GameState.next_level()
-
+                        Fov.require_recompute()
+                        Render.render_all()
+                        return 0
                     elif key_char == 'x':
                         Fov.require_recompute()
                         Constants.DEBUG = not Constants.DEBUG
                         Render.render_all()
+                        return 0
 
-            return 0
-                # print "took turn"
-                # return Constants.TURN_COST
-                # print "rendering"
-                # Render.render_all()
+            # return 0
 
-                # Render.update()
-                #libtcod.console_flush()
 
 
 class Fighter:
@@ -352,13 +361,15 @@ class MeleeMonster:
 
             if self.active:
                 # move towards player if far away
-                dist = monster.distance_to(player)
+                dist = Map.current_map()[monster.x][monster.y].distance_to_player
                 # print self.owner.name + " | " + str(dist)
-                if dist <= 1.5 and player.fighter.hp > 0:
+                if dist == 1 and player.fighter.hp > 0:
+                    print "{0} fights Player.".format(monster.name)
                     monster.fighter.attack(player)
                 else:
+                    print "{0} is at {1}".format(monster.name, (monster.x, monster.y))
                     dest = Pathing.get_lowest_neighbor(monster.x, monster.y)
-                    print dest
+                    print "{0} moves to {1}.".format(monster.name, dest)
                     monster.move_to(dest[0], dest[1])
                     # monster.move_astar(player)
                     # monster.move_dijkstra(player)
@@ -835,7 +846,7 @@ def monster_death(monster):
     monster.ai = None
     monster.name = 'remains of ' + monster.name
     Schedule.release(monster)
-    Schedule.pq
+    # Schedule.pq
 
     monster.send_to_back()
 

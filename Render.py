@@ -16,6 +16,9 @@ import GameState
 import Map
 import Themes
 import UI
+import Input
+from timeit import default_timer as timer
+
 
 consoles = {}
 gameState = None
@@ -104,10 +107,13 @@ def full_map():
                     if Map.is_blocked(map_x,map_y):
                         libtcod.console_put_char_ex(consoles['map_console'], x, y, '*',
                                                     tile.f_color, libtcod.BKGND_SET)
-                    else:
+                    #else:
+                    if True:
                         dist = Map.current_map()[map_x][map_y].distance_to_player
 
                         char = chr(min(dist + 48, 200)) # chr(min(Map.d_map[map_x][map_y] + 48, 200))
+                        if dist == -1:
+                            char = '!'
                         c_value = max(dist, 0)   # max(Map.d_map[map_x][map_y] , 0)
 
                         # char = hm_values[min(c_value, len(hm_values) - 1)]
@@ -405,9 +411,26 @@ def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constant
 
 
 def render_all():
+    print "Render All"
     libtcod.console_clear(0)
+    # print Fov.fov_recompute
+    # startA = timer()
     full_map()
+    # startB = timer()
     objects()
+    # startC = timer()
+    ui()
+    # startD = timer()
+    update()
+    # startE = timer()
+    libtcod.console_flush()
+
+
+def render_UI():
+    Input.update()
     ui()
     update()
     libtcod.console_flush()
+
+    # print "Full: {0}, Object: {1}, UI: {2}, Update: {3}".format(startB - startA, startC - startB, startD - startC, startE - startD)
+

@@ -132,13 +132,10 @@ class Entity:
     def move_to(self, x, y):
         # move by the given amount, if the destination is not blocked
         if not Map.is_blocked(x, y):
-            Fov.fov_change(self.x, self.y, 'Unchanged', False)
+            # Fov.fov_change(self.x, self.y, 'Unchanged', False)
             self.x = x
             self.y = y
-            print "Moved"
-            if self.name != 'player':
-                Fov.fov_change(self.x, self.y, 'Unchanged', True)
-                pass
+            Fov.require_recompute()
         else:
             return False
 

@@ -257,10 +257,13 @@ def play_game():
     Fov.require_recompute()
     Pathing.BFS(player)
     Render.render_all()
+    vCount = 0
 
     while not libtcod.console_is_window_closed():
-        Render.render_all()
+        # print "playgame Render: " + str(vCount)
+        # Render.render_all()
         Schedule.process()
+        # vCount+=1
 
 
 
