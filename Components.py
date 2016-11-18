@@ -74,7 +74,7 @@ class PlayeControlled:
             On player turn this loops continuasouly waiting for user input
             """
 
-            Render.render_UI()
+            Render.render_ui()
             Input.update()
             mouse = Input.mouse
             key = Input.key
@@ -747,15 +747,21 @@ class Ranged:
         if target is None:
 
             tile_effected = None
-            Utils.message('Choose Target. Right Click to cancel.', libtcod.gold)
+            Utils.message('Choose Target. Left Click/Space to execute. Right Click/ESC to cancel.', libtcod.gold)
             Render.render_all()
 
             background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
             libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
 
+            target = Map.closest_monster(self.max_range)
+            if target:
+                cam_x, cam_y = Map.to_camera_coordinates(target.x, target.y)
+                libtcod.mouse_move(cam_x * 16, cam_y * 16)
+
             while True:
                 Input.update()
                 mouse = Input.mouse
+                key = Input.key
                 Render.blit(background, 0)
 
                 target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
@@ -788,7 +794,7 @@ class Ranged:
                             libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
                                                                 libtcod.BKGND_LIGHTEN)
 
-                if mouse.lbutton_pressed:
+                if mouse.lbutton_pressed or key.vk == libtcod.KEY_SPACE:
                     # target_tile = (target_x, target_y)
                     print tile_effected
                     for target in tile_effected:
@@ -799,7 +805,7 @@ class Ranged:
                             targets.append(monster)
                     break
 
-                if mouse.rbutton_pressed:
+                if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
                     break
 
                 libtcod.console_flush()

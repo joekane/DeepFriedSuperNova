@@ -338,7 +338,7 @@ def render_stat_bars():
     temp_y = 3
     for object in Map.get_visible_objects():
         if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
-            if temp_y < 17:
+            if temp_y < 17: # TODO: Make constant to scale UI
                 render_box_bar(1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
                                libtcod.Color(0, 255, 0),
                                libtcod.Color(0, 64, 0),
@@ -351,18 +351,23 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
     bar_width = int(float(value) / maximum * total_width)
     og_y = y
     height = 1
-    #print "Box Bar!"
+    offset_color = libtcod.Color(128, 128, 128)
+
     if name != '':
         libtcod.console_set_default_background(target, libtcod.black)
         libtcod.console_set_default_foreground(target, libtcod.Color(51, 51, 51))
         libtcod.console_print(target, x, y, name)
         y += 1
         height += 1
-    # render the background first
-    libtcod.console_set_default_background(target, back_color)
-    libtcod.console_set_default_foreground(target, bar_color)
+
+    ''' render MAX value '''
+    libtcod.console_set_default_background(target, back_color-offset_color)
+    libtcod.console_set_default_foreground(target, bar_color-offset_color)
     for x1 in range(x, x+total_width):
         libtcod.console_put_char(target, x1, y, 255, libtcod.BKGND_SET)
+    ''' render current value '''
+    libtcod.console_set_default_background(target, back_color)
+    libtcod.console_set_default_foreground(target, bar_color)
     for x1 in range(x, x+bar_width):
         libtcod.console_put_char(target, x1, y, 254, libtcod.BKGND_SET)
 
@@ -373,7 +378,6 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
     bar_width = int(float(value) / maximum * total_width)
-
 
     # render the background first
     libtcod.console_set_default_background(target, back_color)
@@ -426,7 +430,7 @@ def render_all():
     libtcod.console_flush()
 
 
-def render_UI():
+def render_ui():
     Input.update()
     ui()
     update()

@@ -244,7 +244,8 @@ def next_level():
         Themes.set_theme('Valley of Devils')
     # Themes.set_theme('Abyss of the Fish Men')
 
-    # 644444444Themes.set_theme('Shadow State Archive')
+    # OVERRIDE
+    Themes.set_theme('Shadow State Archive')
 
     Schedule.reset()
     Map.generate_map()
@@ -252,13 +253,16 @@ def next_level():
     print "VisObjects: " + str(len(Map.get_visible_objects()))
     print "Dungeon Lvl: " + str(dungeon_level)
 
+    Fov.require_recompute()
+    Pathing.BFS(player)
+    Render.render_all()
+
 
 def play_game():
 
     Fov.require_recompute()
     Pathing.BFS(player)
     Render.render_all()
-    vCount = 0
 
     while not libtcod.console_is_window_closed():
         Schedule.process()
