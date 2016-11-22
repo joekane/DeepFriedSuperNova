@@ -199,7 +199,11 @@ class PlayeControlled:
 
                         # I.beastiary(width=50, height=45, title=title, text=text)
                     elif key_char == 's':
-                        UI.skill_tree()
+                        import pygame
+                        print "S!"
+
+                        #UI.skill_tree()
+                        pass
                     elif key_char == 'k':
                         print "Pressed 'K'"
                         GameState.next_level()

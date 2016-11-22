@@ -18,6 +18,7 @@ import time
 import Animate
 import Render
 import re
+from bearlibterminal import terminal
 
 map_old_x = 0
 map_old_y = 0
@@ -293,3 +294,6 @@ def find_element_in_list(element, list_element):
     except ValueError:
         return None
 
+
+def convert_color(libtcod_color):
+    return terminal.color_from_argb(255, libtcod_color[0], libtcod_color[1], libtcod_color[2])

@@ -66,6 +66,7 @@ class Palette:
         self.opened = False
 
     def draw(self):
+        import graphics
         self.opened = True
         print self.width, self.height
         pop = libtcod.console_new(self.width, self.height)
@@ -98,6 +99,7 @@ class Palette:
         click_x = None
 
         while True:
+
             Input.update()
             mouse = Input.mouse
 
@@ -119,7 +121,22 @@ class Palette:
                 self.opened = False
                 return
 
+
+
+
+
+
+
+
             libtcod.console_flush()
+
+
+
+            graphics.draw_image(x, y, enlarge=True)
+            # graphics.draw_image(x + 1, y + 1, enlarge=True)
+            # graphics.clear()
+            graphics.draw_font(0,0)
+
 
 
 def load_from_xp(x, y, filename, console):
@@ -211,11 +228,11 @@ def Display_MainMenu():
     libtcod.console_set_default_foreground(mm, Constants.UI_PopFore)
     libtcod.console_set_default_background(mm, Constants.UI_PopBack)
 
-    libtcod.console_print_frame(mm, 0, 0, width, height, clear=True,
-                                flag=libtcod.BKGND_SET,
-                                fmt="Deep Fried Supernova")
+    #libtcod.console_print_frame(mm, 0, 0, width, height, clear=True,
+    #                            flag=libtcod.BKGND_SET,
+    #                            fmt="Deep Fried Supernova")
 
-    libtcod.console_print_rect(mm, 4, 4, width, height, 'Welcome to Deep Fried Supernova')
+    Render.print_rect(mm, 4, 4, width, height, 'Welcome to Deep Fried Supernova')
 
 
     # blit the contents of "window" to the root console
@@ -245,11 +262,12 @@ def Display_MainMenu():
                        function=close_window)
 
     img = libtcod.image_load('diner_logo_sm.png')
-    libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
-    # show the background image, at twice the regular console resolution
-    libtcod.image_blit_2x(img, mm, 37, 2)
+    # libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
 
-    libtcod.console_blit(mm, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
+    # show the background image, at twice the regular console resolution
+    #libtcod.image_blit_2x(img, mm, 37, 2)
+
+    #libtcod.console_blit(mm, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
 
     while True:
         Input.update()

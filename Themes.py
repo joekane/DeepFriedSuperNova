@@ -80,7 +80,7 @@ def set_theme(theme):
 
 
 def ground_char():
-    return eval(str(random.choice(GROUND_CHAR)))
+    return int(random.choice(GROUND_CHAR), 16)
 
 
 def ground_color():
@@ -94,7 +94,7 @@ def ground_bcolor():
 
 
 def wall_char():
-    return eval(str(random.choice(WALL_CHAR)))
+    return int(random.choice(WALL_CHAR), 16)
 
 
 def wall_color():

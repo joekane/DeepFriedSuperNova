@@ -17,6 +17,8 @@ import Map
 import Themes
 import UI
 import Input
+from bearlibterminal import terminal
+import graphics
 from timeit import default_timer as timer
 
 
@@ -75,7 +77,7 @@ def initialize(map_console, entity_console, panel_console, side_panel_console, a
     UI.load_from_xp(0, 0, 'Side_panel', consoles['side_panel_console'])
     UI.load_from_xp(0, 0, 'Panel', consoles['panel_console'])
 
-    # libtcod.console_set_default_background(consoles['animation_console'], libtcod.Color(255,255,255))
+    # set_background(consoles['animation_console'], libtcod.Color(255,255,255))
     # libtcod.console_set_background_flag(consoles['animation_console'], libtcod.BKGND_MULTIPLY)
 
 
@@ -105,8 +107,8 @@ def full_map():
 
                 if Constants.DEBUG:
                     if Map.is_blocked(map_x,map_y):
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, '*',
-                                                    tile.f_color, libtcod.BKGND_SET)
+                        draw_char(consoles['map_console'], x, y, '*',
+                                  tile.f_color, libtcod.BKGND_SET)
                     #else:
                     if True:
                         dist = Map.current_map()[map_x][map_y].distance_to_player
@@ -119,8 +121,9 @@ def full_map():
                         # char = hm_values[min(c_value, len(hm_values) - 1)]
                         db_color = hm_colors[min(c_value, len(hm_colors) - 1)]
 
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                    db_color, libtcod.BKGND_SET)
+                        draw_char(consoles['map_console'], x, y, char,
+                                  db_color, libtcod.BKGND_SET)
+
 
                 else:
                     if not visible:
@@ -134,9 +137,9 @@ def full_map():
                                 f_color = libtcod.Color(50, 50, 50)
                                 b_color = libtcod.Color(0, 0, 0)
 
-                            libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
-                                                        f_color, libtcod.BKGND_SET)
-                            libtcod.console_set_char_background(consoles['map_console'], x, y,
+                            draw_char(consoles['map_console'], x, y, char,
+                                              f_color, libtcod.BKGND_SET)
+                            draw_background(consoles['map_console'], x, y,
                                                                 b_color, flag=libtcod.BKGND_SET)
                             #libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
                             #                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
@@ -144,11 +147,86 @@ def full_map():
                     else:
                         offset_color = get_offset_color(map_x, map_y)
 
-                        libtcod.console_put_char_ex(consoles['map_console'], x, y, tile.char,
+                        draw_char(consoles['map_console'], x, y, tile.char,
                                                     tile.f_color - offset_color, libtcod.BKGND_SET)
-                        libtcod.console_set_char_background(consoles['map_console'], x, y,
+                        draw_background(consoles['map_console'], x, y,
                                                             tile.b_color - offset_color, flag=libtcod.BKGND_SET)
                         tile.explored = True
+
+
+def draw_char(dest, x, y, char, color=None, flag=None):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    #BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVET COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    color = Utils.convert_color(color)
+    terminal.color(color)
+    terminal.put(x, y, char)
+
+
+def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
+    # LIBTCOD
+    # libtcod.console_set_char_background(dest, x, y, color, flag)
+    # BEARLIB
+    color = Utils.convert_color(color)
+    terminal.bkcolor(color)
+    terminal.put(x, y, terminal.pick(x,y, 0))
+
+
+def set_foreground(dest, color):
+    # LIBTCOD
+    # libtcod.console_set_default_foreground(dest, color)
+    # BEARLIB
+    color = Utils.convert_color(color)
+    terminal.color(color)
+
+
+def set_background(dest, color):
+    # LIBTCOD
+    # libtcod.console_set_default_background(dest, color)
+    # BEARLIB
+    color = Utils.convert_color(color)
+    terminal.bkcolor(color)
+
+
+def print_line(dest, x, y, text, flag=libtcod.BKGND_NONE, alignment=libtcod.LEFT): # bottom-right for BEARLIB
+    # LIBTCOD
+    # libtcod.console_print_ex(dest, x, y, flag, alignment, text)
+
+    # BERALIB
+    if alignment == libtcod.LEFT:
+        alignment = "left"
+    terminal.layer(dest)
+    terminal.print_(x, y, "{0}[align={1}".format(text,alignment))
+
+
+def print_rect(dest, x, y, w, h, text):
+    # LIBTCOD
+    # libtcod.console_print_rect(dest, x, y, w, h, text)
+
+    # BEARLIB
+    terminal.layer(dest)
+    terminal.print_(x, y, "{0}[bbox={1}x{2}]".format(text, w, h))
+
+
+def draw_rect(dest, x, y, w, h, clr=True, flag=None):
+    # LIBTCOD
+    # libtcod.console_rect(dest, x, y, w, h, clr, flag)
+
+    #BEARLIB
+    terminal.layer(dest)
+    if clr:
+        terminal.clear_area(x, y, w, h)
+    else:
+        color = terminal.state(terminal.TK_BKCOLOR)
+        for x1 in range(w):
+            for y1 in range(h):
+                print "Draw!"
+                draw_background(dest, x1, y1, color)
+
+
 
 
 def object_clear():
@@ -166,12 +244,12 @@ def objects():
 
 def ui():
     # prepare to render the GUI panel
-    # libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
+    # set_background(consoles['panel_console'], libtcod.black)
     # libtcod.console_clear(consoles['panel_console'])
 
     # print the Side Panel, with auto-wrap
     # libtcod.console_set_default_foreground(consoles['panel_console'], Constants.UI_Fore)
-    # libtcod.console_set_default_background(consoles['panel_console'], Constants.UI_Back)
+    # set_background(consoles['panel_console'], Constants.UI_Back)
     #libtcod.console_print_frame(consoles['panel_console'], 0, 0,
     #                            Constants.SCREEN_WIDTH,
     #                            Constants.PANEL_HEIGHT,
@@ -190,7 +268,8 @@ def ui():
 
 
     # DEBUG STUFF
-    libtcod.console_print_ex(consoles['panel_console'], 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, ' -> FPS' + str(libtcod.sys_get_fps()) + '   ')
+    print_line(consoles['panel_console'], 0, 0, ' -> FPS' + str(libtcod.sys_get_fps()) + '   ',
+               libtcod.BKGND_NONE, libtcod.CENTER)
     #libtcod.console_print_ex(consoles['panel_console'], 1, 5, libtcod.BKGND_NONE, libtcod.LEFT, '# ' +
     #                         str(GameState.get_player().x) + "/" + str(GameState.get_player().y))
     #libtcod.console_print_ex(consoles['panel_console'], 1, 6, libtcod.BKGND_NONE, libtcod.LEFT, 'Level: ' +
@@ -230,7 +309,8 @@ def update_animations():
 
 def blank(x, y):
     x, y = Map.to_camera_coordinates(x, y)
-    libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
+    # libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
+    draw_char(consoles['entity_console'], x, y, ' ', None, libtcod.BKGND_NONE)
 
 
 def get_offset_color(map_x, map_y):
@@ -248,26 +328,26 @@ def draw_object(obj, visible=True):
     x, y = Map.to_camera_coordinates(obj.x, obj.y)
 
     if visible:
-        libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
-        libtcod.console_set_char_background(consoles['entity_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
+        draw_char(consoles['entity_console'], x, y, obj.char, obj.color, libtcod.BKGND_NONE)
+        draw_background(consoles['entity_console'], x, y, Themes.ground_bcolor() - get_offset_color(obj.x, obj.y), libtcod.BKGND_SET)
     else:
-        libtcod.console_put_char_ex(consoles['entity_console'], x, y, obj.char, libtcod.darker_gray,
+        draw_char(consoles['entity_console'], x, y, obj.char, libtcod.darker_gray,
                                     libtcod.BKGND_NONE)
 
 
 def render_messages():
     #clear old messages
-    libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.black)
-    libtcod.console_set_default_background(consoles['panel_console'], libtcod.black)
+    set_foreground(consoles['panel_console'], libtcod.black)
+    set_background(consoles['panel_console'], libtcod.black)
     libtcod.console_rect(consoles['panel_console'], 1, 3, 57, Constants.PANEL_HEIGHT - 4, True, libtcod.BKGND_SET)
     # print the game messages, one line at a time
     y = 3
     for (line, color) in GameState.get_msg_queue():
         if y < Constants.PANEL_HEIGHT - 1:
-            libtcod.console_set_default_foreground(consoles['panel_console'], color)
+            set_foreground(consoles['panel_console'], color)
             line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH,
                                                             Constants.PANEL_HEIGHT - 3, line)
-            libtcod.console_print_rect(consoles['panel_console'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
+            print_rect(consoles['panel_console'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
 
             y += line_height
 
@@ -275,19 +355,16 @@ def render_messages():
 def render_common():
     import Input
 
-    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(0,70,140))
-    libtcod.console_print_rect(consoles['side_panel_console'],1,1, 17,1, "Level 1".center(17, ' '))
+    set_foreground(consoles['side_panel_console'], libtcod.Color(0,70,140))
+    print_rect(consoles['side_panel_console'],1,1, 17,1, "Level 1".center(17, ' '))
 
-    libtcod.console_print_rect(consoles['side_panel_console'], 9, 18, 17, 2,
+    print_rect(consoles['side_panel_console'], 9, 18, 17, 2,
                                "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
 
-
-
-    libtcod.console_set_default_foreground(consoles['panel_console'], libtcod.Color(175,175,255))
-    libtcod.console_set_default_background(consoles['panel_console'], libtcod.Color(0,32,64))
-    libtcod.console_set_background_flag(consoles['panel_console'], libtcod.BKGND_SET)
-    libtcod.console_print_rect(consoles['panel_console'], 1, 1, Constants.SCREEN_WIDTH - 19, 1, GameState.dungeon_name.center(57, ' '))
-
+    set_foreground(consoles['panel_console'], libtcod.Color(175,175,255))
+    set_background(consoles['panel_console'], libtcod.Color(0,32,64))
+    # libtcod.console_set_background_flag(consoles['panel_console'], libtcod.BKGND_SET)
+    print_rect(consoles['panel_console'], 1, 1, Constants.SCREEN_WIDTH - 19, 1, GameState.dungeon_name.center(57, ' '))
 
 
 def render_status():
@@ -295,8 +372,8 @@ def render_status():
     sx = 1
     sy = 25
     # CLEAR HP AREA / Status Area
-    libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.black)
-    libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
+    set_foreground(consoles['side_panel_console'], libtcod.black)
+    set_background(consoles['side_panel_console'], libtcod.black)
     libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
     libtcod.console_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
 
@@ -306,17 +383,17 @@ def render_status():
 
     for st in GameState.player.status:
         if num_of_status == 9:
-            libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-            libtcod.console_set_default_foreground(consoles['side_panel_console'], libtcod.Color(51,51,51))
-            libtcod.console_print(consoles['side_panel_console'], sx, sy-1,
+            set_background(consoles['side_panel_console'], libtcod.black)
+            set_foreground(consoles['side_panel_console'], libtcod.Color(51,51,51))
+            print_line(consoles['side_panel_console'], sx, sy-1,
                                   "...             ")  # + " (" + str(st[1]) + ")")
             return
-        libtcod.console_set_default_background(consoles['side_panel_console'], libtcod.black)
-        libtcod.console_set_default_foreground(consoles['side_panel_console'], st['color'])
+        set_background(consoles['side_panel_console'], libtcod.black)
+        set_foreground(consoles['side_panel_console'], st['color'])
         if Utils.is_mouse_in(Constants.MAP_CONSOLE_WIDTH + sx, sy, 17, 1):
-            libtcod.console_print(consoles['side_panel_console'], sx, sy, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
+            print_line(consoles['side_panel_console'], sx, sy, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
         else:
-            libtcod.console_print(consoles['side_panel_console'], sx, sy, st['name'])  # + " (" + str(st[1]) + ")")
+            print_line(consoles['side_panel_console'], sx, sy, st['name'])  # + " (" + str(st[1]) + ")")
         num_of_status += 1
         sy += 1
 
@@ -354,25 +431,26 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
     offset_color = libtcod.Color(128, 128, 128)
 
     if name != '':
-        libtcod.console_set_default_background(target, libtcod.black)
-        libtcod.console_set_default_foreground(target, libtcod.Color(51, 51, 51))
-        libtcod.console_print(target, x, y, name)
+        set_background(target, libtcod.black)
+        set_foreground(target, libtcod.Color(51, 51, 51))
+        print_line(target, x, y, name)
         y += 1
         height += 1
 
     ''' render MAX value '''
-    libtcod.console_set_default_background(target, back_color-offset_color)
-    libtcod.console_set_default_foreground(target, bar_color-offset_color)
+    set_background(target, back_color-offset_color)
+    # set_foreground(target, bar_color-offset_color)
     for x1 in range(x, x+total_width):
-        libtcod.console_put_char(target, x1, y, 255, libtcod.BKGND_SET)
+        draw_char(target, x1, y, 255, bar_color-offset_color, libtcod.BKGND_SET)
     ''' render current value '''
-    libtcod.console_set_default_background(target, back_color)
-    libtcod.console_set_default_foreground(target, bar_color)
+    set_background(target, back_color)
+    # set_foreground(target, bar_color)
     for x1 in range(x, x+bar_width):
-        libtcod.console_put_char(target, x1, y, 254, libtcod.BKGND_SET)
+        draw_char(target, x1, y, 254, bar_color, libtcod.BKGND_SET)
 
     if Utils.is_mouse_in(Constants.MAP_CONSOLE_WIDTH + x, og_y, total_width, height):
-        libtcod.console_print_ex(target, x, y, libtcod.BKGND_SET, libtcod.LEFT, str(value) + "/" + str(maximum))
+        print_line(target, x, y, str(value) + "/" + str(maximum),
+                   libtcod.BKGND_NONE, libtcod.CENTER)
 
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
@@ -380,31 +458,31 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, t
     bar_width = int(float(value) / maximum * total_width)
 
     # render the background first
-    libtcod.console_set_default_background(target, back_color)
+    set_background(target, back_color)
     libtcod.console_rect(target, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
     # now render the bar on top
-    libtcod.console_set_default_background(target, bar_color)
+    set_background(target, bar_color)
     if bar_width > 0:
         libtcod.console_rect(target, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
     # finally, some centered text with the values
-    libtcod.console_set_default_foreground(target, libtcod.white)
+    set_foreground(target, libtcod.white)
 
     if name is not '':
-        libtcod.console_print_ex(target, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER,
-                                 name + ': ' + str(value) + '/' + str(maximum))
+        print_line(target, x + total_width / 2, y, name + ': ' + str(value) + '/' + str(maximum),
+                   libtcod.BKGND_NONE, libtcod.CENTER)
 
 
 def render_vert_line(x, y, length, color, target):
     # render the background first
-    libtcod.console_set_default_background(target, color)
+    set_background(target, color)
     libtcod.console_rect(target, x, y, 1, length, False, libtcod.BKGND_SCREEN)
 
 
 def render_hoz_line(x, y, length, color, target):
     # render the background first
-    libtcod.console_set_default_background(target, color)
+    set_background(target, color)
     libtcod.console_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
@@ -414,9 +492,15 @@ def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constant
     libtcod.console_blit(source, 0, 0, width, height, target, x, y, f_alpha, b_alpha)
 
 
+
 def render_all():
     print "Render All"
-    libtcod.console_clear(0)
+    # graphics.clear_con()
+    # libtcod.console_clear(0)
+
+    terminal.refresh()
+    terminal.clear()
+
     # print Fov.fov_recompute
     # startA = timer()
     full_map()

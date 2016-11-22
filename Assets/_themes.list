@@ -1,10 +1,10 @@
 [Diner]
 LEVEL_STYLE = Fixed
-GROUND_CHAR = libtcod.CHAR_SUBP_DIAG
+GROUND_CHAR =  0x2518
 GROUND_COLOR = libtcod.lighter_gray
 GROUND_BCOLOR = libtcod.black
 
-WALL_CHAR = libtcod.CHAR_BLOCK3
+WALL_CHAR = 0x00A2
 WALL_COLOR = libtcod.red
 WALL_BCOLOR = libtcod.black
 
@@ -27,11 +27,11 @@ OUT_OF_FOV_COLOR = libtcod.darker_gray
 
 [Shadow State Archive]
 LEVEL_STYLE = BSP
-GROUND_CHAR = libtcod.CHAR_SE
+GROUND_CHAR =  0x2518
 GROUND_COLOR = libtcod.grey
 GROUND_BCOLOR = libtcod.dark_grey
 
-WALL_CHAR = 255
+WALL_CHAR = 0x00A0
 WALL_COLOR = libtcod.darker_flame
 WALL_BCOLOR = libtcod.dark_red
 
