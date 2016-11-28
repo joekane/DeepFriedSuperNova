@@ -68,7 +68,7 @@ hm_values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D
 
 def initialize(map_console, entity_console, panel_console, side_panel_console, animation_console):
     global consoles, gameState
-    consoles['map_console'] = map_console
+    consoles['map_console'] = 0
     consoles['panel_console'] = panel_console
     consoles['side_panel_console'] = side_panel_console
     consoles['entity_console'] = entity_console
@@ -89,6 +89,11 @@ def full_map():
     import Noise
 
     if Fov.recompute():
+
+        # terminal.layer(0)
+        # terminal.bkcolor('black')
+        # terminal.clear_area(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
+
         map = Map.current_map()
         player = GameState.get_player()
         Map.move_camera(player.x, player.y)
@@ -199,7 +204,7 @@ def print_line(dest, x, y, text, flag=libtcod.BKGND_NONE, alignment=libtcod.LEFT
     if alignment == libtcod.LEFT:
         alignment = "left"
     terminal.layer(dest)
-    terminal.print_(x, y, "{0}[align={1}".format(text,alignment))
+    terminal.print_(x, y, "{0}[align={1}]".format(text,alignment))
 
 
 def print_rect(dest, x, y, w, h, text):
@@ -339,7 +344,7 @@ def render_messages():
     #clear old messages
     set_foreground(consoles['panel_console'], libtcod.black)
     set_background(consoles['panel_console'], libtcod.black)
-    libtcod.console_rect(consoles['panel_console'], 1, 3, 57, Constants.PANEL_HEIGHT - 4, True, libtcod.BKGND_SET)
+    draw_rect(consoles['panel_console'], 1, 3, 57, Constants.PANEL_HEIGHT - 4, True, libtcod.BKGND_SET)
     # print the game messages, one line at a time
     y = 3
     for (line, color) in GameState.get_msg_queue():
@@ -374,8 +379,8 @@ def render_status():
     # CLEAR HP AREA / Status Area
     set_foreground(consoles['side_panel_console'], libtcod.black)
     set_background(consoles['side_panel_console'], libtcod.black)
-    libtcod.console_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
-    libtcod.console_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
+    draw_rect(consoles['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
+    draw_rect(consoles['side_panel_console'], sx, sy, 10, 9, True, libtcod.BKGND_SET)
 
     # print GameState.player.status
 
@@ -459,12 +464,12 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, t
 
     # render the background first
     set_background(target, back_color)
-    libtcod.console_rect(target, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
+    draw_rect(target, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
     # now render the bar on top
     set_background(target, bar_color)
     if bar_width > 0:
-        libtcod.console_rect(target, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
+        draw_rect(target, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
     # finally, some centered text with the values
     set_foreground(target, libtcod.white)
@@ -477,13 +482,13 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, t
 def render_vert_line(x, y, length, color, target):
     # render the background first
     set_background(target, color)
-    libtcod.console_rect(target, x, y, 1, length, False, libtcod.BKGND_SCREEN)
+    draw_rect(target, x, y, 1, length, False, libtcod.BKGND_SCREEN)
 
 
 def render_hoz_line(x, y, length, color, target):
     # render the background first
     set_background(target, color)
-    libtcod.console_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
+    draw_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
 def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constants.SCREEN_HEIGHT,
@@ -494,13 +499,14 @@ def blit(source, target, x=0, y=0, width=Constants.SCREEN_WIDTH, height=Constant
 
 
 def render_all():
-    print "Render All"
+    #print "Render All"
     # graphics.clear_con()
     # libtcod.console_clear(0)
 
-    terminal.refresh()
+    terminal.bkcolor('black')
     terminal.clear()
 
+    Fov.require_recompute()
     # print Fov.fov_recompute
     # startA = timer()
     full_map()
@@ -509,16 +515,17 @@ def render_all():
     # startC = timer()
     ui()
     # startD = timer()
-    update()
+    # update()
     # startE = timer()
-    libtcod.console_flush()
+    # libtcod.console_flush()
+    terminal.refresh()
 
 
 def render_ui():
-    Input.update()
+    # Input.update()
     ui()
-    update()
-    libtcod.console_flush()
+    # update()
+    # libtcod.console_flush()
 
     # print "Full: {0}, Object: {1}, UI: {2}, Update: {3}".format(startB - startA, startC - startB, startD - startC, startE - startD)
 

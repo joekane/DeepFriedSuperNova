@@ -84,3 +84,16 @@ UI_Button_Back = libtcod.dark_azure
 
 UI_PopFore = libtcod.azure
 UI_PopBack = libtcod.darkest_azure
+
+# KEY DEFINE
+KEY_UP = 96
+KEY_DOWN = 90
+KEY_LEFT = 92
+KEY_RIGHT = 94
+KEY_UPLEFT = 95
+KEY_UPRIGHT = 97
+KEY_DOWNLEFT = 89
+KEY_DOWNRIGHT = 91
+KEY_STAY = 93
+
+

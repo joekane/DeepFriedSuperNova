@@ -255,14 +255,13 @@ def next_level():
 
     Fov.require_recompute()
     Pathing.BFS(player)
-    Render.render_all()
+
 
 
 def play_game():
 
     Fov.require_recompute()
     Pathing.BFS(player)
-    Render.render_all()
 
     while not libtcod.console_is_window_closed():
         Schedule.process()

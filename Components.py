@@ -23,6 +23,11 @@ import Schedule
 import UI
 import Input
 import Pathing
+from bearlibterminal import terminal
+
+import time
+
+vCount = 0
 
 
 class PlayeControlled:
@@ -35,10 +40,10 @@ class PlayeControlled:
         self.owner.delay += cost
         # print cost
         if cost > 0:
-            print "Recalc BFS"
+            # print "Recalc BFS"
             Pathing.BFS(GameState.player)
             GameState.get_player().pass_time()
-            Render.render_all()
+            # Render.render_all()
 
         return cost
 
@@ -68,18 +73,35 @@ class PlayeControlled:
             Utils.inspect_tile(mouse.cx, mouse.cy)
 
     def take_turn(self):
+        global vCount
         Render.render_all()
+        print "Render-All"
+
         while True:
+
+
             """
             On player turn this loops continuasouly waiting for user input
             """
 
             Render.render_ui()
-            Input.update()
+
+            # Input.update()
+
             mouse = Input.mouse
-            key = Input.key
+            # key = Input.key
+
+            # key = Input.read_key_int()
+
+
+            # mouse = Input.mouse_coords()
+            # print key
+            # print mouse
 
             player = GameState.get_player()
+
+
+            '''
             # TODO: Move moveing does not follow normal time step. Hrmmmm.
             if self.process_mouse_clicks(mouse):
                 return 0
@@ -93,37 +115,46 @@ class PlayeControlled:
                 return self.end_turn(Constants.TURN_COST)
             elif not GameState.continue_walking:
                 GameState.get_player().clear_path()
+            '''
+
+            # key = Input.key
+            key = Input.read_key_int()
+
 
             # movement keys
             if True:
-                if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8:
+                if key == Constants.KEY_UP:
                     Map.player_move_or_interact(0, -1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2:
+                elif key == Constants.KEY_DOWN:
                     Map.player_move_or_interact(0, 1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4:
+                elif key == Constants.KEY_LEFT:
                     Map.player_move_or_interact(-1, 0)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6:
+                elif key == Constants.KEY_RIGHT:
                     Map.player_move_or_interact(1, 0)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_HOME or key.vk == libtcod.KEY_KP7:
+                elif key == Constants.KEY_UPLEFT:
                     Map.player_move_or_interact(-1, -1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_PAGEUP or key.vk == libtcod.KEY_KP9:
+                elif key == Constants.KEY_UPRIGHT:
                     Map.player_move_or_interact(1, -1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_END or key.vk == libtcod.KEY_KP1:
+                elif key == Constants.KEY_DOWNLEFT:
                     Map.player_move_or_interact(-1, 1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_PAGEDOWN or key.vk == libtcod.KEY_KP3:
+                elif key == Constants.KEY_DOWNRIGHT:
                     Map.player_move_or_interact(1, 1)
                     return self.end_turn(Constants.TURN_COST)
-                elif key.vk == libtcod.KEY_KP5:
+                elif key == Constants.KEY_STAY:
                     return self.end_turn(Constants.TURN_COST)
                     pass  # do nothing ie wait for the monster to come to you
                 else:
+                    #### TEMP ####
+                    '''
+
+
                     # test for other keys
                     key_char = chr(key.c)
 
@@ -215,8 +246,9 @@ class PlayeControlled:
                         Constants.DEBUG = not Constants.DEBUG
                         Render.render_all()
                         return 0
+                    '''
 
-            # return 0
+
 
 
 class Fighter:

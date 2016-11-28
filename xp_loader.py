@@ -1,6 +1,7 @@
 import libtcodpy as libtcod
 import Themes
 import Map
+import Render
 
 ##################################
 # In-memory XP format is as follows:
@@ -82,7 +83,7 @@ def load_layer_to_console(console, xp_file_layer):
             cell_data = xp_file_layer['cells'][x][y]
             fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
             back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
-            libtcod.console_put_char_ex(console, x, y, cell_data['keycode'], fore_color, back_color)
+            Render.draw_char(console, x, y, cell_data['keycode'], fore_color, back_color)
 
 
 def load_layer_to_map(map, x1, y1, xp_file_layer, rotation='None'):

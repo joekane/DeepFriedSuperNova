@@ -208,7 +208,7 @@ def inspect_tile(x, y):
                 # Pre-Delay
                 pass
         else:
-            Render.clear_animations()
+            # 88Render.clear_animations()
             new_animation = True
             map_old_x = map_x
             map_old_y = map_y

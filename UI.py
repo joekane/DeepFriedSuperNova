@@ -90,7 +90,7 @@ class Palette:
 
         libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
         libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-        libtcod.console_print_rect(pop, 3, 3, self.width, self.height, self.text)
+        Render.print_rect(pop, 3, 3, self.width, self.height, self.text)
 
         background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
         libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
@@ -176,7 +176,7 @@ def menu(header, options, width):
     letter_index = ord('a')
     for option_text in options:
         text = '(' + chr(letter_index) + ') ' + option_text
-        libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, text)
+        Render.print_line(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, text)
         y += 1
         letter_index += 1
 
@@ -217,7 +217,7 @@ def menu(header, options, width):
 
 
 def Display_MainMenu():
-
+    new_game()
 
     # calculate total height for the header (after auto-wrap) and one line per option
     width = Constants.SCREEN_WIDTH
@@ -304,7 +304,7 @@ def pop_up(width=None, height=None, title=None, text=None):
                                 flag=libtcod.BKGND_SET,
                                 fmt=title)
 
-    libtcod.console_print_rect(pop, 3, 3, width-6, height, text)
+    Render.print_rect(pop, 3, 3, width-6, height, text)
 
 
     # blit the contents of "window" to the root console
@@ -373,7 +373,7 @@ def beastiary(width=10, height=10, title=None, text=None):
 
     libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
     libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-    libtcod.console_print_rect(pop, 3, 3, width - 6, height, text)
+    Render.print_rect(pop, 3, 3, width - 6, height, text)
 
     background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
     libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
@@ -459,7 +459,7 @@ def skill_tree():
                                 flag=libtcod.BKGND_SET,
                                 fmt="Skill Tree")
 
-    libtcod.console_print_rect(st, 4, 4, width, height, 'Insert Skill Tree')
+    Render.print_rect(st, 4, 4, width, height, 'Insert Skill Tree')
 
     # blit the contents of "window" to the root console
     x = 0
@@ -545,65 +545,65 @@ def skill_tree():
 
                 char = skills[x][y].char
                 if char == "|":
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_VLINE, libtcod.white, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_VLINE, libtcod.white, Constants.UI_PopBack)
                 elif char == "-":
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_HLINE, libtcod.white, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_HLINE, libtcod.white, Constants.UI_PopBack)
                 elif char == ".":
                     if color == libtcod.purple:
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE,
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE,
+                        Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW,
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE,
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE,
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE,
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE,
+                        Render.draw_char(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE,
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW,
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW,
                                                     color, Constants.UI_PopBack)
                     else:
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, ' ',
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, ' ',
+                        Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, ' ',
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] - 1, ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], ' ',
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1], ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], ' ',
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1], ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, ' ',
+                        Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] + 1, ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, ' ',
+                        Render.draw_char(st, x + x + offset[0], y + y + offset[1] + 1, ' ',
                                                     color, Constants.UI_PopBack)
-                        libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, ' ',
+                        Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] + 1, ' ',
                                                     color, Constants.UI_PopBack)
 
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], chr(4),
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1], chr(4),
                                                 libtcod.white, Constants.UI_PopBack)
 
 
 
 
                 elif char != ' ' and char != chr(10):
-                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE, color, Constants.UI_PopBack)
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
-                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW, color, Constants.UI_PopBack)
 
-                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
 
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1], char, libtcod.red, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1], char, libtcod.red, Constants.UI_PopBack)
 
-                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE, color, Constants.UI_PopBack)
 
-                    libtcod.console_put_char_ex(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE, color, Constants.UI_PopBack)
-                    libtcod.console_put_char_ex(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
-                    libtcod.console_put_char_ex(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE, color, Constants.UI_PopBack)
+                    Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW, color, Constants.UI_PopBack)
 
 
 

@@ -1,6 +1,7 @@
 import GameState
 import Render
 import Pathing
+import Input
 
 
 time_travelers = []
@@ -13,7 +14,7 @@ def register(obj):
     time_travelers.append(obj)
     obj.action_points = 0
 
-
+11
 """
 Removes object from scheduler (ie: death)
 """

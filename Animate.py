@@ -33,10 +33,10 @@ def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.dark
             offset_color = Render.get_offset_color(map_x, map_y)
 
             if (x, y) == line[-1]:
-                libtcod.console_put_char_ex(0, x, y, end_tile, color, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y, end_tile, color, libtcod.BKGND_NONE)
                 libtcod.console_set_char_background(0, x, y, Themes.ground_bcolor() - offset_color, libtcod.BKGND_SET)
             else:
-                libtcod.console_put_char_ex(0, x, y, projectile, color, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y, projectile, color, libtcod.BKGND_NONE)
                 libtcod.console_set_char_background(0, x, y, Themes.ground_bcolor() - offset_color, libtcod.BKGND_SET)
 
             libtcod.console_flush()
@@ -49,24 +49,24 @@ def explosion(target, radius=3):
         for r in range(0, radius):
             Render.render_all()
             if r >= 0:
-                libtcod.console_put_char_ex(0, x, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y, 'X', libtcod.red, libtcod.BKGND_NONE)
                 print "1"
             if r >= 1:
-                libtcod.console_put_char_ex(0, x-1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x+1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x, y-1, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x, y+1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x-1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x+1, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y-1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y+1, 'X', libtcod.red, libtcod.BKGND_NONE)
                 print "2"
             if r >= 2:
-                libtcod.console_put_char_ex(0, x - 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x + 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x, y - 2, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x, y + 2, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x - 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x + 2, y, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y - 2, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x, y + 2, 'X', libtcod.red, libtcod.BKGND_NONE)
 
-                libtcod.console_put_char_ex(0, x+1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x-1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x+1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
-                libtcod.console_put_char_ex(0, x-1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x+1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x-1, y + 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x+1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
+                Render.draw_char(0, x-1, y - 1, 'X', libtcod.red, libtcod.BKGND_NONE)
                 print "3"
             libtcod.console_flush()
             print "sleep"
@@ -89,33 +89,33 @@ def inspect_banner(x, y, banner_text, new_animation=True):
 
     back = libtcod.green
 
-    libtcod.console_put_char_ex(animation_console, x + 1, y, libtcod.CHAR_HLINE, color, back)
+    Render.draw_char(animation_console, x + 1, y, libtcod.CHAR_HLINE, color, back)
 
-    libtcod.console_put_char_ex(animation_console, x + 2, y - 1, libtcod.CHAR_NW, color, back)
-    libtcod.console_put_char_ex(animation_console, x + 2, y, libtcod.CHAR_TEEW, color, back)
-    libtcod.console_put_char_ex(animation_console, x + 2, y + 1, libtcod.CHAR_SW, color, back)
+    Render.draw_char(animation_console, x + 2, y - 1, libtcod.CHAR_NW, color, back)
+    Render.draw_char(animation_console, x + 2, y, libtcod.CHAR_TEEW, color, back)
+    Render.draw_char(animation_console, x + 2, y + 1, libtcod.CHAR_SW, color, back)
 
     if new_animation:
         for z in range(length):
 
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y - 1, libtcod.CHAR_HLINE, color, back)
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y, banner_text[z], color, back)
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y + 1, libtcod.CHAR_HLINE, color, back)
-            Render.update_animations()
+            Render.draw_char(animation_console, x + z + 3, y - 1, libtcod.CHAR_HLINE, color, back)
+            Render.draw_char(animation_console, x + z + 3, y, banner_text[z], color, back)
+            Render.draw_char(animation_console, x + z + 3, y + 1, libtcod.CHAR_HLINE, color, back)
+            # Render.update_animations()
             libtcod.console_flush()
             # time.sleep(0.05)
     else:
         for z in range(length):
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y - 1, libtcod.CHAR_HLINE, color, back)
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y, ' ', color, back)
-            libtcod.console_put_char_ex(animation_console, x + z + 3, y + 1, libtcod.CHAR_HLINE, color, back)
+            Render.draw_char(animation_console, x + z + 3, y - 1, libtcod.CHAR_HLINE, color, back)
+            Render.draw_char(animation_console, x + z + 3, y, ' ', color, back)
+            Render.draw_char(animation_console, x + z + 3, y + 1, libtcod.CHAR_HLINE, color, back)
 
-    libtcod.console_put_char_ex(animation_console, x + 3 + length, y - 1, libtcod.CHAR_NE, color, back)
-    libtcod.console_put_char_ex(animation_console, x + 3 + length, y, libtcod.CHAR_VLINE, color, back)
-    libtcod.console_put_char_ex(animation_console, x + 3 + length, y + 1, libtcod.CHAR_SE, color, back)
+    Render.draw_char(animation_console, x + 3 + length, y - 1, libtcod.CHAR_NE, color, back)
+    Render.draw_char(animation_console, x + 3 + length, y, libtcod.CHAR_VLINE, color, back)
+    Render.draw_char(animation_console, x + 3 + length, y + 1, libtcod.CHAR_SE, color, back)
 
     libtcod.console_set_default_foreground(animation_console, libtcod.lightest_blue)
-    libtcod.console_print_ex(animation_console, x + 3, y, libtcod.BKGND_NONE, libtcod.LEFT, banner_text)
+    Render.print_line(animation_console, x + 3, y, libtcod.BKGND_NONE, libtcod.LEFT, banner_text)
     libtcod.console_flush()
 
 
@@ -145,20 +145,20 @@ def large_button(x, y, text, hover, length=None, target=0):
     color3 = base_color
 
 
-    #libtcod.console_put_char_ex(animation_console, x + 1, y, libtcod.CHAR_HLINE, color, libtcod.BKGND_NONE)
+    #Render.draw_char(animation_console, x + 1, y, libtcod.CHAR_HLINE, color, libtcod.BKGND_NONE)
 
-    libtcod.console_put_char_ex(animation_console, x, y - 1, libtcod.CHAR_NW, color1, libtcod.BKGND_NONE)
-    libtcod.console_put_char_ex(animation_console, x, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
-    libtcod.console_put_char_ex(animation_console, x, y + 1, libtcod.CHAR_SW, color3, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x, y - 1, libtcod.CHAR_NW, color1, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x, y + 1, libtcod.CHAR_SW, color3, libtcod.BKGND_NONE)
 
     for z in range(length):
-        libtcod.console_put_char_ex(animation_console, x + z + 1, y - 1, libtcod.CHAR_HLINE, color1, libtcod.BKGND_NONE)
-        libtcod.console_put_char_ex(animation_console, x + z + 1, y, text[z], color2, libtcod.BKGND_NONE)
-        libtcod.console_put_char_ex(animation_console, x + z + 1, y + 1, libtcod.CHAR_HLINE, color3, libtcod.BKGND_NONE)
+        Render.draw_char(animation_console, x + z + 1, y - 1, libtcod.CHAR_HLINE, color1, libtcod.BKGND_NONE)
+        Render.draw_char(animation_console, x + z + 1, y, text[z], color2, libtcod.BKGND_NONE)
+        Render.draw_char(animation_console, x + z + 1, y + 1, libtcod.CHAR_HLINE, color3, libtcod.BKGND_NONE)
 
-    libtcod.console_put_char_ex(animation_console, x + 1 + length, y - 1, libtcod.CHAR_NE, color1, libtcod.BKGND_NONE)
-    libtcod.console_put_char_ex(animation_console, x + 1 + length, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
-    libtcod.console_put_char_ex(animation_console, x + 1 + length, y + 1, libtcod.CHAR_SE, color3, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x + 1 + length, y - 1, libtcod.CHAR_NE, color1, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x + 1 + length, y, libtcod.CHAR_VLINE, color2, libtcod.BKGND_NONE)
+    Render.draw_char(animation_console, x + 1 + length, y + 1, libtcod.CHAR_SE, color3, libtcod.BKGND_NONE)
 
 
 
