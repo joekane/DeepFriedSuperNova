@@ -2,6 +2,7 @@ import GameState
 import Render
 import Pathing
 import Input
+import Utils
 
 
 time_travelers = []
@@ -32,6 +33,7 @@ def reset():
 """
 Cycles through entities and executes their AI.Take_Turn when delay == 0
 """
+
 def process():
     for obj in time_travelers:
         if obj.delay > 0:

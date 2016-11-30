@@ -6,6 +6,7 @@ import Render
 import Animate
 import Input
 import Utils
+from bearlibterminal import terminal
 
 
 class Button:
@@ -66,18 +67,11 @@ class Palette:
         self.opened = False
 
     def draw(self):
-        import graphics
+        Utils.clear_layer(5)
         self.opened = True
         print self.width, self.height
-        pop = libtcod.console_new(self.width, self.height)
-        # print the header, with auto-wrap
-        libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-        libtcod.console_set_default_background(pop, Constants.UI_PopBack)
 
-        libtcod.console_print_frame(pop, 0, 0, self.width, self.height, clear=True,
-                                    flag=libtcod.BKGND_SET,
-                                    fmt=self.title)
-        # blit the contents of "window" to the root console
+
 
         x = 0
         y = 0
@@ -88,24 +82,26 @@ class Palette:
                         self.height - 3,
                         function=close_window)
 
-        libtcod.console_set_default_foreground(pop, Constants.UI_PopFore)
-        libtcod.console_set_default_background(pop, Constants.UI_PopBack)
-        Render.print_rect(pop, 3, 3, self.width, self.height, self.text)
-
-        background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
-        libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
+        Render.print_rect(5, 3, 3, self.width, self.height, self.text)
 
         dragging = False
         click_x = None
 
         while True:
+            Utils.clear_layer(5)
 
-            Input.update()
+            Render.draw_rect(5, 0, 0,
+                             self.width,
+                             self.height,
+                             frame=True,
+                             f_color=terminal.color_from_argb(255, 100, 100, 255),
+                             bk_color=terminal.color_from_argb(192, 32, 32, 128))
+            # Input.update()
             mouse = Input.mouse
 
-            Render.blit(background, 0)
+            # Render.blit(background, 0)
             # libtcod.console_blit(background, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 1.0)
-            libtcod.console_blit(pop, 0, 0, self.width, self.height, 0, x, y, 1.0, .85)
+            # libtcod.console_blit(pop, 0, 0, self.width, self.height, 0, x, y, 1.0, .85)
 
             if mouse.lbutton and x <= mouse.cx <= x + self.width and (mouse.cy == y or dragging):
                 if click_x is None:
@@ -121,21 +117,14 @@ class Palette:
                 self.opened = False
                 return
 
+            # libtcod.console_flush()
 
-
-
-
-
-
-
-            libtcod.console_flush()
-
-
-
-            graphics.draw_image(x, y, enlarge=True)
+            # graphics.draw_image(x, y, enlarge=True)
             # graphics.draw_image(x + 1, y + 1, enlarge=True)
             # graphics.clear()
-            graphics.draw_font(0,0)
+            # graphics.draw_font(0,0)
+            terminal.refresh()
+
 
 
 
@@ -149,7 +138,7 @@ def load_from_xp(x, y, filename, console):
 
     xp_data = xp_loader.load_xp_string(raw_data)
 
-    xp_loader.load_layer_to_console(console, xp_data['layer_data'][0])
+    xp_loader.load_layer_to_layer(console, x, y, xp_data['layer_data'][0])
 
 
 def menu(header, options, width):
@@ -159,7 +148,7 @@ def menu(header, options, width):
         raise ValueError('Cannot have a menu with more than 26 options.')
 
     # calculate total height for the header (after auto-wrap) and one line per option
-    header_height = libtcod.console_get_height_rect(Render.consoles['map_console'], 0, 0, width, Constants.SCREEN_HEIGHT, header)
+    header_height = libtcod.console_get_height_rect(Render.layers['map_console'], 0, 0, width, Constants.SCREEN_HEIGHT, header)
     if header == '':
         header_height = 0
     height = len(options) + header_height

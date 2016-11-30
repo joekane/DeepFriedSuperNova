@@ -2,6 +2,7 @@ import libtcodpy as libtcod
 import Themes
 import Map
 import Render
+import Utils
 
 ##################################
 # In-memory XP format is as follows:
@@ -84,6 +85,28 @@ def load_layer_to_console(console, xp_file_layer):
             fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
             back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
             Render.draw_char(console, x, y, cell_data['keycode'], fore_color, back_color)
+
+
+def load_layer_to_layer(layer, x, y, xp_file_layer):
+    if not xp_file_layer['width'] or not xp_file_layer['height']:
+        raise AttributeError(
+            'Attempted to call load_layer_to_console on data that didn\'t have a width or height key, check your data')
+
+    offset_x, offset_y = x, y
+
+    for x in range(xp_file_layer['width']):
+        for y in range(xp_file_layer['height']):
+            cell_data = xp_file_layer['cells'][x][y]
+            fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
+            back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
+
+            Render.draw_char(layer, x + offset_x, y + offset_y, Utils.get_unicode(219), back_color,
+                             back_color)
+            Render.draw_char(layer, x + offset_x, y + offset_y, Utils.get_unicode(cell_data['keycode']), fore_color,
+                             back_color)
+
+
+
 
 
 def load_layer_to_map(map, x1, y1, xp_file_layer, rotation='None'):

@@ -1366,6 +1366,25 @@ def closest_monster(max_range):
     return closest_enemy
 
 
+def closest_monsters(max_range):
+    closest_dist = max_range + 1  # start with (slightly more than) maximum range
+
+    player = GameState.get_player()
+
+    monsters = []
+
+    for object in get_visible_objects():
+        if object.fighter and not object == player and Fov.is_visible(obj=object):
+            dist = player.distance_to(object)
+            if dist <= max_range:
+                monsters.append((object, dist))
+
+    monsters.sort(key=lambda tup: tup[1])
+
+    print "Monsters: {0}".format(monsters)
+    return monsters
+
+
 def is_explored(x,y):
     # first test the map tile
     if level_map[x][y].explored:

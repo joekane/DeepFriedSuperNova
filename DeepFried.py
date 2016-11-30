@@ -25,7 +25,6 @@ if term == "TCOD":
     """
     LIBTCOD Init stuff
     """
-    # libtcod.console_set_custom_font('terminal10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_set_custom_font('Fonts/cp437_16x16.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
     libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep Fried Supernova', False)
     libtcod.sys_set_fps(Constants.LIMIT_FPS)
@@ -53,10 +52,14 @@ ALT-Graphics init
 
 
 terminal.open()
-    # blt.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
+    # terminal.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
     # blt.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: arial.ttf, size=8")  # font: UbuntuMono-R.ttf, size=12"
+
 terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\cp437_16x16_alpha.png, size=16x16, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
-terminal.set('input.filter=[keyboard+, mouse]')
+#terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\yoshis_island_opaque.png, size=9x12, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
+
+
+terminal.set('input.filter=[keyboard+, mouse+]')
 terminal.composition(terminal.TK_ON)
 terminal.color("white")
 terminal.refresh()

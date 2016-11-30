@@ -22,8 +22,8 @@ SOUND_ON = False
 ANIMATE_ON = True
 
 # actual size of the window
-SCREEN_WIDTH = 100
-SCREEN_HEIGHT = 50
+SCREEN_WIDTH = 100 # 100
+SCREEN_HEIGHT = 50 # 100
 
 PANEL_HEIGHT = 12
 PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
@@ -32,8 +32,8 @@ PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
 MAP_CONSOLE_WIDTH = SCREEN_WIDTH - 19
 MAP_CONSOLE_HEIGHT = SCREEN_HEIGHT - PANEL_HEIGHT
 
-MAP_WIDTH = MAP_CONSOLE_WIDTH * 2 # 150 # MIN 70
-MAP_HEIGHT = MAP_CONSOLE_HEIGHT * 2 # 150 # MIN 40
+MAP_WIDTH = MAP_CONSOLE_WIDTH * 1 # 150 # MIN 70
+MAP_HEIGHT = MAP_CONSOLE_HEIGHT * 1 # 150 # MIN 40
 
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
@@ -46,9 +46,9 @@ MSG_HEIGHT = PANEL_HEIGHT - 3
 # LEVEL_SCREEN_WIDTH = 40
 
 # parameters for dungeon generator
-ROOM_MAX_SIZE = 12
-ROOM_MIN_SIZE = 8
-MAX_ROOMS = (MAP_HEIGHT * MAP_WIDTH / 1000) + 50
+ROOM_MAX_SIZE = 9
+ROOM_MIN_SIZE = 5
+MAX_ROOMS = (MAP_HEIGHT * MAP_WIDTH / 1000) + 500
 
 DEPTH = 5
 MIN_SIZE = 10
@@ -69,7 +69,7 @@ LEVEL_UP_FACTOR = 5000
 
 FOV_ALGO = 0  # default FOV algorithm
 FOV_LIGHT_WALLS = True  # light walls or not
-TORCH_RADIUS = 15  # 15 Def
+TORCH_RADIUS = 5  # 15 Def
 
 LIMIT_FPS = 0 # 20 frames-per-second maximum
 
@@ -79,21 +79,11 @@ INSPECTION_DELAY = 0.5
 UI_Fore = libtcod.Color(0, 50, 90)
 UI_Back = libtcod.Color(0, 10, 25)
 
-UI_Button_Fore = libtcod.light_azure
+UI_Button_Fore = libtcod.light_red
 UI_Button_Back = libtcod.dark_azure
 
 UI_PopFore = libtcod.azure
 UI_PopBack = libtcod.darkest_azure
 
-# KEY DEFINE
-KEY_UP = 96
-KEY_DOWN = 90
-KEY_LEFT = 92
-KEY_RIGHT = 94
-KEY_UPLEFT = 95
-KEY_UPRIGHT = 97
-KEY_DOWNLEFT = 89
-KEY_DOWNRIGHT = 91
-KEY_STAY = 93
 
 

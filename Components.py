@@ -24,6 +24,7 @@ import UI
 import Input
 import Pathing
 from bearlibterminal import terminal
+from itertools import cycle
 
 import time
 
@@ -75,33 +76,23 @@ class PlayeControlled:
     def take_turn(self):
         global vCount
         Render.render_all()
-        print "Render-All"
+        #print "Render-All"2
+
+        mouse = Input.mouse
 
         while True:
-
-
             """
             On player turn this loops continuasouly waiting for user input
             """
 
+            # key = Input.key
+            key = Input.read_key_int()
+            if key:
+                # print "Keypressed: " + str(key)
+                pass
+
             Render.render_ui()
 
-            # Input.update()
-
-            mouse = Input.mouse
-            # key = Input.key
-
-            # key = Input.read_key_int()
-
-
-            # mouse = Input.mouse_coords()
-            # print key
-            # print mouse
-
-            player = GameState.get_player()
-
-
-            '''
             # TODO: Move moveing does not follow normal time step. Hrmmmm.
             if self.process_mouse_clicks(mouse):
                 return 0
@@ -114,45 +105,64 @@ class PlayeControlled:
                 print "Auto-Walking"
                 return self.end_turn(Constants.TURN_COST)
             elif not GameState.continue_walking:
-                GameState.get_player().clear_path()
-            '''
-
-            # key = Input.key
-            key = Input.read_key_int()
+                self.owner.clear_path()
 
 
-            # movement keys
-            if True:
-                if key == Constants.KEY_UP:
-                    Map.player_move_or_interact(0, -1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_DOWN:
-                    Map.player_move_or_interact(0, 1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_LEFT:
-                    Map.player_move_or_interact(-1, 0)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_RIGHT:
-                    Map.player_move_or_interact(1, 0)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_UPLEFT:
-                    Map.player_move_or_interact(-1, -1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_UPRIGHT:
-                    Map.player_move_or_interact(1, -1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_DOWNLEFT:
-                    Map.player_move_or_interact(-1, 1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_DOWNRIGHT:
-                    Map.player_move_or_interact(1, 1)
-                    return self.end_turn(Constants.TURN_COST)
-                elif key == Constants.KEY_STAY:
-                    return self.end_turn(Constants.TURN_COST)
-                    pass  # do nothing ie wait for the monster to come to you
-                else:
-                    #### TEMP ####
-                    '''
+            if key == terminal.TK_KP_8:
+                Map.player_move_or_interact(0, -1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_2:
+                Map.player_move_or_interact(0, 1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_4:
+                Map.player_move_or_interact(-1, 0)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_6:
+                Map.player_move_or_interact(1, 0)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_7:
+                Map.player_move_or_interact(-1, -1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_9:
+                Map.player_move_or_interact(1, -1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_1:
+                Map.player_move_or_interact(-1, 1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_3:
+                Map.player_move_or_interact(1, 1)
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_KP_5:
+                return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_X:
+                Fov.require_recompute()
+                Constants.DEBUG = not Constants.DEBUG
+                Render.render_all()
+            elif key == terminal.TK_G:
+                # pick up an item
+                for object in Map.get_all_objects():  # look for an item in the player's tile
+                    if object.x == player.x and object.y == player.y and object.item:
+                        object.item.pick_up()
+                        break
+            elif key == terminal.TK_F:
+                for obj in GameState.get_all_equipped(self.owner):
+                    if obj.owner.ranged:
+                        outcome = obj.owner.ranged.fire()
+                        if outcome == 'cancelled':
+                            return 0
+                        else:
+                            return self.end_turn(Constants.TURN_COST)
+            elif key == terminal.TK_B:
+                title = "Beastiary"
+
+                text = 'Cipher Warden\n\n\nHP = 50\nDEF = 10\nDODGE = 5%'
+
+                pal = UI.Palette(width=20, title='Title', text=text)
+
+                pal.draw()
+
+                # I.beastiary(width=50, height=45, title=title, text=text)
+                '''
 
 
                     # test for other keys
@@ -246,7 +256,7 @@ class PlayeControlled:
                         Constants.DEBUG = not Constants.DEBUG
                         Render.render_all()
                         return 0
-                    '''
+                '''
 
 
 
@@ -778,30 +788,60 @@ class Ranged:
 
         targets = []
 
+
         if source is None:
             source = GameState.get_player()
         if target is None:
-
             tile_effected = None
             Utils.message('Choose Target. Left Click/Space to execute. Right Click/ESC to cancel.', libtcod.gold)
-            Render.render_all()
 
-            background = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
-            libtcod.console_blit(0, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, background, 0, 0, 1.0, 1.0)
+            #target = Map.closest_monster(self.max_range)
 
-            target = Map.closest_monster(self.max_range)
+            target_list = Map.closest_monsters(self.max_range)
+
+            if target_list:
+                target_list = cycle(target_list)
+                target = next(target_list)[0]
+
             if target:
                 cam_x, cam_y = Map.to_camera_coordinates(target.x, target.y)
+                # LIBTCOD (move mouse to target, then auto target mouse)
                 libtcod.mouse_move(cam_x * 16, cam_y * 16)
+                # BEAR (only move to mouse if mouse moves)
+                pass
+
+            mouse = Input.mouse
+            mouse_last_x, mouse_last_y = mouse.cx, mouse.cy
+            mouse_moved = False
 
             while True:
-                Input.update()
-                mouse = Input.mouse
-                key = Input.key
-                Render.blit(background, 0)
+                Utils.clear_layer(5)
 
-                target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
-                print source.x, source.y
+                key = Input.read_key_int()
+                # Render.blit(background, 0)
+
+                if mouse.cx != mouse_last_x or mouse.cy != mouse_last_y:
+                    mouse_moved = True
+                    moues_last_x, mouse_last_y = mouse.cx, mouse.cy
+
+
+                # LIBTCOD
+                # target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+
+                # BEAR
+
+
+                if mouse_moved:
+                    target_x, target_y = Map.to_map_coordinates(mouse.cx, mouse.cy)
+                elif target:
+                    target_x, target_y = target.x, target.y
+                else:
+                    target_x, target_y = source.x, source.y
+
+
+
+                # print source.x, source.y
+
                 line = Utils.get_line((source.x, source.y),
                                       (target_x, target_y),
                                       walkable=True,
@@ -813,6 +853,9 @@ class Ranged:
                         break
                     point = Map.to_camera_coordinates(point[0], point[1])
                     libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
+                    Render.draw_char(5, point[0], point[1], 0x2588, terminal.color_from_argb(128, 64,64,255),
+                                     libtcod.BKGND_SET)
+
                 if len(line) > 0:
                     index = Utils.find_element_in_list((None, None), line)
 
@@ -827,10 +870,14 @@ class Ranged:
 
                         for points in circle:
                             points = Map.to_camera_coordinates(points[0], points[1])
-                            libtcod.console_set_char_background(0, points[0], points[1], libtcod.dark_red,
-                                                                libtcod.BKGND_LIGHTEN)
+                            Render.draw_char(5, points[0], points[1], 0x2588, terminal.color_from_argb(128, 200, 32, 32),
+                                             libtcod.BKGND_SET)
+                            Render.draw_char(5, points[0], points[1], 0xE000 , terminal.color_from_argb(128, 255, 0, 0),
+                                             libtcod.BKGND_SET)
 
-                if mouse.lbutton_pressed or key.vk == libtcod.KEY_SPACE:
+                # print "Pressed: {0}".format(key)
+
+                if mouse.lbutton_pressed or key == terminal.TK_SPACE:
                     # target_tile = (target_x, target_y)
                     print tile_effected
                     for target in tile_effected:
@@ -841,14 +888,21 @@ class Ranged:
                             targets.append(monster)
                     break
 
-                if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
+
+                if mouse.rbutton_pressed or key == terminal.TK_ESCAPE:
                     break
 
-                libtcod.console_flush()
+                if key == terminal.TK_F:
+                    if target_list:
+                        target = next(target_list)[0]
+
+                terminal.refresh()
+
 
 
             if not targets:  # no enemy found within maximum range
                 Utils.message('Cancelled.', libtcod.red)
+                Utils.clear_layer(5)
                 return 'cancelled'
 
 
@@ -861,6 +915,7 @@ class Ranged:
             Utils.message('{0} takes {1} damage.'.format(target.name, self.owner.equipment.power_bonus),
                           libtcod.light_blue)
             target.fighter.take_damage(self.owner.equipment.power_bonus)
+        Utils.clear_layer(5)
         return 'fired'
 
 

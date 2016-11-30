@@ -22,6 +22,7 @@ import Fov
 import Render
 import Schedule
 import Pathing
+import Input
 import SoundEffects
 import Status
 
@@ -98,7 +99,7 @@ def starting_equipment():
 
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10)
+    ranged_component = Components.Ranged(10, aoe=1)
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
                         equipment=equipment_component,
                         ranged=ranged_component)
@@ -206,13 +207,14 @@ def main_menu():
 def new_game():
     initialize()
 
-    map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
-    entity_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
-    panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
-    side_panel = libtcod.console_new(20, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
-    animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+    # map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+    # entity_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
+    # panel = libtcod.console_new(Constants.SCREEN_WIDTH, Constants.PANEL_HEIGHT)
+    # side_panel = libtcod.console_new(20, Constants.SCREEN_HEIGHT - Constants.PANEL_HEIGHT)
+    # animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 
-    Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
+    # Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
+    Render.initialize()
 
     Map.load_diner_map()
     next_level()
@@ -264,6 +266,7 @@ def play_game():
     Pathing.BFS(player)
 
     while not libtcod.console_is_window_closed():
+        Input.clear()
         Schedule.process()
 
 

@@ -5,11 +5,9 @@ from bearlibterminal import terminal
 
 
 
-def update():
+def update_OLD():
     global key, mouse
 
-
-    return
     libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
     key_char = chr(key.c)
 
@@ -39,7 +37,16 @@ def console_coords():
     return mouse.cx, mouse.cy
 
 
+def clear():
+    while terminal.has_input():
+        terminal.read()
+
+
+
 class Mouse:
+    def __init__(self):
+        pass
+
     @property
     def cx(self):
         return terminal.state(terminal.TK_MOUSE_X)
@@ -50,11 +57,19 @@ class Mouse:
 
     @property
     def lbutton_pressed(self):
-        return terminal.state(terminal.TK_MOUSE_LEFT)
+        return bool(terminal.state(terminal.TK_MOUSE_LEFT))
 
     @property
     def rbutton_pressed(self):
-        return terminal.state(terminal.TK_MOUSE_RIGHT)
+        return bool(terminal.state(terminal.TK_MOUSE_RIGHT))
+
+    @property
+    def lbutton(self):
+        return bool(terminal.state(terminal.TK_MOUSE_LEFT))
+
+    @property
+    def rbutton(self):
+        return bool(terminal.state(terminal.TK_MOUSE_RIGHT))
 
 
 

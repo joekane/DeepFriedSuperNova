@@ -22,8 +22,8 @@ player = None
 def initialize():
     global fov_recompute, fov_map, player
     # unexplored areas start black (which is the default background color)
-    from Render import clear_map
-    clear_map()
+    # from Render import clear_map
+    # clear_map()
     map = Map.current_map()
     player = GameState.get_player()
     require_recompute()
@@ -64,7 +64,7 @@ def recompute():
                                 Constants.TORCH_RADIUS,
                                 Constants.FOV_LIGHT_WALLS,
                                 Constants.FOV_ALGO)
-        Render.clear_map()
+        # Render.clear_map()
         return True
     return False
 

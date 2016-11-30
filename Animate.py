@@ -75,7 +75,7 @@ def explosion(target, radius=3):
 
 def inspect_banner(x, y, banner_text, new_animation=True):
 
-    animation_console = Render.consoles['animation_console']
+    animation_console = Render.layers['animation_console']
     # animation_console = 0
 
     # print "printing"

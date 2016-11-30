@@ -19,6 +19,7 @@ import Animate
 import Render
 import re
 from bearlibterminal import terminal
+from timeit import default_timer as timer
 
 map_old_x = 0
 map_old_y = 0
@@ -202,7 +203,8 @@ def inspect_tile(x, y):
                         pass
                     else:
                         # print "animating..."
-                        Animate.inspect_banner(x, y, obj[0].name, new_animation)
+                        #TODO: FIX animation calls
+                        #Animate.inspect_banner(x, y, obj[0].name, new_animation)
                         new_animation = False
             else:
                 # Pre-Delay
@@ -242,6 +244,7 @@ def is_mouse_in(con_x, con_y, width, height):
     import Input
     mouse = Input.mouse
 
+    # print mouse.cx, mouse.cy, " -> ", con_x, con_y
 
     if con_x <= mouse.cx <= con_x + width - 1 and con_y <= mouse.cy <= con_y + height - 1:
         return True
@@ -295,5 +298,127 @@ def find_element_in_list(element, list_element):
         return None
 
 
-def convert_color(libtcod_color):
-    return terminal.color_from_argb(255, libtcod_color[0], libtcod_color[1], libtcod_color[2])
+def convert_color(color, alpha=255):
+
+    if type(color) is libtcod.Color:
+        return terminal.color_from_argb(alpha, color[0], color[1], color[2])
+    else:
+        return color
+
+
+def profile(some_function):
+    import time
+
+    def wrapper():
+        startA = timer()
+        #print("Something is happening before some_function() is called.")
+
+        some_function()
+        startB = timer()
+
+        print("{0} Took {1} secs to execute".format(some_function, startB - startA))
+
+    return wrapper
+
+
+def clear_layer(layer, color='black'):
+    terminal.bkcolor(color)
+    terminal.layer(layer)
+    terminal.clear_area(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
+
+
+def get_unicode(code):
+    # print "Code: {0}".format(code)
+
+    look_up = {
+        '176': 0x2591,
+        '177': 0x2592,
+        '178': 0x2593,
+        '179': 0x2502,
+        '180': 0x2524,
+        '181': 0x2561,
+        '182': 0x2562,
+        '183': 0x2556,
+        '184': 0x2555,
+        '185': 0x2563,
+        '186': 0x2551,
+        '187': 0x2557,
+        '188': 0x255D,
+        '189': 0x255C,
+        '190': 0x255B,
+        '191': 0x2510,
+
+        '192': 0x2514,
+        '193': 0x2534,
+        '194': 0x252C,
+        '195': 0x251C,
+        '196': 0x2500,
+        '197': 0x253C,
+        '198': 0x255E,
+        '199': 0x255F,
+        '200': 0x255A,
+        '201': 0x2554,
+        '202': 0x2569,
+        '203': 0x2566,
+        '204': 0x2560,
+        '205': 0x2550,
+        '206': 0x256C,
+        '207': 0x2567,
+
+        '208': 0x2568,
+        '209': 0x2564,
+        '210': 0x2565,
+        '211': 0x2559,
+        '212': 0x2558,
+        '213': 0x2552,
+        '214': 0x2553,
+        '215': 0x256B,
+        '216': 0x256A,
+        '217': 0x2518,
+        '218': 0x250C,
+        '219': 0x2588,
+        '220': 0x2584,
+        '221': 0x258C,
+        '222': 0x2590,
+        '223': 0x2580,
+
+        '224': 0x03B1,
+        '225': 0x00DF,
+        '226': 0x0393,
+        '227': 0x03C0,
+        '228': 0x03A3,
+        '229': 0x03C3,
+        '230': 0x00B5,
+        '231': 0x03C4,
+        '232': 0x03A6,
+        '233': 0x0398,
+        '234': 0x03A9,
+        '235': 0x03B4,
+        '236': 0x221E,
+        '237': 0x03C6,
+        '238': 0x03B5,
+        '239': 0x2229,
+
+        '240': 0x2261,
+        '241': 0x00B1,
+        '242': 0x2265,
+        '243': 0x2264,
+        '244': 0x2320,
+        '245': 0x2321,
+        '246': 0x00F7,
+        '247': 0x2248,
+        '248': 0x00B0,
+        '249': 0x2219,
+        '250': 0x00B7,
+        '251': 0x221A,
+        '252': 0x207F,
+        '253': 0x00B2,
+        '254': 0x25A0,
+        '255': 0x00A0
+
+    }
+
+    if str(code) in look_up.keys():
+        return look_up[str(code)]
+    else:
+        return code
