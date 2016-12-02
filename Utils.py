@@ -9,17 +9,18 @@
 
 
 import math
-import Constants
-import GameState
-import libtcodpy as libtcod
-import Map
-import Fov
-import time
-import Animate
-import Render
 import re
-from bearlibterminal import terminal
+import time
 from timeit import default_timer as timer
+
+from bearlibterminal import terminal
+
+import Constants
+# import Engine.Fov
+import Engine.Input
+import GameState
+# import MapGen.Map
+import libtcodpy as libtcod
 
 map_old_x = 0
 map_old_y = 0
@@ -99,7 +100,7 @@ def get_line(start, end, walkable=False, ignore_mobs=False, max_length=99999):
     points = []
     for x in range(x1, x2 + 1):
         coord = (y, x) if is_steep else (x, y)
-        if  Map.is_blocked(coord[0], coord[1], ignore_mobs) and walkable is True:
+        if  GameState.current_level.is_blocked(coord[0], coord[1], ignore_mobs) and walkable is True:
             points.append((None, None))
             #max_length += 1
         else:
@@ -127,25 +128,23 @@ def distance_between(x1, y1, x2, y2):
 
 
 def get_names_under_mouse():
-    import Fov
     mouse = libtcod.Mouse()
     # return a string with the names of all objects under the mouse
     (x, y) = (mouse.cx, mouse.cy)
     # create a list with the names of all objects at the mouse's coordinates and in FOV
-    names = [obj.name for obj in Map.get_all_objects()
-             if obj.x == x and obj.y == y and Fov.is_visible(obj=obj)]
+    names = [obj.name for obj in GameState.current_level.get_all_objects()
+             if obj.x == x and obj.y == y and Engine.Fov.is_visible(obj=obj)]
     names = ', '.join(names)  # join the names, separated by commas
     return names.capitalize()
 
 
 def get_fighters_under_mouse():
-    import Fov
     mouse = libtcod.Mouse()
     # return a string with the names of all objects under the mouse
     (x, y) = (mouse.cx, mouse.cy)
     # create a list with the names of all objects at the mouse's coordinates and in FOV
-    fighters = [obj for obj in Map.get_all_objects()
-                if obj.x == x and obj.y == y and Fov.is_visible(obj)]
+    fighters = [obj for obj in GameState.current_level.get_all_objects()
+                if obj.x == x and obj.y == y and Engine.Fov.is_visible(obj)]
 
     return fighters
 
@@ -190,15 +189,15 @@ def inspect_tile(x, y):
     if 0 < x < Constants.MAP_CONSOLE_WIDTH and 0 < y < Constants.MAP_CONSOLE_HEIGHT:
         # Mouse over Inspection
 
-        camera_x, camera_y = Map.get_camera()
+        camera_x, camera_y = GameState.get_camera()
         map_x, map_y = (camera_x + x, camera_y + y)
 
         if map_x is map_old_x and map_y is map_old_y:
             if time.time() - delay > Constants.INSPECTION_DELAY:
                 # Post-Delay
 
-                if Map.level_map[map_x][map_y].explored:
-                    obj = [obj for obj in Map.get_all_objects() if obj.x == map_x and obj.y == map_y]
+                if GameState.current_level.map_array[map_x][map_y].explored:
+                    obj = [obj for obj in GameState.current_level.get_all_objects() if obj.x == map_x and obj.y == map_y]
                     if len(obj) == 0:
                         pass
                     else:
@@ -230,7 +229,7 @@ def find_path(source, target):
 
 def connected_cells(source, target):
 
-    my_path = libtcod.path_new_using_map(Fov.get_fov_map(), 1.41)
+    my_path = libtcod.path_new_using_map(Engine.Fov.get_fov_map(), 1.41)
 
     libtcod.path_compute(my_path, source[0], source[1], target[0], target[1])
 
@@ -241,8 +240,7 @@ def connected_cells(source, target):
 
 
 def is_mouse_in(con_x, con_y, width, height):
-    import Input
-    mouse = Input.mouse
+    mouse = Engine.Input.mouse
 
     # print mouse.cx, mouse.cy, " -> ", con_x, con_y
 
@@ -307,8 +305,6 @@ def convert_color(color, alpha=255):
 
 
 def profile(some_function):
-    import time
-
     def wrapper():
         startA = timer()
         #print("Something is happening before some_function() is called.")
@@ -321,10 +317,6 @@ def profile(some_function):
     return wrapper
 
 
-def clear_layer(layer, color='black'):
-    terminal.bkcolor(color)
-    terminal.layer(layer)
-    terminal.clear_area(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
 
 
 def get_unicode(code):
@@ -422,3 +414,78 @@ def get_unicode(code):
         return look_up[str(code)]
     else:
         return code
+
+
+def get_offset_color(map_x, map_y, source_x, source_y):
+    try:
+        dist = int(distance_between(map_x, map_y, source_x, source_y))
+    except:
+        dist = 0
+    offset_value = int((float(dist) / Constants.TORCH_RADIUS) * 255)
+    offset_value = max(0, min(offset_value, 255)) / 2
+    offset_color = libtcod.Color(offset_value, offset_value, offset_value)
+    return offset_color
+
+
+def to_camera_coordinates(x, y):
+    # convert coordinates on the map to coordinates on the screen
+    # print "ToCam: " + str(x) + " " + str(y)
+    (x, y) = (x - GameState.camera_x, y - GameState.camera_y)
+
+    if x < 0 or y < 0 or x > Constants.MAP_CONSOLE_WIDTH or y > Constants.MAP_CONSOLE_HEIGHT:
+        return None, None  # if it's outside the map, return nothing
+
+    return x, y
+
+
+def to_map_coordinates(x, y):
+    # convert coordinates on the map to coordinates on the screen
+    # print "ToMap: " + str(x) + " " + str(y)
+    (x, y) = (x + GameState.camera_x, y + GameState.camera_y)
+
+    if x < 0 or y < 0 or x > Constants.MAP_WIDTH -1 or y > Constants.MAP_HEIGHT - 1:
+        return None, None  # if it's outside the map, return nothing
+
+    return x, y
+
+
+heat_map_colors = [libtcod.yellow,
+                   libtcod.color_lerp(libtcod.yellow, libtcod.amber, 0.5),
+                   libtcod.color_lerp(libtcod.yellow, libtcod.amber, 0.5),
+                   libtcod.amber,
+                   libtcod.color_lerp(libtcod.amber, libtcod.orange, 0.5),
+                   libtcod.color_lerp(libtcod.amber, libtcod.orange, 0.5),
+                   libtcod.orange,
+                   libtcod.color_lerp(libtcod.orange, libtcod.flame, 0.5),
+                   libtcod.color_lerp(libtcod.orange, libtcod.flame, 0.5),
+                   libtcod.flame,
+                   libtcod.color_lerp(libtcod.flame, libtcod.red, 0.5),
+                   libtcod.color_lerp(libtcod.flame, libtcod.red, 0.5),
+                   libtcod.red,
+                   libtcod.color_lerp(libtcod.red, libtcod.crimson, 0.5),
+                   libtcod.color_lerp(libtcod.red, libtcod.crimson, 0.5),
+                   libtcod.crimson,
+                   libtcod.color_lerp(libtcod.crimson, libtcod.pink, 0.5),
+                   libtcod.color_lerp(libtcod.crimson, libtcod.pink, 0.5),
+                   libtcod.pink,
+                   libtcod.color_lerp(libtcod.pink, libtcod.magenta, 0.5),
+                   libtcod.color_lerp(libtcod.pink, libtcod.magenta, 0.5),
+                   libtcod.magenta,
+                   libtcod.color_lerp(libtcod.magenta, libtcod.fuchsia, 0.5),
+                   libtcod.color_lerp(libtcod.magenta, libtcod.fuchsia, 0.5),
+                   libtcod.fuchsia,
+                   libtcod.color_lerp(libtcod.fuchsia, libtcod.purple, 0.5),
+                   libtcod.color_lerp(libtcod.fuchsia, libtcod.purple, 0.5),
+                   libtcod.purple,
+                   libtcod.color_lerp(libtcod.purple, libtcod.violet, 0.5),
+                   libtcod.color_lerp(libtcod.purple, libtcod.violet, 0.5),
+                   libtcod.violet,
+                   libtcod.color_lerp(libtcod.violet, libtcod.han, 0.5),
+                   libtcod.color_lerp(libtcod.violet, libtcod.han, 0.5),
+                   libtcod.han,
+                   libtcod.color_lerp(libtcod.han, libtcod.blue, 0.5),
+                   libtcod.color_lerp(libtcod.han, libtcod.blue, 0.5),
+                   libtcod.blue]
+
+heat_map_chrs = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']

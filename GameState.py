@@ -9,22 +9,18 @@
  *******************************************************/
 '''
 
-import libtcodpy as libtcod
-import Components
-import Constants
-import Entity
 import ConfigParser
-import Map
-import Themes
-import UI
+
+from bearlibterminal import terminal
+
+import Constants
+import Engine.Schedule
+from Engine import UI
+import MapGen.WorldGen
 import Utils
-import Fov
-import Render
-import Schedule
-import Pathing
-import Input
-import SoundEffects
-import Status
+import random
+import libtcodpy as libtcod
+from Entities import Entity, Components, Pathing
 
 
 imported_items_list = {}
@@ -34,20 +30,35 @@ current_quests = []
 player = None
 inventory = []
 game_msgs = []
-dungeon_level = 0
+dungeon_level = 1
 dungeon_name = "Test"
 dungeon_tags = []
+
+inventory = []
+
+
+visible_objects = None
+
+camera_x = 0
+camera_y = 0
 
 goals = [((20, 20), 0)]
 
 continue_walking = False
+
+""" Worlds """
+# diner
+# level1
+
+
+current_level = None
 
 
 def initialize():
     global imported_items_list, imported_npc_list, imported_quest_list
     global current_quests, player, inventory, game_msgs, dungeon_level
 
-    import Schedule
+    import Engine.Schedule
 
     imported_items_list = {}
     imported_npc_list = {}
@@ -84,9 +95,9 @@ def initialize():
     player.level = 1
     player.action_points = 100
 
-    Schedule.register(player)
+    Engine.Schedule.register(player)
 
-    dungeon_level = 0
+    dungeon_level = 1
 
 
 def starting_equipment():
@@ -178,33 +189,37 @@ def add_msg(line, color):
 
 
 def read_external_items():
+    global imported_items_list
     config = ConfigParser.RawConfigParser()
-    config.read('Objects\_items.list')
+    config.read('Assets\Objects\_items.list')
 
     for i in config.sections():
         imported_items_list[str(i)] = dict(config.items(i))
 
 
 def read_external_npcs():
+    global imported_npc_list
     config = ConfigParser.RawConfigParser()
-    config.read('Objects\_npcs.list')
+    config.read('Assets\Objects\_npcs.list')
 
     for i in config.sections():
         imported_npc_list[str(i)] = dict(config.items(i))
 
 
 def read_external_quests():
+    global imported_quest_list
     config = ConfigParser.RawConfigParser()
-    config.read('Objects\_quests.list')
+    config.read('Assets\Objects\_quests.list')
 
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
 
 def main_menu():
-    UI.Display_MainMenu()
+    Engine.UI.Display_MainMenu()
 
 
 def new_game():
+    global current_level
     initialize()
 
     # map_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
@@ -214,17 +229,40 @@ def new_game():
     # animation_console = libtcod.console_new(Constants.MAP_CONSOLE_WIDTH, Constants.MAP_CONSOLE_HEIGHT)
 
     # Render.initialize(map_console, entity_console, panel, side_panel, animation_console)
+    """ OLD WAY """
+    '''
     Render.initialize()
 
-    Map.load_diner_map()
+    MapGen.Map.load_diner_map()
     next_level()
     Fov.initialize()
+
+    play_game()
+    '''
+    """ NEW WAY """
+
+    import MapGen.Themes
+    MapGen.Themes.set_theme('Shadow State Archive')
+
+    current_level = MapGen.WorldGen.Level("Test World")
+    current_level.initialize(player, MapGen.WorldGen.mst_dungeon)
+
+    #current_level.map_array = MapGen.WorldGen.new_map()
+    #MapGen.WorldGen.mst_dungeon(current_level)
+
+    #current_level.fov_initialize()
+    #current_level.require_recompute()
+    #current_level.recompute_fov()
+
+
     play_game()
 
 
 def next_level():
     global dungeon_level, dungeon_name, dungeon_tags
-    import Keys
+    from Engine import Keys
+
+    print "SHOULD NOT BE HERE....."
 
     # advance to the next level
     add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
@@ -238,6 +276,8 @@ def next_level():
     dungeon_name = Utils.remove_tags(key)
     dungeon_tags = Utils.get_tags(key)
 
+    """ SHOULD BE IN LEVEL/WORLD CONSTRUCTION """
+    '''
     if '<M+>' in dungeon_tags:
         Themes.set_theme('Shadow State Archive')
     elif '<PRE>' in dungeon_tags:
@@ -248,26 +288,25 @@ def next_level():
 
     # OVERRIDE
     Themes.set_theme('Shadow State Archive')
+    '''
 
-    Schedule.reset()
-    Map.generate_map()
-    print "Objects: " + str(len(Map.objects))
-    print "VisObjects: " + str(len(Map.get_visible_objects()))
-    print "Dungeon Lvl: " + str(dungeon_level)
+    Engine.Schedule.reset()
 
-    Fov.require_recompute()
+    # TODO: THIS NEEDS TO BE BROUGHT UP TO SPEED """
+    # MapGen.Map.generate_map()
+    new_game()
+
+
+    current_level.require_recompute()
     Pathing.BFS(player)
-
 
 
 def play_game():
-
-    Fov.require_recompute()
+    UI.initilize_hud()
+    current_level.require_recompute()
     Pathing.BFS(player)
-
     while not libtcod.console_is_window_closed():
-        Input.clear()
-        Schedule.process()
+        Engine.Schedule.process()
 
 
 def check_level_up():
@@ -282,11 +321,11 @@ def check_level_up():
 
         choice = None
         while choice is None:  # keep asking until a choice is made
-            choice = UI.menu('Level up! Choose a stat to raise:\n',
-                          ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
+            choice = Engine.UI.menu('Level up! Choose a stat to raise:\n',
+                                    ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
                            'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
                            'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
-                          Constants.LEVEL_SCREEN_WIDTH)
+                                    Constants.LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
             player.fighter.base_max_hp += 20
@@ -328,3 +367,81 @@ def load_game():
     # file.close()
     # Fov.initialize()
     pass
+
+
+# CAMERA
+def get_camera():
+    return camera_x, camera_y
+
+
+def move_camera(target_x, target_y):
+    global camera_x, camera_y
+
+    try:
+    # new camera coordinates (top-left corner of the screen relative to the map)
+        x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
+        y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
+    except:
+        x = camera_x
+        y = camera_y
+
+    # make sure the camera doesn't see outside the map
+    if x < 0:
+        x = 0
+    if y < 0:
+        y = 0
+    if x > Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH:
+        x = Constants.MAP_WIDTH - Constants.MAP_CONSOLE_WIDTH
+    if y > Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT:
+        y = Constants.MAP_HEIGHT - Constants.MAP_CONSOLE_HEIGHT
+
+    if x != camera_x or y != camera_y:
+        current_level.require_recompute()
+
+    (camera_x, camera_y) = (x, y)
+
+
+def render_all():
+    current_level.draw()
+    UI.draw_hud()
+    terminal.refresh()
+
+
+def render_ui():
+    UI.draw_hud()
+    terminal.refresh()
+
+
+def player_move_or_interact(dx, dy):
+    # the coordinates the player is moving to/interacting
+
+
+    x = player.x + dx
+    y = player.y + dy
+
+    # try to find an interactable object there
+
+    for object in current_level.get_visible_objects():
+
+        if object.fighter and object.x == x and object.y == y:
+            player.fighter.attack(object)
+
+            return
+        """ DISABLE QUEST SYSTEM """
+        '''
+        if isinstance(object.ai, Components.QuestNpc) and object.x == x and object.y == y:
+            # print "Reward!!!! .... ??"
+            object.ai.talk()
+            return
+        '''
+        if object.blocks:
+            if isinstance(object.ai, Components.Door) and object.x == x and object.y == y:
+                object.ai.interact()
+                current_level.require_recompute()
+                return
+
+    player.move(dx, dy)
+    current_level.require_recompute()
+
+
+

@@ -1,5 +1,5 @@
-import libtcodpy as libtcod
 import Constants
+import libtcodpy as libtcod
 
 noise_field = None
 height_map = None

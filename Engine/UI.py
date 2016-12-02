@@ -1,13 +1,16 @@
-import libtcodpy as libtcod
-import Constants
-import Map
-import GameState
-import Render
-import Animate
-import Input
-import Utils
 from bearlibterminal import terminal
 
+# import Animate
+import collections
+import Constants
+import GameState
+import Input
+import Render
+import Utils
+import Engine.Animate as Animate
+import libtcodpy as libtcod
+
+Pos = collections.namedtuple('Pos', 'x y')
 
 class Button:
 
@@ -31,21 +34,24 @@ class Button:
             self.function = function
 
     def draw(self, offset_x, offset_y):
-        import Input
         mouse = Input.mouse
 
         min_x = offset_x - (self.length / 2)
         if Utils.is_mouse_in(min_x + self.x - 1, offset_y + self.y - 1, self.length + 2, 3):
             # libtcod.console_set_default_foreground(self.target, self.fore_alt)
             # libtcod.console_set_default_background(self.target, self.back_alt)
+
+
             Animate.large_button(self.x + offset_x, self.y + offset_y, self.text, True, length=self.length, target=self.target)
+
             if mouse.lbutton_pressed:
-                # print "Func!"
+                print "Func!"
                 return self.function()
 
         else:
             # libtcod.console_set_default_foreground(self.target, self.fore)
             # libtcod.console_set_default_background(self.target, self.back)
+
             Animate.large_button(self.x + offset_x, self.y + offset_y, self.text, False, length=self.length, target=self.target)
 
         # libtcod.console_print_ex(self.target, 0, 0, libtcod.BKGND_SET, libtcod.LEFT, self.text)
@@ -67,41 +73,41 @@ class Palette:
         self.opened = False
 
     def draw(self):
-        Utils.clear_layer(5)
+        Render.clear_layer(5)
         self.opened = True
         print self.width, self.height
 
 
 
-        x = 0
-        y = 0
+        x = 5
+        y = 5
 
         button_text = 'Close'
         button = Button(button_text,
                         self.width / 2,
                         self.height - 3,
-                        function=close_window)
-
-        Render.print_rect(5, 3, 3, self.width, self.height, self.text)
+                        function=close_window,
+                        target=Render.layers['overlay_console'])
 
         dragging = False
         click_x = None
 
-        while True:
-            Utils.clear_layer(5)
+        mouse = Input.mouse
 
-            Render.draw_rect(5, 0, 0,
+        while True:
+
+            Input.update()
+            Render.clear_layer(Render.layers['overlay_console'])
+
+            Render.draw_rect(Render.layers['overlay_console'], x, y,
                              self.width,
                              self.height,
                              frame=True,
                              f_color=terminal.color_from_argb(255, 100, 100, 255),
-                             bk_color=terminal.color_from_argb(192, 32, 32, 128))
-            # Input.update()
-            mouse = Input.mouse
+                             bk_color=terminal.color_from_argb(192, 32, 32, 128),
+                             title="POP_UP TEST!")
 
-            # Render.blit(background, 0)
-            # libtcod.console_blit(background, 0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 0, 0, 0, 1.0, 1.0)
-            # libtcod.console_blit(pop, 0, 0, self.width, self.height, 0, x, y, 1.0, .85)
+            Render.print_rect(Render.layers['overlay_console'], x + 2, y + 2, self.width - 4, self.height - 4, self.text)
 
             if mouse.lbutton and x <= mouse.cx <= x + self.width and (mouse.cy == y or dragging):
                 if click_x is None:
@@ -115,6 +121,7 @@ class Palette:
 
             if button.draw(x, y) == 'close':
                 self.opened = False
+                Render.clear_layer(Render.layers['overlay_console'])
                 return
 
             # libtcod.console_flush()
@@ -123,14 +130,144 @@ class Palette:
             # graphics.draw_image(x + 1, y + 1, enlarge=True)
             # graphics.clear()
             # graphics.draw_font(0,0)
-            terminal.refresh()
+
+            GameState.render_ui()
+
+layers = {}
+
+def initilize_hud():
+    global layers
+    layers = Render.layers
+    load_from_xp(Constants.MAP_CONSOLE_WIDTH, 0, 'Side_panel', Render.layers['UI_Back'])
+    load_from_xp(0, Constants.MAP_CONSOLE_HEIGHT, 'Panel', Render.layers['UI_Back'])
 
 
+def draw_hud():
+    Render.clear_layer(layers['panel_console'])
+    Render.clear_layer(layers['side_panel_console'])
+    render_common()
+    render_messages()
+    render_status()
+    render_stat_bars()
+
+
+def render_common():
+    import Input
+
+    pos = Pos(Constants.MAP_CONSOLE_WIDTH, 0)
+
+    Render.set_foreground(layers['side_panel_console'], libtcod.Color(0, 70, 140))
+
+    """ LEVEL NUMBER """
+    Render.print_rect(layers['side_panel_console'], pos.x + 1, pos.y + 1, 17, 1, "Level 1".center(17, ' '))
+
+    """ MOUSE X / Y """
+    Render.print_rect(layers['side_panel_console'], pos.x + 9, pos.y + 18, 17, 2,
+                               "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
+
+    """ STATS """
+    Render.set_foreground(layers['panel_console'], libtcod.Color(175, 175, 255))
+    player = GameState.player
+
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 18, str(player.fighter.base_str).rjust(3))
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 19, str(player.fighter.base_def).rjust(3))
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 20, str(player.fighter.base_agl).rjust(3))
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 21, str(player.fighter.base_stm).rjust(3))
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 22, str(player.fighter.base_skl).rjust(3))
+    Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 23, str(player.fighter.base_int).rjust(3))
+
+    """ CONTROLS """
+    Render.print_line(layers['side_panel_console'], 59, 39, "Move:      NUMPAD")
+    Render.print_line(layers['side_panel_console'], 59, 40, "Fire:           F")
+    Render.print_line(layers['side_panel_console'], 59, 41, "Pickup:         G")
+    Render.print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:    B")
+    Render.print_line(layers['side_panel_console'], 59, 43, "Decend:         <")
+    Render.print_line(layers['side_panel_console'], 59, 44, "DEBUG:          X")
+
+
+    """ DUNGEON NAME """
+    pos = Pos(0, Constants.MAP_CONSOLE_HEIGHT)
+
+    Render.print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,
+               GameState.dungeon_name.center(57, ' '))
+    # print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,'TEST')
+
+
+def render_status():
+    # RENDER HEALTH BARS
+    pos = Pos(Constants.MAP_CONSOLE_WIDTH + 1, 25)
+    # CLEAR HP AREA / Status Area
+    Render.set_foreground(layers['side_panel_console'], libtcod.black)
+    Render.set_background(layers['side_panel_console'], libtcod.black)
+    # draw_rect(layers['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
+    # draw_rect(layers['side_panel_console'], pos.x, pos.y, 10, 9, True, libtcod.BKGND_SET)
+
+    # print GameState.player.status
+
+    num_of_status = 0
+    inc = 0
+    for st in GameState.player.status:
+        if num_of_status == 9:
+            Render.set_background(layers['side_panel_console'], libtcod.black)
+            Render.set_foreground(layers['side_panel_console'], libtcod.Color(51, 51, 51))
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + inc,
+                              "...             ")  # + " (" + str(st[1]) + ")")
+            return
+        Render.set_background(layers['side_panel_console'], libtcod.black)
+        Render.set_foreground(layers['side_panel_console'], st['color'])
+
+        if Utils.is_mouse_in(pos.x, pos.y + inc, 17, 1):
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y + inc, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
+        else:
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y + inc, st['name'])  # + " (" + str(st[1]) + ")")
+        num_of_status += 1
+        inc += 1
+
+
+def render_stat_bars():
+
+    pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
+
+    # SHOW PLAYER STAT BARS
+    Render.render_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
+                   libtcod.Color(178, 0, 45),
+                   libtcod.Color(64, 0, 16), layers['side_panel_console'])
+    Render.render_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
+                   libtcod.Color(0, 30, 255),
+                   libtcod.Color(0, 10, 64), layers['side_panel_console'])
+    Render.render_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
+                   libtcod.Color(255, 255, 0),
+                   libtcod.Color(65, 65, 0), layers['side_panel_console'])
+
+    # RENDER MONSTER HEALTH BARS
+    temp_y = 3
+    for object in GameState.current_level.get_visible_objects():
+        if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
+            if temp_y < 17: # TODO: Make constant to scale UI
+                Render.render_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
+                               libtcod.Color(0, 255, 0),
+                               libtcod.Color(0, 64, 0),
+                               layers['side_panel_console'])
+                temp_y += 2
+
+
+
+def render_messages():
+    Render.clear_layer(layers['messages'])
+    y = 3 + Constants.MAP_CONSOLE_HEIGHT
+    for (line, color) in GameState.get_msg_queue():
+        if y < Constants.SCREEN_HEIGHT - 1:
+            Render.set_foreground(layers['messages'], color)
+            # line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH, Constants.PANEL_HEIGHT - 3, line)
+            line_height = 1
+            Render.print_rect(layers['messages'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
+
+            y += line_height
 
 
 def load_from_xp(x, y, filename, console):
     import gzip
-    import xp_loader
+    from Engine import xp_loader
 
     xp_file = gzip.open('Assets\_' + filename + '.xp')
     raw_data = xp_file.read()
@@ -293,7 +430,7 @@ def pop_up(width=None, height=None, title=None, text=None):
                                 flag=libtcod.BKGND_SET,
                                 fmt=title)
 
-    Render.print_rect(pop, 3, 3, width-6, height, text)
+    Render.print_rect(pop, 3, 3, width - 6, height, text)
 
 
     # blit the contents of "window" to the root console
@@ -540,41 +677,41 @@ def skill_tree():
                 elif char == ".":
                     if color == libtcod.purple:
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] - 1, libtcod.CHAR_DNW,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1], libtcod.CHAR_DVLINE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1], libtcod.CHAR_DVLINE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] + 1, libtcod.CHAR_DSE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0], y + y + offset[1] + 1, libtcod.CHAR_DHLINE,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] + 1, libtcod.CHAR_DSW,
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                     else:
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] - 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1], ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1], ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] + 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0], y + y + offset[1] + 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0] - 1, y + y + offset[1] + 1, ' ',
-                                                    color, Constants.UI_PopBack)
+                                         color, Constants.UI_PopBack)
 
                     Render.draw_char(st, x + x + offset[0], y + y + offset[1], chr(4),
-                                                libtcod.white, Constants.UI_PopBack)
+                                     libtcod.white, Constants.UI_PopBack)
 
 
 

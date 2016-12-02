@@ -2,31 +2,29 @@
 # A* Pathfinding in Python (2.7)
 # Please give credit if used
 
-import Fov
-import Map
-import Constants
-from random import shuffle
 from heapq import *
+from random import shuffle
+import GameState
+import Constants
+
+
+# from Engine import Map
 
 
 def reset():
-    map = Map.current_map()
+    map = GameState.current_level.map_array
     for x in range(Constants.MAP_WIDTH):
         for y in range(Constants.MAP_HEIGHT):
             map[x][y].distance_to_player = -1
 
 
-def heuristic(a, b):
-    return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+def BFS(source):
 
-
-def BFS(source, max_distance=10):
-    map = Map.current_map()
+    map = GameState.current_level.map_array
     x, y = source.x, source.y
     # dest_x, dest_y = dest
-
+    # print "UPDATING BFS!"
     reset()
-
 
     visited_tiles = set([])
     tiles_to_proces = []
@@ -41,49 +39,50 @@ def BFS(source, max_distance=10):
         x, y = tiles_to_proces[0][0]
         dist = tiles_to_proces[0][1]
 
-        if dist > 50:
+        if dist > Constants.BFS_MAX_DISTANCE:
             break
         count += 1
 
         map[x][y].distance_to_player = dist
         visited_tiles.add(tiles_to_proces.pop(0)[0])
 
-        if not Map.is_blocked(x + 1, y, True): # RIGHT
+        if not GameState.current_level.is_blocked(x + 1, y, True): # RIGHT
             if (x + 1, y) not in visited_tiles:
                 visited_tiles.add((x + 1, y))
                 tiles_to_proces.append( ((x + 1, y), dist + 1))
-        if not Map.is_blocked(x - 1, y, True):  # RIGHT
+        if not GameState.current_level.is_blocked(x - 1, y, True):  # RIGHT
             if (x - 1, y) not in visited_tiles:
                 visited_tiles.add((x - 1, y))
                 tiles_to_proces.append( ((x - 1, y), dist + 1))
-        if not Map.is_blocked(x, y + 1, True):  # RIGHT
+        if not GameState.current_level.is_blocked(x, y + 1, True):  # RIGHT
             if (x , y + 1) not in visited_tiles:
                 visited_tiles.add((x, y + 1))
                 tiles_to_proces.append( ((x, y + 1), dist + 1))
-        if not Map.is_blocked(x, y - 1, True):  # RIGHT
+        if not GameState.current_level.is_blocked(x, y - 1, True):  # RIGHT
             if (x, y - 1) not in visited_tiles:
                 visited_tiles.add((x, y - 1))
                 tiles_to_proces.append( ((x, y - 1), dist + 1))
 
-        if not Map.is_blocked(x + 1, y + 1, True): #
+        if not GameState.current_level.is_blocked(x + 1, y + 1, True): #
             if (x + 1, y + 1) not in visited_tiles:
                 visited_tiles.add((x + 1, y + 1))
                 tiles_to_proces.append( ((x + 1, y + 1), dist + 1))
-        if not Map.is_blocked(x - 1, y - 1, True):  # RIGHT DOWN
+        if not GameState.current_level.is_blocked(x - 1, y - 1, True):  # RIGHT DOWN
             if (x - 1, y - 1) not in visited_tiles:
                 visited_tiles.add((x - 1, y - 1))
                 tiles_to_proces.append( ((x - 1, y - 1), dist + 1))
-        if not Map.is_blocked(x - 1, y + 1, True):  # RIGHT
+        if not GameState.current_level.is_blocked(x - 1, y + 1, True):  # RIGHT
             if (x - 1, y + 1) not in visited_tiles:
                 visited_tiles.add((x - 1, y + 1))
                 tiles_to_proces.append( ((x - 1, y + 1), dist + 1))
-        if not Map.is_blocked(x + 1, y - 1, True):  # RIGHT
+        if not GameState.current_level.is_blocked(x + 1, y - 1, True):  # RIGHT
             if (x + 1, y - 1) not in visited_tiles:
                 visited_tiles.add((x + 1, y - 1))
                 tiles_to_proces.append( ((x + 1, y - 1), dist + 1))
 
 
-    # print "Loop Count: {0}  Visted Size: {1}".format(count, len(visited_tiles))
+def heuristic(a, b):
+    return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
 
 
 def astar(start, goal, use_fov=True):
@@ -167,29 +166,29 @@ def astar(start, goal, use_fov=True):
 
 def get_lowest_neighbor(x, y):
 
-    map = Map.current_map()
+    map = GameState.current_level.map_array
 
     options = []
 
     """
     Check Neighbors for lowest D-Value
     """
-    if not Map.is_blocked(x, y - 1) and map[x][y - 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x, y - 1) and map[x][y - 1].distance_to_player != -1:
         options.append(((x, y - 1), map[x][y - 1].distance_to_player))
-    if not Map.is_blocked(x - 1, y) and map[x - 1][y].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x - 1, y) and map[x - 1][y].distance_to_player != -1:
         options.append(((x - 1, y), map[x - 1][y].distance_to_player))
-    if not Map.is_blocked(x + 1, y) and map[x + 1][y].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x + 1, y) and map[x + 1][y].distance_to_player != -1:
         options.append(((x + 1, y), map[x + 1][y].distance_to_player))
-    if not Map.is_blocked(x, y + 1) and map[x][y + 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x, y + 1) and map[x][y + 1].distance_to_player != -1:
         options.append(((x, y + 1), map[x][y + 1].distance_to_player))
 
-    if not Map.is_blocked(x - 1, y - 1) and map[x - 1][y - 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x - 1, y - 1) and map[x - 1][y - 1].distance_to_player != -1:
         options.append(((x - 1, y - 1), map[x - 1][y - 1].distance_to_player))
-    if not Map.is_blocked(x - 1, y + 1) and map[x - 1][y + 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x - 1, y + 1) and map[x - 1][y + 1].distance_to_player != -1:
         options.append(((x - 1, y + 1), map[x - 1][y + 1].distance_to_player))
-    if not Map.is_blocked(x + 1, y - 1) and map[x + 1][y - 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x + 1, y - 1) and map[x + 1][y - 1].distance_to_player != -1:
         options.append(((x + 1, y - 1), map[x + 1][y - 1].distance_to_player))
-    if not Map.is_blocked(x + 1, y + 1) and map[x + 1][y + 1].distance_to_player != -1:
+    if not GameState.current_level.is_blocked(x + 1, y + 1) and map[x + 1][y + 1].distance_to_player != -1:
         options.append(((x + 1, y + 1), map[x + 1][y + 1].distance_to_player))
 
     """

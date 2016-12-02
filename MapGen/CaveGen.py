@@ -8,11 +8,12 @@
 # *******************************************************/
 
 
-import libtcodpy as libtcod
 import random
+import sys
+
 import Constants
 import Utils
-import sys
+import libtcodpy as libtcod
 
 sys.setrecursionlimit((Constants.MAP_WIDTH * Constants.MAP_HEIGHT))
 
@@ -107,7 +108,7 @@ def build_caves(map):
                 set_point(cell, 0)
 
     for loops in range(Interations):
-        cell = random.randint(1, Constants.MAP_WIDTH-3), random.randint(1, Constants.MAP_HEIGHT-3)
+        cell = random.randint(1, Constants.MAP_WIDTH - 3), random.randint(1, Constants.MAP_HEIGHT - 3)
 
         neighbors = get_full_closed_neighbours(cell)
         # print neighbors
@@ -131,8 +132,8 @@ def build_caves(map):
                     # print "Smoothing......."
                     set_point(cell, 0)
 
-    for x in range(1,Constants.MAP_WIDTH-1):
-        for y in range(1,Constants.MAP_HEIGHT-1):
+    for x in range(1, Constants.MAP_WIDTH-1):
+        for y in range(1, Constants.MAP_HEIGHT-1):
             cell = x, y
 
             if get_point(cell) == 0 and len(get_closed_neighbours(cell)) >= EmptyCellNeighbours:

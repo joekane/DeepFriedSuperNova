@@ -1,8 +1,7 @@
-import libtcodpy as libtcod
-import Themes
-import Map
 import Render
 import Utils
+import libtcodpy as libtcod
+# from MapGen import Themes, Map
 
 ##################################
 # In-memory XP format is as follows:
@@ -111,6 +110,7 @@ def load_layer_to_layer(layer, x, y, xp_file_layer):
 
 def load_layer_to_map(map, x1, y1, xp_file_layer, rotation='None'):
     global id
+    from MapGen import Map
     if not xp_file_layer['width'] or not xp_file_layer['height']:
         raise AttributeError(
             'Attempted to call load_layer_to_console on data that didn\'t have a width or height key, check your data')
@@ -203,6 +203,7 @@ def load_layer_to_objects(map, x1, y1, xp_file_layer, rotation='None'):
 
 def load_layer_to_map_cosmetic(map, x1, y1, xp_file_layer, rotation='None'):
     global id
+    from MapGen import Themes
     if not xp_file_layer['width'] or not xp_file_layer['height']:
         raise AttributeError(
             'Attempted to call load_layer_to_console on data that didn\'t have a width or height key, check your data')

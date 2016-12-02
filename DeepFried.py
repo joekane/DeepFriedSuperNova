@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # *******************************************************
 # * Copyright (C) 2016-2017 Joe Kane
 # *
@@ -7,31 +8,26 @@
 # * permission of Joe Kane
 # *******************************************************/
 
-
-# -*- coding: utf-8 -*-
-import libtcodpy as libtcod
 from bearlibterminal import terminal
+
 import Constants
-import SoundEffects
-import Themes
 import GameState
-import graphics
+import Render
+from Engine import SoundEffects
+from MapGen import Themes
 
+terminal.open()
+# terminal.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
+# blt.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: arial.ttf, size=8")  # font: UbuntuMono-R.ttf, size=12"
+terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\cp437_16x16_alpha.png, size=16x16, codepage=437".format(
+             Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
+# terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\yoshis_island_opaque.png, size=9x12, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
 
-term = "BEAR"
-
-
-if term == "TCOD":
-    """
-    LIBTCOD Init stuff
-    """
-    libtcod.console_set_custom_font('Fonts/cp437_16x16.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
-    libtcod.console_init_root(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, 'Deep Fried Supernova', False)
-    libtcod.sys_set_fps(Constants.LIMIT_FPS)
-    libtcod.sys_force_fullscreen_resolution(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
-
-
-
+terminal.set('input.filter=[keyboard+, mouse+]')
+terminal.composition(terminal.TK_ON)
+# terminal.set('output.vsync=false')
+terminal.color("white")
+terminal.refresh()
 
 """
 Sound Init
@@ -43,34 +39,18 @@ Load Themes from file & set default theme.
 """
 Themes.initialize()
 
-
 """
 ALT-Graphics init
 """
-# graphics.initilize()  # PYGAME
-
-
-
-terminal.open()
-    # terminal.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
-    # blt.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: arial.ttf, size=8")  # font: UbuntuMono-R.ttf, size=12"
-
-terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\cp437_16x16_alpha.png, size=16x16, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
-#terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\yoshis_island_opaque.png, size=9x12, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
-
-
-terminal.set('input.filter=[keyboard+, mouse+]')
-terminal.composition(terminal.TK_ON)
-terminal.color("white")
-terminal.refresh()
-
-
-
+Render.initialize()
 
 """
 Launch Menu
 """
 GameState.main_menu()
 
+"""
+Close Window in Exit
+"""
 terminal.close()
 

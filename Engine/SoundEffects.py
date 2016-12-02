@@ -1,6 +1,6 @@
 import pygame
-import Constants
 
+import Constants
 
 # MUSIC
 
