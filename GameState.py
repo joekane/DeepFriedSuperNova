@@ -18,6 +18,7 @@ import Engine.Schedule
 from Engine import UI
 import MapGen.WorldGen
 import Utils
+import Engine.Animation_System as Animation
 import random
 import libtcodpy as libtcod
 from Entities import Entity, Components, Pathing
@@ -33,6 +34,8 @@ game_msgs = []
 dungeon_level = 1
 dungeon_name = "Test"
 dungeon_tags = []
+
+animation_queue = []
 
 inventory = []
 
@@ -110,7 +113,10 @@ def starting_equipment():
 
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10, aoe=1)
+    ranged_component = Components.Ranged(10,
+                                         aoe=1,
+                                         animation='Shot'
+                                         )
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
                         equipment=equipment_component,
                         ranged=ranged_component)
@@ -305,8 +311,14 @@ def play_game():
     UI.initilize_hud()
     current_level.require_recompute()
     Pathing.BFS(player)
+
     while not libtcod.console_is_window_closed():
-        Engine.Schedule.process()
+        #print animation_queue
+        #print not animation_queue
+        if not animation_queue:
+            Engine.Schedule.process()
+        else:
+            render_ui()
 
 
 def check_level_up():
@@ -404,12 +416,27 @@ def move_camera(target_x, target_y):
 def render_all():
     current_level.draw()
     UI.draw_hud()
+
     terminal.refresh()
 
 
 def render_ui():
     UI.draw_hud()
+    render_animations()
     terminal.refresh()
+
+
+def render_animations():
+    import Render
+    Render.clear_layer(10)
+    for ani in animation_queue:
+        #print "Animating................."
+        result = ani.play()
+        if result == 'Done':
+            #print "Want?"
+            animation_queue.remove(ani)
+        terminal.refresh()
+
 
 
 def player_move_or_interact(dx, dy):
@@ -444,4 +471,5 @@ def player_move_or_interact(dx, dy):
     current_level.require_recompute()
 
 
-
+def add_animation(animation, animation_params):
+    animation_queue.append(Animation.AddAnimation(animation, animation_params))

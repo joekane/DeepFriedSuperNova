@@ -10,6 +10,8 @@
 
 from bearlibterminal import terminal
 
+import libtcodpy as libtcod
+
 import Constants
 import GameState
 import Render
@@ -25,7 +27,7 @@ terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fon
 
 terminal.set('input.filter=[keyboard+, mouse+]')
 terminal.composition(terminal.TK_ON)
-# terminal.set('output.vsync=false')
+terminal.set('output.vsync=false')
 terminal.color("white")
 terminal.refresh()
 
@@ -43,6 +45,11 @@ Themes.initialize()
 ALT-Graphics init
 """
 Render.initialize()
+
+
+#import playground
+#playground.play()
+
 
 """
 Launch Menu

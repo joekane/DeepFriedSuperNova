@@ -44,7 +44,7 @@ def blank(x, y):
     draw_char(layers['entity_console'], x, y, ' ', None, libtcod.BKGND_NONE)
 
 
-def draw_char(dest, x, y, char, color=None, flag=None):
+def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
     # LIBTCOD
     # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
 
@@ -52,7 +52,7 @@ def draw_char(dest, x, y, char, color=None, flag=None):
     terminal.layer(dest)
     # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
     if color is not None:
-        color = Utils.convert_color(color)
+        color = Utils.convert_color(color, alpha)
         terminal.color(color)
     terminal.put(x, y, char)
 
@@ -147,7 +147,7 @@ def draw_hoz_line(x, y, length, color, target):
 
 """ EVERYTHING BELOW THIS LINE SHOULD MOVE TO A UI FILE """
 
-def ui(): # TODO: These should all be in UI (Move UI bits to a UI.Component class or something)
+def ui_OLD(): # TODO: These should all be in UI (Move UI bits to a UI.Component class or something)
     clear_layer(layers['panel_console'])
     clear_layer(layers['side_panel_console'])
 

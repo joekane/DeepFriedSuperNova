@@ -119,6 +119,85 @@ def get_line(start, end, walkable=False, ignore_mobs=False, max_length=99999):
     # print points, max_length
     return points[0:max_length+1]
 
+# Get Coods from DIST and ANGLE
+def get_vector(start_x, start_y, dist, angle):
+
+    #      270
+    # 180   +   360
+    #       90
+
+    x = dist * math.cos(math.radians(angle))
+    y = dist * math.sin(math.radians(angle))
+    return int(round(start_x + x)), int(round(start_y + y))
+
+
+# GET ANGLE FROM COORDS
+def get_angle(start_x, start_y, end_x, end_y):
+    dx = end_x - start_x
+    dy = end_y - start_y
+    rads = math.atan2(dy, dx)
+    rads %= 2*math.pi
+    degrees =  int(math.degrees(rads))
+    print "Angle: {0}".format(degrees)
+    return degrees
+
+
+
+def b_line(start, end, max_length=99999):
+
+    if start == (None, None) or end == (None, None):
+        return []
+
+    # Setup initial conditions
+    x1, y1 = start
+    x2, y2 = end
+    dx = x2 - x1
+    dy = y2 - y1
+
+    # Determine how steep the line is
+    is_steep = abs(dy) > abs(dx)
+
+    # Rotate line
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+
+    # Swap start and end points if necessary and store swap state
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
+
+    # Recalculate differentials
+    dx = x2 - x1
+    dy = y2 - y1
+
+    # Calculate error
+    error = int(dx / 2.0)
+    ystep = 1 if y1 < y2 else -1
+
+    # Iterate over bounding box generating points between start and end
+    y = y1
+    points = []
+    for x in range(x1, x2 + 1):
+        coord = (y, x) if is_steep else (x, y)
+        points.append(coord)
+
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+
+
+    # Reverse the list if the coordinates were swapped
+    if swapped:
+        points.reverse()
+    # points.remove(start)
+    # print points, max_length
+    return points[0:max_length+1]
+
+
 
 def distance_between(x1, y1, x2, y2):
     # return the distance to another object
@@ -447,6 +526,19 @@ def to_map_coordinates(x, y):
         return None, None  # if it's outside the map, return nothing
 
     return x, y
+
+
+def gradient(color_list, color_keys):
+    return libtcod.color_gen_map(color_list, color_keys)
+
+
+def segment_number(number, times):
+    num_list = []
+    for x in range(1,times+1):
+        num_list.append((float(number)/float(times)) * x)
+    print "Number: {0}\n Times: {1}\n Result: {2}\n".format(number, times, num_list)
+    return num_list
+
 
 
 heat_map_colors = [libtcod.yellow,

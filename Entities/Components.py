@@ -22,8 +22,10 @@ import Render
 import Utils
 import Engine.Animate as Animate
 import libtcodpy as libtcod
+import random
 from Engine import Input, Schedule
 from Engine import UI
+from Engine import Animation_System as Animate
 
 vCount = 0
 
@@ -116,19 +118,19 @@ class PlayeControlled:
             """
             Basic User Input
             """
-            if key == terminal.TK_KP_8:
+            if key == terminal.TK_KP_8 or key == terminal.TK_UP:
                 GameState.player_move_or_interact(0, -1)
                 return self.end_turn(Constants.TURN_COST)
-            elif key == terminal.TK_KP_2:
+            elif key == terminal.TK_KP_2 or key == terminal.TK_DOWN:
                 GameState.player_move_or_interact(0, 1)
                 return self.end_turn(Constants.TURN_COST)
-            elif key == terminal.TK_KP_4:
+            elif key == terminal.TK_KP_4 or key == terminal.TK_LEFT:
                 GameState.player_move_or_interact(-1, 0)
                 return self.end_turn(Constants.TURN_COST)
-            elif key == terminal.TK_KP_6:
+            elif key == terminal.TK_KP_6 or key == terminal.TK_RIGHT:
                 GameState.player_move_or_interact(1, 0)
                 return self.end_turn(Constants.TURN_COST)
-            elif key == terminal.TK_KP_7:
+            elif key == terminal.TK_KP_7: # or (terminal.TK_LEFT and terminal.TK_UP):
                 GameState.player_move_or_interact(-1, -1)
                 return self.end_turn(Constants.TURN_COST)
             elif key == terminal.TK_KP_9:
@@ -416,12 +418,12 @@ class MeleeMonster:
                 dist = GameState.current_level.map_array[monster.x][monster.y].distance_to_player
                 # print self.owner.name + " | " + str(dist)
                 if dist == 1 and player.fighter.hp > 0:
-                    print "{0} fights Player.".format(monster.name)
+                    # print "{0} fights Player.".format(monster.name)
                     monster.fighter.attack(player)
                 else:
-                    print "{0} is at {1}".format(monster.name, (monster.x, monster.y))
+                    # print "{0} is at {1}".format(monster.name, (monster.x, monster.y))
                     dest = Pathing.get_lowest_neighbor(monster.x, monster.y)
-                    print "{0} moves to {1}.".format(monster.name, dest)
+                    # print "{0} moves to {1}.".format(monster.name, dest)
                     monster.move_to(dest[0], dest[1])
                     # monster.move_astar(player)
                     # monster.move_dijkstra(player)
@@ -572,23 +574,34 @@ class RangedMonster:
                 # move towards player if far away
 
             if self.active:
-
                 dist = monster.distance_to(player)
 
                 if dist > self.attack_range:
                     # monster.move_astar(player)
+                    dest = Pathing.get_lowest_neighbor(monster.x, monster.y)
+                    # print "{0} moves to {1}.".format(monster.name, dest)
+                    monster.move_to(dest[0], dest[1])
                     self.reload -= 1
                 # close enough, attack! (if the player is still alive.)
                 elif player.fighter.hp > 0 and self.reload <= 0 and GameState.current_level.is_visible(obj=monster):
-
-                    Animate.follow_line(self.owner, player)
                     monster.fighter.attack(player)
+                    self.play_animation('Shot', self.owner, player.x, player.y)
                     self.reload = 3
                 else:
                     # Move away?
                     self.reload -= 1
 
+
+
             return Constants.TURN_COST
+
+    def play_animation(self, animation_name, source, target_x, target_y):
+        animation_params = {}
+        animation_params['origin'] = (source.x, source.y)
+        animation_params['target'] = (target_x, target_y)
+        animation_params['target_angle'] = Utils.get_angle(source.x, source.y, target_x, target_y)
+
+        GameState.add_animation(animation_name, animation_params)
 
 
 class RangedTurretMonster:
@@ -620,13 +633,25 @@ class RangedTurretMonster:
             elif player.fighter.hp > 0 and self.reload <= 0 and GameState.current_level.is_visible(obj=monster):
                 """ DISABLE """
                 #Animate.follow_line(self.owner, player)
+
+                self.play_animation('Shot', self.owner,  player.x, player.y )
                 monster.fighter.attack(player)
+
+
                 self.reload = 3
             else:
                 # Move away?
                 self.reload -= 1
 
         return Constants.TURN_COST
+
+    def play_animation(self, animation_name, source, target_x, target_y):
+        animation_params = {}
+        animation_params['origin'] = (source.x, source.y)
+        animation_params['target'] = (target_x, target_y)
+        animation_params['target_angle'] = Utils.get_angle(source.x, source.y, target_x, target_y)
+
+        GameState.add_animation(animation_name, animation_params)
 
 
 class SpawningMonster:
@@ -786,16 +811,20 @@ class Equipment:
 
 
 class Ranged:
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, owner=None):
+    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, animation=None, animation_params={'none': None}, owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
         self.owner = owner
         self.aoe = aoe
+        self.animation = animation
+        self.animation_params = animation_params
 
     def fire(self, source=None, target=None):
 
         targets = []
+        target_x = 0
+        target_y = 0
 
         if source is None:
             source = GameState.get_player()
@@ -871,12 +900,12 @@ class Ranged:
 
                 if mouse.lbutton_pressed or key == terminal.TK_SPACE:
                     # target_tile = (target_x, target_y)
-                    print tile_effected
+                    #print tile_effected
                     for target in tile_effected:
                         #target = Map.to_map_coordinates(target[0], target[1])
                         monster = GameState.current_level.get_monster_at((target[0], target[1]))
-                        print "Monster: " + str(monster) + " at " +  str(target)
                         if monster is not None:
+                            print "Monster: " + str(monster) + " at " + str(target)
                             targets.append(monster)
                     break
 
@@ -903,10 +932,18 @@ class Ranged:
         # Animate.explosion(target)
 
         # zap it!
+        if self.animation:
+            self.animation_params['origin'] = (source.x, source.y)
+            self.animation_params['target'] = (target_x, target_y)
+            self.animation_params['target_angle'] = Utils.get_angle(source.x, source.y, target_x, target_y)
+
+            GameState.add_animation(self.animation, self.animation_params)
+
         for target in targets:
-            Utils.message('{0} takes {1} damage.'.format(target.name, self.owner.equipment.power_bonus),
-                          libtcod.light_blue)
-            target.fighter.take_damage(self.owner.equipment.power_bonus)
+            if target.fighter:
+                Utils.message('{0} takes {1} damage.'.format(target.name, self.owner.equipment.power_bonus),
+                              libtcod.light_blue)
+                target.fighter.take_damage(self.owner.equipment.power_bonus)
         Render.clear_layer(5)
         return 'fired'
 
