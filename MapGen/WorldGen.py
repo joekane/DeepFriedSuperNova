@@ -1616,7 +1616,7 @@ def spawn_npc_at(level, x, y, npc):
     monster.action_points = 0
 
     if monster.base_speed > 0:
-        Engine.Schedule.register(monster)
+        GameState.schedule.register(monster)
 
 
 def spawn_door_at(level, x, y, npc):

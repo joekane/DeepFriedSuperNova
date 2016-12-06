@@ -45,6 +45,7 @@ class PlayeControlled:
             Pathing.BFS(GameState.player)
             self.owner.pass_time()
             # Render.render_all()
+        print "Contorl Leaving.............{0}".format(cost)
         Input.clear()
         return cost
 
@@ -86,12 +87,16 @@ class PlayeControlled:
 
 
         while True:
+
+
+
             """
             On player turn this loops continuasouly waiting for user input
             """
             Input.update()
             key = Input.key
             GameState.render_ui()
+
 
 
             """
@@ -176,7 +181,15 @@ class PlayeControlled:
                 if stairs.x == self.owner.x and stairs.y == self.owner.y:
                     GameState.next_level()
                     return 1
-                    '''
+            elif key == terminal.TK_ESCAPE:
+                GameState.save_game()
+                terminal.close()
+            elif key == terminal.TK_L:
+                GameState.load_game()
+            elif key == terminal.TK_O:
+                print GameState.current_level.fov_map
+
+                '''
                     elif key_char == 'i':
                         # Map.update_d_map()
                         # show the inventory; if an item is selected, use it
@@ -967,7 +980,7 @@ def monster_death(monster):
     monster.fighter = None
     monster.ai = None
     monster.name = 'remains of ' + monster.name
-    Schedule.release(monster)
+    GameState.schedule.release(monster)
     # Schedule.pq
 
     monster.send_to_back()

@@ -21,6 +21,7 @@ import Utils
 import Engine.Animation_System as Animation
 import random
 import libtcodpy as libtcod
+import shelve
 from Entities import Entity, Components, Pathing
 
 
@@ -34,27 +35,24 @@ game_msgs = []
 dungeon_level = 1
 dungeon_name = "Test"
 dungeon_tags = []
-
 animation_queue = []
-
-inventory = []
-
-
 visible_objects = None
-
 camera_x = 0
 camera_y = 0
+continue_walking = False
+
+schedule = Engine.Schedule.Scheduler()
+
+
 
 goals = [((20, 20), 0)]
 
-continue_walking = False
 
 """ Worlds """
 # diner
 # level1
 
 
-current_level = None
 
 
 def initialize():
@@ -98,7 +96,7 @@ def initialize():
     player.level = 1
     player.action_points = 100
 
-    Engine.Schedule.register(player)
+    schedule.register(player)
 
     dungeon_level = 1
 
@@ -114,7 +112,7 @@ def starting_equipment():
     # Starting Pistol
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
     ranged_component = Components.Ranged(10,
-                                         aoe=1,
+                                         aoe=0,
                                          animation='Shot'
                                          )
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
@@ -296,7 +294,7 @@ def next_level():
     Themes.set_theme('Shadow State Archive')
     '''
 
-    Engine.Schedule.reset()
+    schedule.reset()
 
     # TODO: THIS NEEDS TO BE BROUGHT UP TO SPEED """
     # MapGen.Map.generate_map()
@@ -316,7 +314,7 @@ def play_game():
         #print animation_queue
         #print not animation_queue
         if not animation_queue:
-            Engine.Schedule.process()
+            schedule.process()
         else:
             render_ui()
 
@@ -350,34 +348,63 @@ def check_level_up():
 
 
 def save_game():
-    # file = shelve.open('savegame', 'n')
+    file = shelve.open('savegame', 'n')
     # file['map'] = map
     # file['objects'] = objects
     # file['player_index'] = objects.index(player)
     # file['inventory'] = inventory
     # file['game_msgs'] = game_msgs
-    # file['game_state'] = game_state
+    #file['game_state'] = game_state
     # file['stairs_index'] = objects.index(stairs)
     # file['dungeon_level'] = dungeon_level
-    # file.close()
-    pass
+
+    file['current_level'] = current_level
+    file['imported_items_list'] = imported_items_list
+    file['imported_npc_list'] = imported_npc_list
+    file['imported_quest_list'] = imported_quest_list
+    file['current_quests'] = current_quests
+    file['player'] = player
+    file['inventory'] = inventory
+    file['game_msgs'] = game_msgs
+    file['dungeon_level'] = dungeon_level
+    file['dungeon_name'] = dungeon_name
+    file['dungeon_tags'] = dungeon_tags
+    file['camera_pos'] = (camera_x, camera_y)
+    file['schedule'] = schedule
+
+    file.close()
 
 
 def load_game():
     # open the previously saved shelve and load the game data
-    # global map, objects, player, inventory, game_msgs, game_state, dungeon_level, stairs
+    global current_level, imported_items_list, imported_npc_list, imported_quest_list, current_quests
+    global inventory, game_msgs, dungeon_level, dungeon_name, dungeon_tags, camera_x, camera_y, schedule, player
 
-    # file = shelve.open('savegame', 'r')
-    # map = file['map']
-    # objects = file['objects']
-    # player = objects[file['player_index']]  # get index of player in objects list and access it
-    # inventory = file['inventory']
-    # game_msgs = file['game_msgs']
-    # game_state = file['game_state']
-    # stairs = objects[file['stairs_index']]
-    # # dungeon_level = file['dungeon_level']
-    # file.close()
-    # Fov.initialize()
+    file = shelve.open('savegame', 'r')
+
+    current_level = file['current_level']
+    imported_items_list = file['imported_items_list']
+    imported_npc_list = file['imported_npc_list']
+    imported_quest_list = file['imported_quest_list']
+    current_quests = file['current_quests']
+
+    inventory = file['inventory']
+    game_msgs = file['game_msgs']
+    dungeon_level = file['dungeon_level']
+    dungeon_name = file['dungeon_name']
+    dungeon_tags = file['dungeon_tags']
+    camera_x, camera_y = file['camera_pos']
+    schedule = file['schedule']
+
+    player = current_level.player
+    file.close()
+
+    current_level.fov_initialize()
+    current_level.require_recompute()
+    current_level.recompute_fov()
+    render_all()
+
+
     pass
 
 
@@ -414,13 +441,15 @@ def move_camera(target_x, target_y):
 
 
 def render_all():
+    print "Player X/Y: {0},{1}".format(player.x, player.y)
     current_level.draw()
     UI.draw_hud()
-
+    render_animations()
     terminal.refresh()
 
 
 def render_ui():
+
     UI.draw_hud()
     render_animations()
     terminal.refresh()
