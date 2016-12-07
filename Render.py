@@ -57,6 +57,20 @@ def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
     terminal.put(x, y, char)
 
 
+def draw_char_ex(dest, x, y, dx, dy, char, color=None, flag=None, alpha=255):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    # BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    if color is not None:
+        color = Utils.convert_color(color, alpha)
+        terminal.color(color)
+    terminal.put_ext(x, y, dx, dy, char, None)
+
+
+
 def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
     # LIBTCOD
     # libtcod.console_set_char_background(dest, x, y, color, flag)
@@ -164,98 +178,39 @@ def draw_object(obj, visible=True):
     x, y = Utils.to_camera_coordinates(obj.x, obj.y)
 
     if visible:
+        if obj.fighter and Constants.HEALTH_BARS:
+            char = 0x0398
+            draw_char(layers['entity_console'], x, y, char, libtcod.red)
+
+            percentage = (float(obj.fighter.hp) / float(obj.fighter.max_hp))*100
+
+            if percentage <=10:
+                char = 0x03B1
+            elif percentage <=20:
+                char = 0x00DF
+            elif percentage <=30:
+                char = 0x0393
+            elif percentage <=40:
+                char = 0x03C0
+            elif percentage <=50:
+                char = 0x03A3
+            elif percentage <=60:
+                char = 0x03C3
+            elif percentage <=70:
+                char = 0x0085
+            elif percentage <=80:
+                char = 0x03C4
+            elif percentage <=90:
+                char = 0x03A6
+            else:
+                char = 0x0398
+            draw_char(layers['entity_console'], x, y, char, libtcod.green)
+
         draw_char(layers['entity_console'], x, y, obj.char, obj.color,
                   libtcod.BKGND_NONE)
     else:
         draw_char(layers['entity_console'], x, y, obj.char, libtcod.darker_gray,
                   libtcod.BKGND_NONE)
-
-
-def render_messages():
-    print "DONT BE HERE"
-    clear_layer(layers['messages'])
-    y = 3 + Constants.MAP_CONSOLE_HEIGHT
-    for (line, color) in GameState.get_msg_queue():
-        if y < Constants.SCREEN_HEIGHT - 1:
-            set_foreground(layers['messages'], color)
-            # line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH, Constants.PANEL_HEIGHT - 3, line)
-            line_height = 1
-            print_rect(layers['messages'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
-
-            y += line_height
-
-
-def render_common():
-    from Engine import Input
-
-    pos = Pos(Constants.MAP_CONSOLE_WIDTH, 0)
-
-    set_foreground(layers['side_panel_console'], libtcod.Color(0, 70, 140))
-
-    """ LEVEL NUMBER """
-    print_rect(layers['side_panel_console'], pos.x + 1, pos.y + 1, 17, 1, "Level 1".center(17, ' '))
-
-    """ MOUSE X / Y """
-    print_rect(layers['side_panel_console'], pos.x + 9, pos.y + 18, 17, 2,
-                               "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
-
-    """ STATS """
-    set_foreground(layers['panel_console'], libtcod.Color(175, 175, 255))
-    player = GameState.get_player()
-
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 18, str(player.fighter.base_str).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 19, str(player.fighter.base_def).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 20, str(player.fighter.base_agl).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 21, str(player.fighter.base_stm).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 22, str(player.fighter.base_skl).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 23, str(player.fighter.base_int).rjust(3))
-
-    """ CONTROLS """
-    print_line(layers['side_panel_console'], 59, 39, "Move:      NUMPAD")
-    print_line(layers['side_panel_console'], 59, 40, "Fire:           F")
-    print_line(layers['side_panel_console'], 59, 41, "Pickup:         G")
-    print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:    B")
-    print_line(layers['side_panel_console'], 59, 43, "Decend:         <")
-    print_line(layers['side_panel_console'], 59, 44, "DEBUG:          X")
-
-
-    """ DUNGEON NAME """
-    pos = Pos(0, Constants.MAP_CONSOLE_HEIGHT)
-
-    print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,
-               GameState.dungeon_name.center(57, ' '))
-    # print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,'TEST')
-
-
-def render_status():
-    # RENDER HEALTH BARS
-    pos = Pos(Constants.MAP_CONSOLE_WIDTH + 1, 25)
-    # CLEAR HP AREA / Status Area
-    set_foreground(layers['side_panel_console'], libtcod.black)
-    set_background(layers['side_panel_console'], libtcod.black)
-    # draw_rect(layers['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
-    # draw_rect(layers['side_panel_console'], pos.x, pos.y, 10, 9, True, libtcod.BKGND_SET)
-
-    # print GameState.player.status
-
-    num_of_status = 0
-    inc = 0
-    for st in GameState.player.status:
-        if num_of_status == 9:
-            set_background(layers['side_panel_console'], libtcod.black)
-            set_foreground(layers['side_panel_console'], libtcod.Color(51, 51, 51))
-            print_line(layers['side_panel_console'], pos.x, pos.y - 1 + inc,
-                                  "...             ")  # + " (" + str(st[1]) + ")")
-            return
-        set_background(layers['side_panel_console'], libtcod.black)
-        set_foreground(layers['side_panel_console'], st['color'])
-
-        if Utils.is_mouse_in(pos.x, pos.y + inc, 17, 1):
-            print_line(layers['side_panel_console'], pos.x, pos.y + inc, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
-        else:
-            print_line(layers['side_panel_console'], pos.x, pos.y + inc, st['name'])  # + " (" + str(st[1]) + ")")
-        num_of_status += 1
-        inc += 1
 
 
 def render_stat_bars():
@@ -317,9 +272,11 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
         draw_char(target, x1, y, Utils.get_unicode(254), bar_color, libtcod.BKGND_SET)
 
     if Utils.is_mouse_in(x, og_y, total_width, height):
+        terminal.composition(terminal.TK_OFF)
         line = str(value) + "/" + str(maximum)
         set_foreground(target, 'white')
         print_line(target, x, y, line)
+        terminal.composition(terminal.TK_ON)
 
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):

@@ -71,3 +71,58 @@ color = libtcod.light_yellow
 freq = 10:2
 
 
+[Pistol]
+equipment_component = True
+ranged_component = True
+max_range = 5
+aoe = 0
+animation = Shot
+slot = left hand
+power_bonus = 2
+defense_bonus = 0
+char = ~
+name = pistol
+color = libtcod.sky
+freq = 0:0
+
+[Laser]
+equipment_component = True
+ranged_component = True
+max_range = 10
+aoe = 0
+animation = Beam
+slot = left hand
+power_bonus = 5
+defense_bonus = 0
+char = ~
+name = laser
+color = libtcod.sky
+freq = 0:0
+
+[RPG]
+equipment_component = True
+ranged_component = True
+max_range = 15
+aoe = 3
+animation = Burst
+slot = left hand
+power_bonus = 30
+defense_bonus = 0
+char = ~
+name = rpg
+color = libtcod.sky
+freq = 0:0
+
+[Ice Wand]
+equipment_component = True
+ranged_component = True
+max_range = 5
+aoe = 0
+animation = Breath
+slot = left hand
+power_bonus = 4
+defense_bonus = 0
+char = ~
+name = ice wand
+color = libtcod.sky
+freq = 0:0

@@ -109,9 +109,16 @@ def starting_equipment():
     equipment_component.equip()
     obj.always_visible = True
 
-    # Starting Pistol
+    add_item_to_player('RPG')
+    add_item_to_player('Laser')
+    add_item_to_player('Ice Wand')
+    add_item_to_player('Pistol')
+
+    # Starting Weapons
+    '''
+    """ Pistol """
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10,
+    ranged_component = Components.Ranged(5,
                                          aoe=0,
                                          animation='Shot'
                                          )
@@ -122,6 +129,45 @@ def starting_equipment():
     equipment_component.equip()
     obj.always_visible = True
 
+    """ Laser """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=5)
+    ranged_component = Components.Ranged(10,
+                                         aoe=0,
+                                         animation='Beam'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'laser', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+
+    """ RPG """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=20)
+    ranged_component = Components.Ranged(10,
+                                         aoe=3,
+                                         animation='Burst'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'rpg', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+
+    """ Ice Wand """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=3)
+    ranged_component = Components.Ranged(5,
+                                         aoe=0,
+                                         animation='Breath'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'ice wand', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+    '''
 
 def get_player():
     return player
@@ -313,10 +359,8 @@ def play_game():
     while not libtcod.console_is_window_closed():
         #print animation_queue
         #print not animation_queue
-        if not animation_queue:
-            schedule.process()
-        else:
-            render_ui()
+        schedule.process()
+
 
 
 def check_level_up():
@@ -370,7 +414,11 @@ def save_game():
     file['dungeon_name'] = dungeon_name
     file['dungeon_tags'] = dungeon_tags
     file['camera_pos'] = (camera_x, camera_y)
-    file['schedule'] = schedule
+
+    time_indeices = []
+    for obj in schedule.time_travelers:
+        time_indeices.append(current_level.objects.index(obj))
+    file['schedule'] = time_indeices
 
     file.close()
 
@@ -394,18 +442,18 @@ def load_game():
     dungeon_name = file['dungeon_name']
     dungeon_tags = file['dungeon_tags']
     camera_x, camera_y = file['camera_pos']
-    schedule = file['schedule']
+    time_indices = file['schedule']
+
+    schedule.time_travelers = []
+
+    for index in time_indices:
+        schedule.time_travelers.append(current_level.objects[index])
 
     player = current_level.player
     file.close()
 
     current_level.fov_initialize()
     current_level.require_recompute()
-    current_level.recompute_fov()
-    render_all()
-
-
-    pass
 
 
 # CAMERA
@@ -441,30 +489,18 @@ def move_camera(target_x, target_y):
 
 
 def render_all():
-    print "Player X/Y: {0},{1}".format(player.x, player.y)
     current_level.draw()
     UI.draw_hud()
-    render_animations()
+    Animation.render_animations(animation_queue)
     terminal.refresh()
 
 
 def render_ui():
 
     UI.draw_hud()
-    render_animations()
+    Animation.render_animations(animation_queue)
     terminal.refresh()
 
-
-def render_animations():
-    import Render
-    Render.clear_layer(10)
-    for ani in animation_queue:
-        #print "Animating................."
-        result = ani.play()
-        if result == 'Done':
-            #print "Want?"
-            animation_queue.remove(ani)
-        terminal.refresh()
 
 
 
@@ -502,3 +538,34 @@ def player_move_or_interact(dx, dy):
 
 def add_animation(animation, animation_params):
     animation_queue.append(Animation.AddAnimation(animation, animation_params))
+
+
+def add_item_to_player(item_name):
+    item_component = None
+    equipment_component = None
+    rannged_componenet = None
+    item = imported_items_list[item_name]
+    if 'item_component' in item:
+        if 'use_function' in item:
+            item_component = \
+                Components.Item(use_function=eval('Spells.' + item['use_function']))
+        else:
+            item_component = Components.Item()
+    if 'equipment_component' in item:
+        if 'ranged_component' in item:
+            rannged_componenet = Components.Ranged(int(item['max_range']),
+                                                   aoe=int(item['aoe']),
+                                                   animation=item['animation'])
+
+        equipment_component = Components.Equipment(slot=item['slot'],
+                                                   defense_bonus=int(item['defense_bonus']),
+                                                   power_bonus=int(item['power_bonus']))
+    item = Entity.Entity(0, 0, item['char'],
+                         item['name'],
+                         eval(item['color']),
+                         item=item_component,
+                         equipment=equipment_component,
+                         ranged=rannged_componenet)
+    inventory.append(item)
+    item.equipment.equip()
+    item.always_visible = True  # items are visible even out-of-FOV, if in an explored area

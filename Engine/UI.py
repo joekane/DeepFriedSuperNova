@@ -176,13 +176,21 @@ def render_common():
     Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 22, str(player.fighter.base_skl).rjust(3))
     Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 23, str(player.fighter.base_int).rjust(3))
 
+    """ Items """
+    ranged_items = [equip for equip in GameState.inventory if equip.ranged]
+    equipped_ranged = [equip.name for equip in ranged_items if equip.equipment.is_equipped]
+    if equipped_ranged:
+        Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 9, 20, equipped_ranged[0])
+
+
     """ CONTROLS """
-    Render.print_line(layers['side_panel_console'], 59, 39, "Move:      NUMPAD")
-    Render.print_line(layers['side_panel_console'], 59, 40, "Fire:           F")
-    Render.print_line(layers['side_panel_console'], 59, 41, "Pickup:         G")
-    Render.print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:    B")
-    Render.print_line(layers['side_panel_console'], 59, 43, "Decend:         <")
-    Render.print_line(layers['side_panel_console'], 59, 44, "DEBUG:          X")
+    Render.print_line(layers['side_panel_console'], 59, 39, "Move/Attack:      NUMPAD/ARROWS")
+    Render.print_line(layers['side_panel_console'], 59, 40, "Fire:                         F")
+    Render.print_line(layers['side_panel_console'], 59, 41, "Pickup:                       G")
+    Render.print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:                  B")
+    Render.print_line(layers['side_panel_console'], 59, 43, "Decend:                       <")
+    Render.print_line(layers['side_panel_console'], 59, 44, "Change Weapon:              [[/]]")
+    Render.print_line(layers['side_panel_console'], 59, 45, "DEBUG:                        X")
 
 
     """ DUNGEON NAME """
@@ -249,7 +257,6 @@ def render_stat_bars():
                                libtcod.Color(0, 64, 0),
                                layers['side_panel_console'])
                 temp_y += 2
-
 
 
 def render_messages():

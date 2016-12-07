@@ -45,7 +45,7 @@ class PlayeControlled:
             Pathing.BFS(GameState.player)
             self.owner.pass_time()
             # Render.render_all()
-        print "Contorl Leaving.............{0}".format(cost)
+        # print "Contorl Leaving.............{0}".format(cost)
         Input.clear()
         return cost
 
@@ -66,7 +66,21 @@ class PlayeControlled:
                 GameState.continue_walking = False
                 self.owner.clear_path()
                 GameState.current_level.require_recompute()
+
+                animation_params = {}
+                animation_params['origin'] = (self.owner.x, self.owner.y)
+                animation_params['target'] = (self.owner.x, self.owner.y)
+                #animation_params['target_angle'] = Utils.get_angle(self.owner.x, self.owner.y, self.owner.x, self.owner.y)
+                GameState.add_animation('Teleport', animation_params)
+
                 self.owner.x, self.owner.y = Utils.to_map_coordinates(mouse.cx, mouse.cy)
+
+                animation_params = {}
+                animation_params['origin'] = (self.owner.x, self.owner.y)
+                animation_params['target'] = (self.owner.x, self.owner.y)
+                # animation_params['target_angle'] = Utils.get_angle(self.owner.x, self.owner.y, self.owner.x, self.owner.y)
+                GameState.add_animation('Teleport', animation_params)
+
                 return 1
         return 0
 
@@ -88,7 +102,7 @@ class PlayeControlled:
 
         while True:
 
-
+            # print "Waiting for input"
 
             """
             On player turn this loops continuasouly waiting for user input
@@ -186,8 +200,33 @@ class PlayeControlled:
                 terminal.close()
             elif key == terminal.TK_L:
                 GameState.load_game()
+                return 1
             elif key == terminal.TK_O:
                 print GameState.current_level.fov_map
+            elif key == terminal.TK_RBRACKET:
+
+
+                equipped_ranged = [equip.name for equip in GameState.inventory if equip.equipment.is_equipped and equip.ranged]
+
+                if equipped_ranged[0] == "pistol":
+                    new_weapon = [equip for equip in GameState.inventory if
+                                       equip.name == 'laser']
+                    new_weapon[0].equipment.equip()
+                elif equipped_ranged[0] == "laser":
+                    new_weapon = [equip for equip in GameState.inventory if
+                                  equip.name == 'rpg']
+                    new_weapon[0].equipment.equip()
+                elif equipped_ranged[0] == "rpg":
+                    new_weapon = [equip for equip in GameState.inventory if
+                                  equip.name == 'ice wand']
+                    new_weapon[0].equipment.equip()
+                elif equipped_ranged[0] == "ice wand":
+                    new_weapon = [equip for equip in GameState.inventory if
+                                  equip.name == 'pistol']
+                    new_weapon[0].equipment.equip()
+
+            elif key == terminal.TK_LBRACKET:
+                pass
 
                 '''
                     elif key_char == 'i':
@@ -981,6 +1020,30 @@ def monster_death(monster):
     monster.ai = None
     monster.name = 'remains of ' + monster.name
     GameState.schedule.release(monster)
+    # Schedule.pq
+
+    monster.send_to_back()
+
+
+def exmplosive_death(monster):
+    # transform it into a nasty corpse! it doesn't block, can't be
+    # attacked and doesn't move
+    Utils.message('The ' + monster.name + ' is dead! You gain ' + str(monster.fighter.xp) + ' experience points.',
+                  libtcod.orange)
+    monster.char = '%'
+    monster.color = libtcod.dark_red
+    monster.blocks = False
+    monster.fighter = None
+    monster.ai = None
+    monster.name = 'remains of ' + monster.name
+    GameState.schedule.release(monster)
+
+    animation_params = {}
+    animation_params['origin'] = (monster.x, monster.y)
+    animation_params['target'] = (monster.x, monster.y)
+    animation_params['target_angle'] = Utils.get_angle(monster.x, monster.y, monster.x, monster.y)
+    GameState.add_animation('Burst', animation_params)
+
     # Schedule.pq
 
     monster.send_to_back()

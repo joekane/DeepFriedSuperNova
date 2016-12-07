@@ -88,6 +88,9 @@ UI_PopBack = libtcod.darkest_azure
 # PATHFINDING
 BFS_MAX_DISTANCE = 50
 
+# GAMEPLAY
+HEALTH_BARS = False
+
 
 # BOX CHARS
 BOX_W = 0x2502

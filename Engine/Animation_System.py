@@ -31,8 +31,25 @@ animations = {
         'delay_sd': 0.1,
         'background': True,
         'vector': 'Line',
+        'random_target': True,
         'random_chr': True,
         'random_color': False
+    },
+    'Teleport': {
+        'color_list': [libtcod.blue, libtcod.light_blue, libtcod.azure],
+        'char_list': ['@', 'X', '|', 'O'],
+        'min_size': 0,
+        'max_size': 0,
+        'density': 5,
+        'angle_range': 360,
+        'loop': 3,
+        'delay_avg': 0.3,
+        'delay_sd': 0.3,
+        'background': True,
+        'vector': 'Line',
+        'random_target': True,
+        'random_chr': True,
+        'random_color': True
     },
     'TinyFire': {
         'color_list': Utils.gradient([libtcod.yellow,
@@ -55,6 +72,7 @@ animations = {
         'delay_sd': 0.0,
         'background': True,
         'vector': 'Line',
+        'random_target': True,
         'random_chr': True,
         'random_color': False
     },
@@ -71,12 +89,12 @@ animations = {
                                       10]),
         'char_list': [0x2022, 0x25CB, 'o', 'O'],
         'min_size': 1,
-        'max_size': 5,
-        'density': 75,
+        'max_size': 3,
+        'density': 250,
         'angle_range': 360,
         'loop': False,
-        'delay_avg': 0.5,
-        'delay_sd': 0.2,
+        'delay_avg': 1.5,
+        'delay_sd': 0.75,
         'background': True,
         'vector': 'Line',
         'random_target': True,
@@ -106,13 +124,29 @@ animations = {
         'density': 1,
         'angle_range': 0,
         'loop': False,
-        'delay_avg': 0.1,
-        'delay_sd': 0.1,
+        'delay_avg': 0.3,
+        'delay_sd': 0.0,
         'background': False,
         'vector': 'Line',
         'random_target': False,
         'random_chr': True,
         'random_color': False
+    },
+    'Beam': {
+        'color_list': [libtcod.light_blue, libtcod.lighter_blue, libtcod.blue ],
+        'char_list': [Utils.get_unicode(219),0x2022, 0x25CB, 'o', 'O' ],
+        'min_size': 1,
+        'max_size': 1,
+        'density': 1,
+        'angle_range': 0,
+        'loop': 6,
+        'delay_avg': 0.3,
+        'delay_sd': 0.0,
+        'background': True,
+        'vector': 'Beam',
+        'random_target': False,
+        'random_chr': True,
+        'random_color': True
     },
     'Breath': {
         'color_list':  Utils.gradient([libtcod.light_blue,
@@ -120,11 +154,11 @@ animations = {
                                       libtcod.blue,
                                       libtcod.darkest_azure,
                                       libtcod.darkest_blue],
-                                     [0,
-                                      5,
-                                      10,
-                                      20,
-                                      25]),
+                                      [0,
+                                       4,
+                                       8,
+                                       9,
+                                       10]),
         'char_list':[0x2022, 0x25CB, 'o', 'O'],
         'min_size': 3,
         'max_size': 5,
@@ -215,6 +249,18 @@ class Cell:
                                           random.randint(animation['min_size'], animation['max_size']),
                                           random.randint(0 - (animation['angle_range']/2), 0 + (animation['angle_range']/2) ))
             self.vector = Line(source, target, animation['loop'])
+        if animation['vector'] == 'Beam':
+            if not animation['random_target']:
+                # Goto Target
+                source = animation['origin']
+                target = animation['target']
+            else:
+                # if Non specified, randomize
+                source = animation['target']
+                target = Utils.get_vector(source[0], source[1],
+                                          random.randint(animation['min_size'], animation['max_size']),
+                                          random.randint(0 - (animation['angle_range']/2), 0 + (animation['angle_range']/2) ))
+            self.vector = Beam(source, target, animation['loop'])
         if animation['vector'] == 'Breath':
             target_angle = animation['target_angle']
             if not animation['random_target']:
@@ -305,6 +351,27 @@ class Line(Vector):
         else:
             return None
 
+class Beam(Vector):
+    def __init__(self, start, target, loop=True):
+        Vector.__init__(self, start)
+        self.end_x = target[0]
+        self.end_y = target[1]
+        self.target_pos = target
+        self.path = Utils.b_line((self.x, self.y), (self.end_x, self.end_y))
+        self.loop = loop
+        self.stop_animating = False
+        self.distance = Utils.distance_between(self.x, self.y, self.end_x, self.end_y)
+
+    def _update(self):
+        if not self.stop_animating:
+            if not self.loop:
+                self.stop_animating = True
+            elif type(self.loop) == int:
+                self.loop -= 1
+            return self.path
+        else:
+            return None
+
 
 class Blast(Vector):
     def __init__(self, x, y, radius, loop=True):
@@ -313,6 +380,18 @@ class Blast(Vector):
         self.path = cycle(Utils.b_line((self.x, self.y), (self.end_x, self.end_y)))
         self.loop = loop
         self.stop_animating = False
+
+
+
+def render_animations(animation_list):
+    Render.clear_layer(10)
+    for ani in animation_list:
+        # print "Animating................."
+        result = ani.play()
+        if result == 'Done':
+            # print "Want?"
+            animation_list.remove(ani)
+        terminal.refresh()
 
 
 '''

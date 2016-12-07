@@ -13,11 +13,15 @@ import random
 
 
 def dice(s):
+    # print "Die String: {0}".format(s)
     num, temp = s.split('d')
+    # print "First Split: {0}, {1}".format(num, temp)
     if num == '': num = 1
-    die,bonus = temp,0
+    die, bonus = temp, 0
     if "+" in temp:
+
         die, bonus = temp.split('+')
+        # print "Die, Bonus: {0}, {1}".format(die, bonus)
     elif "-" in temp:
         die, bonus = temp.split('-')
         bonus = -int(bonus)
