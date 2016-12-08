@@ -13,6 +13,8 @@ import GameState
 import Components
 import libtcodpy as libtcod
 
+# TODO: Need "Inanimate AI" for barrels and the like. They still need fighter component, but should prevent them from being time_travelers.
+
 class Entity:
     # this is a generic object: the player, a monster, an item, the stairs...
     # it's always represented by a character on screen.

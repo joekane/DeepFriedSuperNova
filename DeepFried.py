@@ -59,3 +59,5 @@ Close Window in Exit
 """
 terminal.close()
 
+
+# TODO: Convert all MESSAGES to tagged colored messages (BearLibStyle)

@@ -24,7 +24,6 @@ import libtcodpy as libtcod
 import shelve
 from Entities import Entity, Components, Pathing
 
-
 imported_items_list = {}
 imported_npc_list = {}
 imported_quest_list = {}
@@ -43,12 +42,11 @@ continue_walking = False
 
 schedule = Engine.Schedule.Scheduler()
 
-
-
 goals = [((20, 20), 0)]
 
-
 """ Worlds """
+
+
 # diner
 # level1
 
@@ -169,6 +167,7 @@ def starting_equipment():
     obj.always_visible = True
     '''
 
+
 def get_player():
     return player
 
@@ -209,11 +208,11 @@ def get_quest_item(number):
 
 def player_has_item(name):
     for item in inventory:
-        #print item.name + " | " + name
+        # print item.name + " | " + name
         if item.name == name:
-            #print "True!"
+            # print "True!"
             return True
-    #print "False"
+    # print "False"
     return False
 
 
@@ -264,8 +263,9 @@ def read_external_quests():
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
 
+
 def main_menu():
-    Engine.UI.Display_MainMenu()
+    Engine.UI.display_mainMenu()
 
 
 def new_game():
@@ -297,12 +297,12 @@ def new_game():
     current_level = MapGen.WorldGen.Level("Test World")
     current_level.initialize(player, MapGen.WorldGen.mst_dungeon)
 
-    #current_level.map_array = MapGen.WorldGen.new_map()
-    #MapGen.WorldGen.mst_dungeon(current_level)
+    # current_level.map_array = MapGen.WorldGen.new_map()
+    # MapGen.WorldGen.mst_dungeon(current_level)
 
-    #current_level.fov_initialize()
-    #current_level.require_recompute()
-    #current_level.recompute_fov()
+    # current_level.fov_initialize()
+    # current_level.require_recompute()
+    # current_level.recompute_fov()
 
 
     play_game()
@@ -346,7 +346,6 @@ def next_level():
     # MapGen.Map.generate_map()
     new_game()
 
-
     current_level.require_recompute()
     Pathing.BFS(player)
 
@@ -357,10 +356,9 @@ def play_game():
     Pathing.BFS(player)
 
     while not libtcod.console_is_window_closed():
-        #print animation_queue
-        #print not animation_queue
+        # print animation_queue
+        # print not animation_queue
         schedule.process()
-
 
 
 def check_level_up():
@@ -377,8 +375,8 @@ def check_level_up():
         while choice is None:  # keep asking until a choice is made
             choice = Engine.UI.menu('Level up! Choose a stat to raise:\n',
                                     ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
-                           'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
-                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
+                                     'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
+                                     'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
                                     Constants.LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
@@ -398,7 +396,7 @@ def save_game():
     # file['player_index'] = objects.index(player)
     # file['inventory'] = inventory
     # file['game_msgs'] = game_msgs
-    #file['game_state'] = game_state
+    # file['game_state'] = game_state
     # file['stairs_index'] = objects.index(stairs)
     # file['dungeon_level'] = dungeon_level
 
@@ -456,7 +454,6 @@ def load_game():
     current_level.require_recompute()
 
 
-# CAMERA
 def get_camera():
     return camera_x, camera_y
 
@@ -465,7 +462,7 @@ def move_camera(target_x, target_y):
     global camera_x, camera_y
 
     try:
-    # new camera coordinates (top-left corner of the screen relative to the map)
+        # new camera coordinates (top-left corner of the screen relative to the map)
         x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
         y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
     except:
@@ -496,17 +493,13 @@ def render_all():
 
 
 def render_ui():
-
     UI.draw_hud()
     Animation.render_animations(animation_queue)
     terminal.refresh()
 
 
-
-
 def player_move_or_interact(dx, dy):
     # the coordinates the player is moving to/interacting
-
 
     x = player.x + dx
     y = player.y + dy

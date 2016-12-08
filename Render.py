@@ -38,52 +38,16 @@ def clear_layer(layer, color='black'):
     terminal.clear_area(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
 
 
-def blank(x, y):
+def draw_blank(x, y):
     x, y = Utils.to_camera_coordinates(x, y)
     # libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
     draw_char(layers['entity_console'], x, y, ' ', None, libtcod.BKGND_NONE)
-
-
-def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
-    # LIBTCOD
-    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
-
-    #BEARLIB
-    terminal.layer(dest)
-    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
-    if color is not None:
-        color = Utils.convert_color(color, alpha)
-        terminal.color(color)
-    terminal.put(x, y, char)
-
-
-def draw_char_ex(dest, x, y, dx, dy, char, color=None, flag=None, alpha=255):
-    # LIBTCOD
-    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
-
-    # BEARLIB
-    terminal.layer(dest)
-    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
-    if color is not None:
-        color = Utils.convert_color(color, alpha)
-        terminal.color(color)
-    terminal.put_ext(x, y, dx, dy, char, None)
-
-
-
-def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
-    # LIBTCOD
-    # libtcod.console_set_char_background(dest, x, y, color, flag)
-    # BEARLIB
-    color = Utils.convert_color(color)
-    terminal.bkcolor(color)
-    terminal.put(x, y, terminal.pick(x,y, 0))
-
 
 def set_foreground(dest, color):
     # LIBTCOD
     # libtcod.console_set_default_foreground(dest, color)
     # BEARLIB
+    # TODO: Replace / Obsolete?
     color = Utils.convert_color(color)
     terminal.color(color)
 
@@ -92,17 +56,22 @@ def set_background(dest, color):
     # LIBTCOD
     # libtcod.console_set_default_background(dest, color)
     # BEARLIB
+    # TODO: Replace / Obsolete?
     color = Utils.convert_color(color)
     terminal.bkcolor(color)
 
 
-def print_line(dest, x, y, text): # bottom-right for BEARLIB
+def print_line(dest, x, y, text, f_color=None): # bottom-right for BEARLIB
     # LIBTCOD
     # libtcod.console_print_ex(dest, x, y, flag, alignment, text)
 
     # BERALIB
 
+    if f_color:
+        set_foreground(dest, f_color)
+
     terminal.layer(dest)
+
     terminal.print_(x, y, text)
 
 
@@ -159,21 +128,6 @@ def draw_hoz_line(x, y, length, color, target):
     draw_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
-""" EVERYTHING BELOW THIS LINE SHOULD MOVE TO A UI FILE """
-
-def ui_OLD(): # TODO: These should all be in UI (Move UI bits to a UI.Component class or something)
-    clear_layer(layers['panel_console'])
-    clear_layer(layers['side_panel_console'])
-
-    render_common()
-
-    render_messages()
-
-    render_status()
-
-    render_stat_bars()
-
-
 def draw_object(obj, visible=True):
     x, y = Utils.to_camera_coordinates(obj.x, obj.y)
 
@@ -213,34 +167,34 @@ def draw_object(obj, visible=True):
                   libtcod.BKGND_NONE)
 
 
-def render_stat_bars():
+def draw_stat_bars():
 
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
 
     # SHOW PLAYER STAT BARS
-    render_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                   libtcod.Color(178, 0, 45),
-                   libtcod.Color(64, 0, 16), layers['side_panel_console'])
-    render_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                   libtcod.Color(0, 30, 255),
-                   libtcod.Color(0, 10, 64), layers['side_panel_console'])
-    render_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
+    draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
+                 libtcod.Color(178, 0, 45),
+                 libtcod.Color(64, 0, 16), layers['side_panel_console'])
+    draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
+                 libtcod.Color(0, 30, 255),
+                 libtcod.Color(0, 10, 64), layers['side_panel_console'])
+    draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
                    libtcod.Color(255, 255, 0),
-                   libtcod.Color(65, 65, 0), layers['side_panel_console'])
+                 libtcod.Color(65, 65, 0), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
     for object in GameState.get_visible_objects():
         if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
-                render_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                               libtcod.Color(0, 255, 0),
-                               libtcod.Color(0, 64, 0),
-                               layers['side_panel_console'])
+                draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
+                             libtcod.Color(0, 255, 0),
+                             libtcod.Color(0, 64, 0),
+                             layers['side_panel_console'])
                 temp_y += 2
 
 
-def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
+def draw_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
 
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
@@ -279,7 +233,7 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
         terminal.composition(terminal.TK_ON)
 
 
-def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
+def draw_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
     bar_width = int(float(value) / maximum * total_width)
 
@@ -297,4 +251,40 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, t
 
     if name is not '':
         print_line(target, x + total_width / 2, y, name + ': ' + str(value) + '/' + str(maximum))
+
+
+def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    #BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    if color is not None:
+        color = Utils.convert_color(color, alpha)
+        terminal.color(color)
+    terminal.put(x, y, char)
+
+
+def draw_char_ex(dest, x, y, dx, dy, char, color=None, flag=None, alpha=255):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    # BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    if color is not None:
+        color = Utils.convert_color(color, alpha)
+        terminal.color(color)
+    terminal.put_ext(x, y, dx, dy, char, None)
+
+
+def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
+    # LIBTCOD
+    # libtcod.console_set_char_background(dest, x, y, color, flag)
+    # BEARLIB
+    # TODO: Replace / Obsolete?
+    color = Utils.convert_color(color)
+    terminal.bkcolor(color)
+    terminal.put(x, y, terminal.pick(x,y, 0))
 

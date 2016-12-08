@@ -116,7 +116,7 @@ class Level:
 
     def clear_object(self, object):
         # erase the character that represents this object
-        Render.blank(object.x, object.y)
+        Render.draw_blank(object.x, object.y)
 
     def get_open_tiles(self):
         open_nodes = []
@@ -216,7 +216,7 @@ class Level:
         return choice
 
     def target_tile(self, max_range=None):
-        # TODO: This goes somewhere else
+        # TODO: This goes somewhere else (This should be oart of independatnt Targetin (see Ranged)
         # return the position of a tile left-clicked in player's FOV (optionally in a range), or (None,None) if right-clicked.
         mouse = libtcod.Mouse()
         key = libtcod.Key()

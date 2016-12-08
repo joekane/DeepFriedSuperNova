@@ -70,15 +70,17 @@ class PlayeControlled:
                 animation_params = {}
                 animation_params['origin'] = (self.owner.x, self.owner.y)
                 animation_params['target'] = (self.owner.x, self.owner.y)
-                #animation_params['target_angle'] = Utils.get_angle(self.owner.x, self.owner.y, self.owner.x, self.owner.y)
+                animation_params['target_angle'] = 0
                 GameState.add_animation('Teleport', animation_params)
 
                 self.owner.x, self.owner.y = Utils.to_map_coordinates(mouse.cx, mouse.cy)
 
+                # TODO: set target Angle to 0 in base animations
+
                 animation_params = {}
                 animation_params['origin'] = (self.owner.x, self.owner.y)
                 animation_params['target'] = (self.owner.x, self.owner.y)
-                # animation_params['target_angle'] = Utils.get_angle(self.owner.x, self.owner.y, self.owner.x, self.owner.y)
+                animation_params['target_angle'] = 0
                 GameState.add_animation('Teleport', animation_params)
 
                 return 1
@@ -197,15 +199,17 @@ class PlayeControlled:
                     return 1
             elif key == terminal.TK_ESCAPE:
                 GameState.save_game()
-                terminal.close()
+                UI.display_mainMenu()
             elif key == terminal.TK_L:
                 GameState.load_game()
                 return 1
+            elif key == terminal.TK_T:
+                GameState.add_animation('FadeText', {'origin': (self.owner.x, self.owner.y),
+                                                     'target': (self.owner.x, self.owner.y-1)})
+
             elif key == terminal.TK_O:
                 print GameState.current_level.fov_map
             elif key == terminal.TK_RBRACKET:
-
-
                 equipped_ranged = [equip.name for equip in GameState.inventory if equip.equipment.is_equipped and equip.ranged]
 
                 if equipped_ranged[0] == "pistol":
@@ -874,12 +878,16 @@ class Ranged:
 
     def fire(self, source=None, target=None):
 
+        # TODO: Break tareting code out into universal method. (get initial coords, return targets)
+
+        """ Reset Params """
         targets = []
         target_x = 0
         target_y = 0
-
         if source is None:
             source = GameState.get_player()
+
+        """ If no target supplied, Enter Targeting mode """
         if target is None:
             tile_effected = None
             Utils.message('Choose Target. Left Click/Space to execute. Right Click/ESC to cancel.', libtcod.gold)
@@ -979,9 +987,7 @@ class Ranged:
                 return 'cancelled'
 
 
-        # TODO: add animation back in when appropriate, Fix Target
-        #Animate.follow_line(source, target_tile)
-        # Animate.explosion(target)
+        # TODO: Allow targeting Empty tiles
 
         # zap it!
         if self.animation:
@@ -1025,17 +1031,18 @@ def monster_death(monster):
     monster.send_to_back()
 
 
-def exmplosive_death(monster):
+def explosive_death(monster):
     # transform it into a nasty corpse! it doesn't block, can't be
     # attacked and doesn't move
-    Utils.message('The ' + monster.name + ' is dead! You gain ' + str(monster.fighter.xp) + ' experience points.',
+    # TODO: String build this message more inteligently
+    Utils.message('The ' + monster.name + ' EXPLODES!!!!! You gain ' + str(monster.fighter.xp) + ' experience points.',
                   libtcod.orange)
-    monster.char = '%'
-    monster.color = libtcod.dark_red
+    monster.char = ' '
+    monster.color = None
     monster.blocks = False
     monster.fighter = None
     monster.ai = None
-    monster.name = 'remains of ' + monster.name
+    monster.name = ''
     GameState.schedule.release(monster)
 
     animation_params = {}
@@ -1043,6 +1050,8 @@ def exmplosive_death(monster):
     animation_params['target'] = (monster.x, monster.y)
     animation_params['target_angle'] = Utils.get_angle(monster.x, monster.y, monster.x, monster.y)
     GameState.add_animation('Burst', animation_params)
+
+    # TODO: Damage surrounding things.....
 
     # Schedule.pq
 

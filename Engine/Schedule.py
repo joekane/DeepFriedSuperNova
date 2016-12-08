@@ -17,7 +17,8 @@ class Scheduler:
     Removes object from scheduler (ie: death)
     """
     def release(self, obj):
-        self.time_travelers.remove(obj)
+        if obj in self.time_travelers:
+            self.time_travelers.remove(obj)
 
     """
     Resets scheduler to just player

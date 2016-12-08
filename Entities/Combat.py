@@ -28,6 +28,12 @@ def dice(s):
     return sum([random.randint(1,int(die)) for a in range(int(num))])+int(bonus)
 
 
+# TODO: Move all Damage incoming / outgoing to this class. Make classes recive messages from here. Only classes that acctually NEED the info should be contacted
+
+# TODO: Perhaps tareting should be there as well............most tarety things will be combat related.
+
+# TODO: Combat should alwasy use PROPERTY based stats. Therefore all manipuylation of stats is done inside each enitity.
+
 def damage_calc(attacker, target):
     if target.fighter.save:
         return False

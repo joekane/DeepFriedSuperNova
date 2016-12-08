@@ -138,7 +138,7 @@ class NodeAction(object):  # has a 'raw' attribute
         elif self.type == 2:
             grammar.flatten(self.target, True)
 
-    def to_text(self): pass  # FIXME
+    def to_text(self): pass
 
 
 class RuleSet(object):

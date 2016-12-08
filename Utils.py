@@ -281,7 +281,7 @@ def inspect_tile(x, y):
                         pass
                     else:
                         # print "animating..."
-                        #TODO: FIX animation calls
+                        #TODO: Re-implement Inspection (make a mode, not always on)
                         #Animate.inspect_banner(x, y, obj[0].name, new_animation)
                         new_animation = False
             else:
