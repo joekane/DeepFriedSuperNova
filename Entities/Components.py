@@ -43,7 +43,7 @@ class PlayeControlled:
             # print "Recalc BFS"
             """ UPDATE D-DMAP / PASS TIME"""
             Pathing.BFS(GameState.player)
-            self.owner.pass_time()
+            self.owner.pass_time(cost)
             # Render.render_all()
         # print "Contorl Leaving.............{0}".format(cost)
         Input.clear()
@@ -351,9 +351,7 @@ class Fighter:
 
     @property
     def damage_reduction(self):
-        for st in self.owner.status:
-            if 'damage_reduction' in st.keys():
-                return Combat.dice(st['damage_reduction'])
+
         return 0
 
     @property
@@ -361,8 +359,11 @@ class Fighter:
         # TODO: Revise ho STATS > Dice rolls
         #bonus = sum(equipment.power_bonus for equipment in GameState.get_all_equipped(self.owner))
         _str = self.base_str
-        _str += self.status.get_bonus('STR', _str)
-        return str(_str)
+        bonus = self.owner.status.get_bonus('STR', _str)
+        bonus_str = ""
+        if bonus > 0:
+            bonus_str = "+{0}".format(bonus)
+        return "{0}d{1}{2}".format(_str , 6, bonus_str)
 
     @property
     def defense(self):  # return actual defense, by summing up the bonuses from all equipped items

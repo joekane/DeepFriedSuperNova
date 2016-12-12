@@ -36,7 +36,8 @@ def get_tags(text):
     return re.findall("[<].*?[>]", text)
 
 
-def message(new_msg, color=libtcod.white):
+def message(new_msg, coloe):
+    # TODO: Make Color unnessasary
     import textwrap
     # split the message if necessary, among multiple lines
     new_msg_lines = textwrap.wrap(new_msg, Constants.MSG_WIDTH)
@@ -47,7 +48,7 @@ def message(new_msg, color=libtcod.white):
             GameState.del_msg(0)
 
         # add the new line as a tuple, with the text and the color
-        GameState.add_msg(line, color)
+        GameState.add_msg(line)
 
 
 def distance_to(self, other):

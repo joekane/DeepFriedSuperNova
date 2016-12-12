@@ -221,6 +221,18 @@ def render_status():
 
     num_of_status = 0
     inc = 0
+
+
+    count = 1
+    for status in GameState.player.status.summary():
+        if Utils.is_mouse_in(pos.x, pos.y - 1 + count, 17, 1):
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + count, str(status[1]/100) + " Turns", f_color='green')
+        else:
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + count, status[0], f_color='green')
+
+        count += 1
+
+
     '''
     for st in GameState.player.status.status_list:
         if num_of_status == 9:
@@ -270,10 +282,8 @@ def render_stat_bars():
 def render_messages():
     Render.clear_layer(layers['messages'])
     y = 3 + Constants.MAP_CONSOLE_HEIGHT
-    for (line, color) in GameState.get_msg_queue():
+    for line in GameState.get_msg_queue():
         if y < Constants.SCREEN_HEIGHT - 1:
-            Render.set_foreground(layers['messages'], color)
-            # line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH, Constants.PANEL_HEIGHT - 3, line)
             line_height = 1
             Render.print_rect(layers['messages'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
 

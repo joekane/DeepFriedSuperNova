@@ -90,6 +90,8 @@ def initialize():
     player.status.add_status('Wet')
     player.status.add_status('Regen')
 
+    print player.status.status_list
+
     player.level = 1
     player.action_points = 100
 
@@ -232,8 +234,8 @@ def del_msg(number):
     del game_msgs[number]
 
 
-def add_msg(line, color):
-    game_msgs.append((line, color))
+def add_msg(line):
+    game_msgs.append(line)
 
 
 def read_external_items():

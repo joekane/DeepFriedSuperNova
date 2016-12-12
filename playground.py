@@ -38,24 +38,29 @@ def play():
 
             # TODO: Cleaup Call. ADD KWARG support, Accept POS(x, y) instead of x,y. make all default variables overrideable via Kwargs
 
+            animation_params={
+                'origin': (x, y),
+                'target': (x, y)
+            }
+
             if choice == 0:
                     animations.append(
-                            Engine.Animation_System.Animation(x,y, 'Flame'))   # , angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('Flame', animation_params))   # , angle=random.randint(270, 270)))
             if choice == 1:
                     animations.append(
-                            Engine.Animation_System.Animation(x, y, 'Burst', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('Burst', animation_params))
             if choice == 4:
                     animations.append(
-                            Engine.Animation_System.Animation(x, y, 'Line', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('Line', animation_params))
             if choice == 2:
                     animations.append(
-                            Engine.Animation_System.Animation(x, y, 'IceBreath', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('IceBreath', animation_params))
             if choice == 3:
                     animations.append(
-                            Engine.Animation_System.Animation(x, y, 'TinyFire', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('TinyFire', animation_params))
             if choice == 5:
                     animations.append(
-                            Engine.Animation_System.Animation(x, y, 'Xmas', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation('Xmas', animation_params))
 
             #print len(animations)
 

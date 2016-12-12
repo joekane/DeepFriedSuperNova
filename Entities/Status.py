@@ -1,5 +1,4 @@
-# TESTimport libtcodpy as libtcod
-import copy
+import libtcodpy as libtcod
 from enum import Enum
 
 
@@ -121,31 +120,42 @@ class StatusList:
 
     def add_status(self, status_name):
         # Check if immune to new status
-        print self.status_list
         for s in self.status_list:
-            if status_name in status_db[s]['immune_to']:
+            if status_name in status_db[s.name]['immune_to']:
                 return
-            # add status
-            self.status_list.append(Status(status_name))
+
+        # add status
+        self.status_list.append(Status(status_name))
+
         # cancel any eddects new status cancesls.
         for cancel in status_db[status_name]['cancels']:
             for s in self.status_list:
-                for t in status_db[s]['effect_tags']:
+                for t in status_db[s.name]['effect_tags']:
                     if cancel == t:
                         self.status_list.remove(s)
 
     def get_bonus(self, stat_name, base_value):
         bonus = 0
         for s in self.status_list:
-            if status_db[s]['effect'].stat == stat_name:
-                bonus += status_db[s]['effect'].value
+            if status_db[s.name]['effect'].stat == stat_name:
+                bonus += status_db[s.name]['effect'].value
         return bonus
 
     def pass_time(self, time_units):
+        to_remove = []
         for s in self.status_list:
             result = s.pass_time(time_units)
-            if result <= 0:
-                self.status_list.remove(s)
+            if result[0] <= 0:
+                to_remove.append(s)
+        for rem in to_remove:
+            self.status_list.remove(rem)
+
+    def summary(self):
+        summary = []
+        for s in self.status_list:
+            summary.append((s.name, s.duration))
+        return summary
+
 
 class Status:
     def __init__(self, status_name):
@@ -157,16 +167,16 @@ class Status:
         plus_hp = 0
         minus_hp = 0
 
-        if status_db[self.name]['effect_type'] == EffectType.HealOT:
-            plus_hp = status_db[self.name]['effect_value']
-        if status_db[self.name]['effect_type'] == EffectType.DmgOT:
-            minus_hp = status_db[self.name]['effect_value']
+        if status_db[self.name]['effect'].type == EffectType.HealOT:
+            plus_hp = status_db[self.name]['effect'].value
+        if status_db[self.name]['effect'].type == EffectType.DmgOT:
+            minus_hp = status_db[self.name]['effect'].value
         return self.duration, plus_hp, minus_hp
 
     def get_bonus(self, stat_name):
-        if status_db[self.name]['effect_type'] == EffectType.StatBonus:
-            if stat_name in status_db[self.name]['effect_stat']:
-                return status_db[self.name]['effect_value']
+        if status_db[self.name]['effect'].type == EffectType.StatBonus:
+            if stat_name in status_db[self.name]['effect'].stat:
+                return status_db[self.name]['effect'].value
 
 
 
