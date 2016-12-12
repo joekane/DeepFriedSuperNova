@@ -17,6 +17,7 @@ from Entities import Components
 
 """ SPELLS """
 
+# TODO: Revise spells to work with Animation_Systems.
 
 def cast_heal():
     # heal the player

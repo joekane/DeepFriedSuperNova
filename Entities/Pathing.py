@@ -195,7 +195,7 @@ def get_lowest_neighbor(x, y):
     Randomize results and sort lowest to hieghest. Return lowest Coords.
     """
     shuffle(options)
-    print "Options: {0}".format(options)
+    # print "Options: {0}".format(options)
     options.sort(key=lambda tup: tup[1])
 
     """

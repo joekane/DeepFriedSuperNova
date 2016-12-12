@@ -1,6 +1,5 @@
 from bearlibterminal import terminal
 
-# import Animate
 import collections
 import Constants
 import GameState
@@ -11,6 +10,8 @@ import Engine.Animate as Animate
 import libtcodpy as libtcod
 
 Pos = collections.namedtuple('Pos', 'x y')
+layers = {}
+
 
 class Button:
 
@@ -57,6 +58,12 @@ class Button:
         # libtcod.console_print_ex(self.target, 0, 0, libtcod.BKGND_SET, libtcod.LEFT, self.text)
 
         # libtcod.console_blit(self.target, 0, 0, self.rect.width, self.rect.height, 0 , min_x + 1 , min_y , 1.0, 1.0)
+
+
+class Skill:
+    def __init__(self, char, purchased=False):
+        self.char = char
+        self.purchased = purchased
 
 
 class Palette:
@@ -133,7 +140,7 @@ class Palette:
 
             GameState.render_ui()
 
-layers = {}
+
 
 def initilize_hud():
     global layers
@@ -176,13 +183,21 @@ def render_common():
     Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 22, str(player.fighter.base_skl).rjust(3))
     Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 23, str(player.fighter.base_int).rjust(3))
 
+    """ Items """
+    ranged_items = [equip for equip in GameState.inventory if equip.ranged]
+    equipped_ranged = [equip.name for equip in ranged_items if equip.equipment.is_equipped]
+    if equipped_ranged:
+        Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 9, 20, equipped_ranged[0])
+
+
     """ CONTROLS """
-    Render.print_line(layers['side_panel_console'], 59, 39, "Move:      NUMPAD")
-    Render.print_line(layers['side_panel_console'], 59, 40, "Fire:           F")
-    Render.print_line(layers['side_panel_console'], 59, 41, "Pickup:         G")
-    Render.print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:    B")
-    Render.print_line(layers['side_panel_console'], 59, 43, "Decend:         <")
-    Render.print_line(layers['side_panel_console'], 59, 44, "DEBUG:          X")
+    Render.print_line(layers['side_panel_console'], 59, 39, "Move/Attack:      NUMPAD/ARROWS")
+    Render.print_line(layers['side_panel_console'], 59, 40, "Fire:                         F")
+    Render.print_line(layers['side_panel_console'], 59, 41, "Pickup:                       G")
+    Render.print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:                  B")
+    Render.print_line(layers['side_panel_console'], 59, 43, "Decend:                       <")
+    Render.print_line(layers['side_panel_console'], 59, 44, "Change Weapon:              [[/]]")
+    Render.print_line(layers['side_panel_console'], 59, 45, "DEBUG:                        X")
 
 
     """ DUNGEON NAME """
@@ -230,27 +245,26 @@ def render_stat_bars():
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
 
     # SHOW PLAYER STAT BARS
-    Render.render_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                   libtcod.Color(178, 0, 45),
-                   libtcod.Color(64, 0, 16), layers['side_panel_console'])
-    Render.render_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                   libtcod.Color(0, 30, 255),
-                   libtcod.Color(0, 10, 64), layers['side_panel_console'])
-    Render.render_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
+    Render.draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
+                        libtcod.Color(178, 0, 45),
+                        libtcod.Color(64, 0, 16), layers['side_panel_console'])
+    Render.draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
+                        libtcod.Color(0, 30, 255),
+                        libtcod.Color(0, 10, 64), layers['side_panel_console'])
+    Render.draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
                    libtcod.Color(255, 255, 0),
-                   libtcod.Color(65, 65, 0), layers['side_panel_console'])
+                        libtcod.Color(65, 65, 0), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
     for object in GameState.current_level.get_visible_objects():
-        if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
+        if object.fighter and object.base_speed != 0 and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
-                Render.render_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                               libtcod.Color(0, 255, 0),
-                               libtcod.Color(0, 64, 0),
-                               layers['side_panel_console'])
+                Render.draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
+                                    libtcod.Color(0, 255, 0),
+                                    libtcod.Color(0, 64, 0),
+                                    layers['side_panel_console'])
                 temp_y += 2
-
 
 
 def render_messages():
@@ -343,23 +357,19 @@ def menu(header, options, width):
             return
 
 
-def Display_MainMenu():
-    new_game()
+def display_mainMenu():
+    # new_game()
 
-    # calculate total height for the header (after auto-wrap) and one line per option
     width = Constants.SCREEN_WIDTH
     height = Constants.SCREEN_HEIGHT
 
-    mm = libtcod.console_new(width, height)
-    # print the header, with auto-wrap
-    libtcod.console_set_default_foreground(mm, Constants.UI_PopFore)
-    libtcod.console_set_default_background(mm, Constants.UI_PopBack)
+    Render.draw_rect(10, 0, 0, width, height,
+                     frame=True,
+                     f_color=terminal.color_from_name('dark azure'),
+                     bk_color=terminal.color_from_name('darkest azure'),
+                     title="DEEP FRIED SUPERNOVA v0.01")
 
-    #libtcod.console_print_frame(mm, 0, 0, width, height, clear=True,
-    #                            flag=libtcod.BKGND_SET,
-    #                            fmt="Deep Fried Supernova")
-
-    Render.print_rect(mm, 4, 4, width, height, 'Welcome to Deep Fried Supernova')
+    Render.print_rect(10, 4, 4, width, height, 'Welcome to Deep Fried Supernova')
 
 
     # blit the contents of "window" to the root console
@@ -372,21 +382,24 @@ def Display_MainMenu():
                        width / 2,
                        height - 12,
                        length=16,
-                       function=new_game)
+                       function=new_game,
+                       target=10)
 
     button_text = 'Continue Game'
     ct_button = Button(button_text,
                        width / 2,
                        height - 9,
                        length=16,
-                       function=continue_game)
+                       function=continue_game,
+                       target=10)
 
     button_text = 'Quit'
     qt_button = Button(button_text,
                        width / 2,
                        height - 6,
                        length=16,
-                       function=close_window)
+                       function=close_window,
+                       target=10)
 
     img = libtcod.image_load('diner_logo_sm.png')
     # libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
@@ -406,9 +419,7 @@ def Display_MainMenu():
             return
 
         ng_button.draw(0, 0)
-        libtcod.console_flush()
-
-
+        terminal.refresh()
 
 
 def pop_up(width=None, height=None, title=None, text=None):
@@ -462,7 +473,6 @@ def pop_up(width=None, height=None, title=None, text=None):
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
         if key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_ESCAPE or key.vk == libtcod.KEY_SPACE:
             return
-
 
 
 def beastiary(width=10, height=10, title=None, text=None):
@@ -532,10 +542,6 @@ def beastiary(width=10, height=10, title=None, text=None):
         libtcod.console_flush()
 
 
-
-
-
-
 def msgbox(text, width=50):
     menu(text, [], width)  # use menu() as a sort of "message box"
 
@@ -559,14 +565,6 @@ def inventory_menu(header):
     if index is None or len(GameState.inventory) == 0:
         return None
     return GameState.inventory[index].item
-
-
-class Skill:
-    def __init__(self, char, purchased=False):
-        self.char = char
-        self.purchased = purchased
-
-
 
 
 def skill_tree():
@@ -741,30 +739,18 @@ def skill_tree():
         libtcod.console_blit(st, 0, 0, width, height, 0, 0, 0, 1.0, 1.0)
 
 
-
-
 def close_window():
-    return 'close'
+    return terminal.close()
 
 
 def continue_game():
-    save_game = False
-    if not save_game and GameState.get_player() is None:
-        return 'nothing'
-    elif not save_game and GameState.get_player() is not None:
-        return 'continue'
-    else:
-        return 'load_save'
-
+    GameState.load_game()
+    return GameState.play_game()
 
 
 def new_game():
     # print "NG?"
     return GameState.new_game()
-
-
-def test():
-    print "TEST CLICK"
 
 
 def do_nothing():

@@ -21,8 +21,8 @@ import Utils
 import Engine.Animation_System as Animation
 import random
 import libtcodpy as libtcod
+import shelve
 from Entities import Entity, Components, Pathing
-
 
 imported_items_list = {}
 imported_npc_list = {}
@@ -34,27 +34,23 @@ game_msgs = []
 dungeon_level = 1
 dungeon_name = "Test"
 dungeon_tags = []
-
 animation_queue = []
-
-inventory = []
-
-
 visible_objects = None
-
 camera_x = 0
 camera_y = 0
+continue_walking = False
+
+schedule = Engine.Schedule.Scheduler()
 
 goals = [((20, 20), 0)]
 
-continue_walking = False
-
 """ Worlds """
+
+
 # diner
 # level1
 
 
-current_level = None
 
 
 def initialize():
@@ -97,7 +93,7 @@ def initialize():
     player.level = 1
     player.action_points = 100
 
-    Engine.Schedule.register(player)
+    schedule.register(player)
 
     dungeon_level = 1
 
@@ -110,10 +106,17 @@ def starting_equipment():
     equipment_component.equip()
     obj.always_visible = True
 
-    # Starting Pistol
+    add_item_to_player('RPG')
+    add_item_to_player('Laser')
+    add_item_to_player('Ice Wand')
+    add_item_to_player('Pistol')
+
+    # Starting Weapons
+    '''
+    """ Pistol """
     equipment_component = Components.Equipment(slot='left hand', power_bonus=2)
-    ranged_component = Components.Ranged(10,
-                                         aoe=1,
+    ranged_component = Components.Ranged(5,
+                                         aoe=0,
                                          animation='Shot'
                                          )
     obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'pistol', libtcod.sky,
@@ -122,6 +125,46 @@ def starting_equipment():
     inventory.append(obj)
     equipment_component.equip()
     obj.always_visible = True
+
+    """ Laser """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=5)
+    ranged_component = Components.Ranged(10,
+                                         aoe=0,
+                                         animation='Beam'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'laser', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+
+    """ RPG """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=20)
+    ranged_component = Components.Ranged(10,
+                                         aoe=3,
+                                         animation='Burst'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'rpg', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+
+    """ Ice Wand """
+    equipment_component = Components.Equipment(slot='left hand', power_bonus=3)
+    ranged_component = Components.Ranged(5,
+                                         aoe=0,
+                                         animation='Breath'
+                                         )
+    obj = Entity.Entity(0, 0, libtcod.CHAR_NW, 'ice wand', libtcod.sky,
+                        equipment=equipment_component,
+                        ranged=ranged_component)
+    inventory.append(obj)
+    # equipment_component.equip()
+    obj.always_visible = True
+    '''
 
 
 def get_player():
@@ -164,11 +207,11 @@ def get_quest_item(number):
 
 def player_has_item(name):
     for item in inventory:
-        #print item.name + " | " + name
+        # print item.name + " | " + name
         if item.name == name:
-            #print "True!"
+            # print "True!"
             return True
-    #print "False"
+    # print "False"
     return False
 
 
@@ -219,8 +262,9 @@ def read_external_quests():
     for i in config.sections():
         imported_quest_list[str(i)] = dict(config.items(i))
 
+
 def main_menu():
-    Engine.UI.Display_MainMenu()
+    Engine.UI.display_mainMenu()
 
 
 def new_game():
@@ -252,12 +296,12 @@ def new_game():
     current_level = MapGen.WorldGen.Level("Test World")
     current_level.initialize(player, MapGen.WorldGen.mst_dungeon)
 
-    #current_level.map_array = MapGen.WorldGen.new_map()
-    #MapGen.WorldGen.mst_dungeon(current_level)
+    # current_level.map_array = MapGen.WorldGen.new_map()
+    # MapGen.WorldGen.mst_dungeon(current_level)
 
-    #current_level.fov_initialize()
-    #current_level.require_recompute()
-    #current_level.recompute_fov()
+    # current_level.fov_initialize()
+    # current_level.require_recompute()
+    # current_level.recompute_fov()
 
 
     play_game()
@@ -295,12 +339,11 @@ def next_level():
     Themes.set_theme('Shadow State Archive')
     '''
 
-    Engine.Schedule.reset()
+    schedule.reset()
 
     # TODO: THIS NEEDS TO BE BROUGHT UP TO SPEED """
     # MapGen.Map.generate_map()
     new_game()
-
 
     current_level.require_recompute()
     Pathing.BFS(player)
@@ -312,12 +355,9 @@ def play_game():
     Pathing.BFS(player)
 
     while not libtcod.console_is_window_closed():
-        #print animation_queue
-        #print not animation_queue
-        if not animation_queue:
-            Engine.Schedule.process()
-        else:
-            render_ui()
+        # print animation_queue
+        # print not animation_queue
+        schedule.process()
 
 
 def check_level_up():
@@ -334,8 +374,8 @@ def check_level_up():
         while choice is None:  # keep asking until a choice is made
             choice = Engine.UI.menu('Level up! Choose a stat to raise:\n',
                                     ['Constitution (+20 HP, from ' + str(player.fighter.base_max_hp) + ')',
-                           'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
-                           'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
+                                     'Strength (+1 attack, from ' + str(player.fighter.base_power) + ')',
+                                     'Agility (+1 defense, from ' + str(player.fighter.base_defense) + ')'],
                                     Constants.LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
@@ -349,7 +389,7 @@ def check_level_up():
 
 
 def save_game():
-    # file = shelve.open('savegame', 'n')
+    file = shelve.open('savegame', 'n')
     # file['map'] = map
     # file['objects'] = objects
     # file['player_index'] = objects.index(player)
@@ -358,29 +398,61 @@ def save_game():
     # file['game_state'] = game_state
     # file['stairs_index'] = objects.index(stairs)
     # file['dungeon_level'] = dungeon_level
-    # file.close()
-    pass
+
+    file['current_level'] = current_level
+    file['imported_items_list'] = imported_items_list
+    file['imported_npc_list'] = imported_npc_list
+    file['imported_quest_list'] = imported_quest_list
+    file['current_quests'] = current_quests
+    file['player'] = player
+    file['inventory'] = inventory
+    file['game_msgs'] = game_msgs
+    file['dungeon_level'] = dungeon_level
+    file['dungeon_name'] = dungeon_name
+    file['dungeon_tags'] = dungeon_tags
+    file['camera_pos'] = (camera_x, camera_y)
+
+    time_indeices = []
+    for obj in schedule.time_travelers:
+        time_indeices.append(current_level.objects.index(obj))
+    file['schedule'] = time_indeices
+
+    file.close()
 
 
 def load_game():
     # open the previously saved shelve and load the game data
-    # global map, objects, player, inventory, game_msgs, game_state, dungeon_level, stairs
+    global current_level, imported_items_list, imported_npc_list, imported_quest_list, current_quests
+    global inventory, game_msgs, dungeon_level, dungeon_name, dungeon_tags, camera_x, camera_y, schedule, player
 
-    # file = shelve.open('savegame', 'r')
-    # map = file['map']
-    # objects = file['objects']
-    # player = objects[file['player_index']]  # get index of player in objects list and access it
-    # inventory = file['inventory']
-    # game_msgs = file['game_msgs']
-    # game_state = file['game_state']
-    # stairs = objects[file['stairs_index']]
-    # # dungeon_level = file['dungeon_level']
-    # file.close()
-    # Fov.initialize()
-    pass
+    file = shelve.open('savegame', 'r')
+
+    current_level = file['current_level']
+    imported_items_list = file['imported_items_list']
+    imported_npc_list = file['imported_npc_list']
+    imported_quest_list = file['imported_quest_list']
+    current_quests = file['current_quests']
+
+    inventory = file['inventory']
+    game_msgs = file['game_msgs']
+    dungeon_level = file['dungeon_level']
+    dungeon_name = file['dungeon_name']
+    dungeon_tags = file['dungeon_tags']
+    camera_x, camera_y = file['camera_pos']
+    time_indices = file['schedule']
+
+    schedule.time_travelers = []
+
+    for index in time_indices:
+        schedule.time_travelers.append(current_level.objects[index])
+
+    player = current_level.player
+    file.close()
+
+    current_level.fov_initialize()
+    current_level.require_recompute()
 
 
-# CAMERA
 def get_camera():
     return camera_x, camera_y
 
@@ -389,7 +461,7 @@ def move_camera(target_x, target_y):
     global camera_x, camera_y
 
     try:
-    # new camera coordinates (top-left corner of the screen relative to the map)
+        # new camera coordinates (top-left corner of the screen relative to the map)
         x = target_x - Constants.MAP_CONSOLE_WIDTH / 2  # coordinates so that the target is at the center of the screen
         y = target_y - Constants.MAP_CONSOLE_HEIGHT / 2
     except:
@@ -415,32 +487,18 @@ def move_camera(target_x, target_y):
 def render_all():
     current_level.draw()
     UI.draw_hud()
-
+    Animation.render_animations(animation_queue)
     terminal.refresh()
 
 
 def render_ui():
     UI.draw_hud()
-    render_animations()
+    Animation.render_animations(animation_queue)
     terminal.refresh()
-
-
-def render_animations():
-    import Render
-    Render.clear_layer(10)
-    for ani in animation_queue:
-        #print "Animating................."
-        result = ani.play()
-        if result == 'Done':
-            #print "Want?"
-            animation_queue.remove(ani)
-        terminal.refresh()
-
 
 
 def player_move_or_interact(dx, dy):
     # the coordinates the player is moving to/interacting
-
 
     x = player.x + dx
     y = player.y + dy
@@ -472,3 +530,34 @@ def player_move_or_interact(dx, dy):
 
 def add_animation(animation, animation_params):
     animation_queue.append(Animation.AddAnimation(animation, animation_params))
+
+
+def add_item_to_player(item_name):
+    item_component = None
+    equipment_component = None
+    rannged_componenet = None
+    item = imported_items_list[item_name]
+    if 'item_component' in item:
+        if 'use_function' in item:
+            item_component = \
+                Components.Item(use_function=eval('Spells.' + item['use_function']))
+        else:
+            item_component = Components.Item()
+    if 'equipment_component' in item:
+        if 'ranged_component' in item:
+            rannged_componenet = Components.Ranged(int(item['max_range']),
+                                                   aoe=int(item['aoe']),
+                                                   animation=item['animation'])
+
+        equipment_component = Components.Equipment(slot=item['slot'],
+                                                   defense_bonus=int(item['defense_bonus']),
+                                                   power_bonus=int(item['power_bonus']))
+    item = Entity.Entity(0, 0, item['char'],
+                         item['name'],
+                         eval(item['color']),
+                         item=item_component,
+                         equipment=equipment_component,
+                         ranged=rannged_componenet)
+    inventory.append(item)
+    item.equipment.equip()
+    item.always_visible = True  # items are visible even out-of-FOV, if in an explored area

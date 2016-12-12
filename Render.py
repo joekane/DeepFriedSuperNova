@@ -38,38 +38,16 @@ def clear_layer(layer, color='black'):
     terminal.clear_area(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT)
 
 
-def blank(x, y):
+def draw_blank(x, y):
     x, y = Utils.to_camera_coordinates(x, y)
     # libtcod.console_put_char(consoles['entity_console'], x, y, ' ', libtcod.BKGND_NONE)
     draw_char(layers['entity_console'], x, y, ' ', None, libtcod.BKGND_NONE)
-
-
-def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
-    # LIBTCOD
-    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
-
-    #BEARLIB
-    terminal.layer(dest)
-    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
-    if color is not None:
-        color = Utils.convert_color(color, alpha)
-        terminal.color(color)
-    terminal.put(x, y, char)
-
-
-def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
-    # LIBTCOD
-    # libtcod.console_set_char_background(dest, x, y, color, flag)
-    # BEARLIB
-    color = Utils.convert_color(color)
-    terminal.bkcolor(color)
-    terminal.put(x, y, terminal.pick(x,y, 0))
-
 
 def set_foreground(dest, color):
     # LIBTCOD
     # libtcod.console_set_default_foreground(dest, color)
     # BEARLIB
+    # TODO: Replace / Obsolete?
     color = Utils.convert_color(color)
     terminal.color(color)
 
@@ -78,17 +56,22 @@ def set_background(dest, color):
     # LIBTCOD
     # libtcod.console_set_default_background(dest, color)
     # BEARLIB
+    # TODO: Replace / Obsolete?
     color = Utils.convert_color(color)
     terminal.bkcolor(color)
 
 
-def print_line(dest, x, y, text): # bottom-right for BEARLIB
+def print_line(dest, x, y, text, f_color=None): # bottom-right for BEARLIB
     # LIBTCOD
     # libtcod.console_print_ex(dest, x, y, flag, alignment, text)
 
     # BERALIB
 
+    if f_color:
+        set_foreground(dest, f_color)
+
     terminal.layer(dest)
+
     terminal.print_(x, y, text)
 
 
@@ -145,25 +128,38 @@ def draw_hoz_line(x, y, length, color, target):
     draw_rect(target, x, y, length, 1, False, libtcod.BKGND_SCREEN)
 
 
-""" EVERYTHING BELOW THIS LINE SHOULD MOVE TO A UI FILE """
-
-def ui_OLD(): # TODO: These should all be in UI (Move UI bits to a UI.Component class or something)
-    clear_layer(layers['panel_console'])
-    clear_layer(layers['side_panel_console'])
-
-    render_common()
-
-    render_messages()
-
-    render_status()
-
-    render_stat_bars()
-
-
 def draw_object(obj, visible=True):
     x, y = Utils.to_camera_coordinates(obj.x, obj.y)
 
     if visible:
+        if obj.fighter and Constants.HEALTH_BARS:
+            char = 0x0398
+            draw_char(layers['entity_console'], x, y, char, libtcod.red)
+
+            percentage = (float(obj.fighter.hp) / float(obj.fighter.max_hp))*100
+
+            if percentage <=10:
+                char = 0x03B1
+            elif percentage <=20:
+                char = 0x00DF
+            elif percentage <=30:
+                char = 0x0393
+            elif percentage <=40:
+                char = 0x03C0
+            elif percentage <=50:
+                char = 0x03A3
+            elif percentage <=60:
+                char = 0x03C3
+            elif percentage <=70:
+                char = 0x0085
+            elif percentage <=80:
+                char = 0x03C4
+            elif percentage <=90:
+                char = 0x03A6
+            else:
+                char = 0x0398
+            draw_char(layers['entity_console'], x, y, char, libtcod.green)
+
         draw_char(layers['entity_console'], x, y, obj.char, obj.color,
                   libtcod.BKGND_NONE)
     else:
@@ -171,121 +167,34 @@ def draw_object(obj, visible=True):
                   libtcod.BKGND_NONE)
 
 
-def render_messages():
-    print "DONT BE HERE"
-    clear_layer(layers['messages'])
-    y = 3 + Constants.MAP_CONSOLE_HEIGHT
-    for (line, color) in GameState.get_msg_queue():
-        if y < Constants.SCREEN_HEIGHT - 1:
-            set_foreground(layers['messages'], color)
-            # line_height = libtcod.console_get_height_rect(consoles['panel_console'], 0, 0, Constants.MSG_WIDTH, Constants.PANEL_HEIGHT - 3, line)
-            line_height = 1
-            print_rect(layers['messages'], Constants.MSG_X, y, Constants.MSG_WIDTH, line_height, line)
-
-            y += line_height
-
-
-def render_common():
-    from Engine import Input
-
-    pos = Pos(Constants.MAP_CONSOLE_WIDTH, 0)
-
-    set_foreground(layers['side_panel_console'], libtcod.Color(0, 70, 140))
-
-    """ LEVEL NUMBER """
-    print_rect(layers['side_panel_console'], pos.x + 1, pos.y + 1, 17, 1, "Level 1".center(17, ' '))
-
-    """ MOUSE X / Y """
-    print_rect(layers['side_panel_console'], pos.x + 9, pos.y + 18, 17, 2,
-                               "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
-
-    """ STATS """
-    set_foreground(layers['panel_console'], libtcod.Color(175, 175, 255))
-    player = GameState.get_player()
-
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 18, str(player.fighter.base_str).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 19, str(player.fighter.base_def).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 20, str(player.fighter.base_agl).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 21, str(player.fighter.base_stm).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 22, str(player.fighter.base_skl).rjust(3))
-    print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 23, str(player.fighter.base_int).rjust(3))
-
-    """ CONTROLS """
-    print_line(layers['side_panel_console'], 59, 39, "Move:      NUMPAD")
-    print_line(layers['side_panel_console'], 59, 40, "Fire:           F")
-    print_line(layers['side_panel_console'], 59, 41, "Pickup:         G")
-    print_line(layers['side_panel_console'], 59, 42, "Pop-Up Test:    B")
-    print_line(layers['side_panel_console'], 59, 43, "Decend:         <")
-    print_line(layers['side_panel_console'], 59, 44, "DEBUG:          X")
-
-
-    """ DUNGEON NAME """
-    pos = Pos(0, Constants.MAP_CONSOLE_HEIGHT)
-
-    print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,
-               GameState.dungeon_name.center(57, ' '))
-    # print_rect(layers['panel_console'], pos.x + 1, pos.y + 1, Constants.SCREEN_WIDTH - 19, 1,'TEST')
-
-
-def render_status():
-    # RENDER HEALTH BARS
-    pos = Pos(Constants.MAP_CONSOLE_WIDTH + 1, 25)
-    # CLEAR HP AREA / Status Area
-    set_foreground(layers['side_panel_console'], libtcod.black)
-    set_background(layers['side_panel_console'], libtcod.black)
-    # draw_rect(layers['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
-    # draw_rect(layers['side_panel_console'], pos.x, pos.y, 10, 9, True, libtcod.BKGND_SET)
-
-    # print GameState.player.status
-
-    num_of_status = 0
-    inc = 0
-    for st in GameState.player.status:
-        if num_of_status == 9:
-            set_background(layers['side_panel_console'], libtcod.black)
-            set_foreground(layers['side_panel_console'], libtcod.Color(51, 51, 51))
-            print_line(layers['side_panel_console'], pos.x, pos.y - 1 + inc,
-                                  "...             ")  # + " (" + str(st[1]) + ")")
-            return
-        set_background(layers['side_panel_console'], libtcod.black)
-        set_foreground(layers['side_panel_console'], st['color'])
-
-        if Utils.is_mouse_in(pos.x, pos.y + inc, 17, 1):
-            print_line(layers['side_panel_console'], pos.x, pos.y + inc, str(st['duration']) + " Turns")  # + " (" + str(st[1]) + ")")
-        else:
-            print_line(layers['side_panel_console'], pos.x, pos.y + inc, st['name'])  # + " (" + str(st[1]) + ")")
-        num_of_status += 1
-        inc += 1
-
-
-def render_stat_bars():
+def draw_stat_bars():
 
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
 
     # SHOW PLAYER STAT BARS
-    render_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                   libtcod.Color(178, 0, 45),
-                   libtcod.Color(64, 0, 16), layers['side_panel_console'])
-    render_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                   libtcod.Color(0, 30, 255),
-                   libtcod.Color(0, 10, 64), layers['side_panel_console'])
-    render_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
+    draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
+                 libtcod.Color(178, 0, 45),
+                 libtcod.Color(64, 0, 16), layers['side_panel_console'])
+    draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
+                 libtcod.Color(0, 30, 255),
+                 libtcod.Color(0, 10, 64), layers['side_panel_console'])
+    draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
                    libtcod.Color(255, 255, 0),
-                   libtcod.Color(65, 65, 0), layers['side_panel_console'])
+                 libtcod.Color(65, 65, 0), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
     for object in GameState.get_visible_objects():
         if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
-                render_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                               libtcod.Color(0, 255, 0),
-                               libtcod.Color(0, 64, 0),
-                               layers['side_panel_console'])
+                draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
+                             libtcod.Color(0, 255, 0),
+                             libtcod.Color(0, 64, 0),
+                             layers['side_panel_console'])
                 temp_y += 2
 
 
-def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
+def draw_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
 
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 4, 35)
@@ -317,12 +226,14 @@ def render_box_bar(x, y, total_width, name, value, maximum, bar_color, back_colo
         draw_char(target, x1, y, Utils.get_unicode(254), bar_color, libtcod.BKGND_SET)
 
     if Utils.is_mouse_in(x, og_y, total_width, height):
+        terminal.composition(terminal.TK_OFF)
         line = str(value) + "/" + str(maximum)
         set_foreground(target, 'white')
         print_line(target, x, y, line)
+        terminal.composition(terminal.TK_ON)
 
 
-def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
+def draw_bar(x, y, total_width, name, value, maximum, bar_color, back_color, target):
     # render a bar (HP, experience, etc). first calculate the width of the bar
     bar_width = int(float(value) / maximum * total_width)
 
@@ -340,4 +251,40 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color, t
 
     if name is not '':
         print_line(target, x + total_width / 2, y, name + ': ' + str(value) + '/' + str(maximum))
+
+
+def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    #BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    if color is not None:
+        color = Utils.convert_color(color, alpha)
+        terminal.color(color)
+    terminal.put(x, y, char)
+
+
+def draw_char_ex(dest, x, y, dx, dy, char, color=None, flag=None, alpha=255):
+    # LIBTCOD
+    # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
+
+    # BEARLIB
+    terminal.layer(dest)
+    # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
+    if color is not None:
+        color = Utils.convert_color(color, alpha)
+        terminal.color(color)
+    terminal.put_ext(x, y, dx, dy, char, None)
+
+
+def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
+    # LIBTCOD
+    # libtcod.console_set_char_background(dest, x, y, color, flag)
+    # BEARLIB
+    # TODO: Replace / Obsolete?
+    color = Utils.convert_color(color)
+    terminal.bkcolor(color)
+    terminal.put(x, y, terminal.pick(x,y, 0))
 

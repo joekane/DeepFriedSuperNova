@@ -21,7 +21,7 @@ from MapGen import Themes
 terminal.open()
 # terminal.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
 # blt.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: arial.ttf, size=8")  # font: UbuntuMono-R.ttf, size=12"
-terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\cp437_16x16_alpha.png, size=16x16, codepage=437".format(
+terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\cp437_16x16_alpha_plus.png, size=16x16, codepage=437".format(
              Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
 # terminal.set("window: size={0}x{1}, cellsize=auto, title='DFS 2016'; font: .\Fonts\yoshis_island_opaque.png, size=9x12, codepage=437".format(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))  # font: UbuntuMono-R.ttf, size=12"
 
@@ -46,10 +46,8 @@ ALT-Graphics init
 """
 Render.initialize()
 
-
 #import playground
 #playground.play()
-
 
 """
 Launch Menu
@@ -61,3 +59,5 @@ Close Window in Exit
 """
 terminal.close()
 
+
+# TODO: Convert all MESSAGES to tagged colored messages (BearLibStyle)

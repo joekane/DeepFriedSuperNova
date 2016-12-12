@@ -1,44 +1,44 @@
 import GameState
 
-time_travelers = []
 
-"""
-Adds Entity to scheduler
-"""
-def register(obj):
-    global time_travelers
-    time_travelers.append(obj)
-    obj.action_points = 0
+class Scheduler:
+    def __init__(self):
+        self.time_travelers = []
 
-11
-"""
-Removes object from scheduler (ie: death)
-"""
-def release(obj):
-    global time_travelers
-    time_travelers.remove(obj)
+    """
+    Adds Entity to scheduler
+    """
+    def register(self, obj):
+        self.time_travelers.append(obj)
+        obj.action_points = 0
 
-"""
-Resets scheduler to just player
-"""
-def reset():
-    global time_travelers
-    time_travelers = [GameState.get_player()]
 
-"""
-Cycles through entities and executes their AI.Take_Turn when delay == 0
-"""
+    """
+    Removes object from scheduler (ie: death)
+    """
+    def release(self, obj):
+        if obj in self.time_travelers:
+            self.time_travelers.remove(obj)
 
-def process():
-    for obj in time_travelers:
-        if obj.delay > 0:
-            obj.delay -= obj.speed
-        else:
-            value = 0
-            while value == 0:
-                value = obj.ai.take_turn()
-                if value != 0:
-                    obj.delay = value
+    """
+    Resets scheduler to just player
+    """
+    def reset(self):
+        self.time_travelers = [GameState.get_player()]
+
+    """
+    Cycles through entities and executes their AI.Take_Turn when delay == 0
+    """
+    def process(self):
+        for obj in self.time_travelers:
+            if obj.delay > 0:
+                obj.delay -= obj.speed
+            else:
+                value = 0
+                while value == 0:
+                    value = obj.ai.take_turn()
+                    if value != 0:
+                        obj.delay = value
 
 
 

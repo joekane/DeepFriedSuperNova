@@ -83,6 +83,24 @@ color = libtcod.yellow
 lore='This is lore!!!'
 freq = 30:1
 
+
+[Explosive Barrel]
+tags=SSA
+fighter_component = True
+hp = 1
+defense = 0
+power = 0
+xp = 0
+speed = 0
+death_function = explosive_death
+ai_component = MeleeMonster()
+char = B
+name = barrel
+color = libtcod.sepia
+lore='This is lore!!!'
+freq = 70:1
+
+
 [Data Roach]
 tags=SSA
 fighter_component = True
@@ -104,9 +122,9 @@ tags=SSA
 fighter_component = True
 hp = 10
 defense = 3
-power = 1d3
+power = 2d6
 xp = 35
-speed = 5
+speed = 9
 death_function = monster_death
 ai_component = RangedMonster()
 char = A
