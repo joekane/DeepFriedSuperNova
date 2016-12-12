@@ -206,7 +206,8 @@ def render_status():
 
     num_of_status = 0
     inc = 0
-    for st in GameState.player.status:
+    '''
+    for st in GameState.player.status.status_list:
         if num_of_status == 9:
             Render.set_background(layers['side_panel_console'], libtcod.black)
             Render.set_foreground(layers['side_panel_console'], libtcod.Color(51, 51, 51))
@@ -222,7 +223,7 @@ def render_status():
             Render.print_line(layers['side_panel_console'], pos.x, pos.y + inc, st['name'])  # + " (" + str(st[1]) + ")")
         num_of_status += 1
         inc += 1
-
+    '''
 
 def render_stat_bars():
 

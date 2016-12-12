@@ -40,22 +40,22 @@ def play():
 
             if choice == 0:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x,y, 'Flame'))   # , angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x,y, 'Flame'))   # , angle=random.randint(270, 270)))
             if choice == 1:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x, y, 'Burst', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x, y, 'Burst', angle=random.randint(270, 270)))
             if choice == 4:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x, y, 'Line', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x, y, 'Line', angle=random.randint(270, 270)))
             if choice == 2:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x, y, 'IceBreath', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x, y, 'IceBreath', angle=random.randint(270, 270)))
             if choice == 3:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x, y, 'TinyFire', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x, y, 'TinyFire', angle=random.randint(270, 270)))
             if choice == 5:
                     animations.append(
-                            Engine.Animation_System.AnimationTemplate(x, y, 'Xmas', angle=random.randint(270, 270)))
+                            Engine.Animation_System.Animation(x, y, 'Xmas', angle=random.randint(270, 270)))
 
             #print len(animations)
 

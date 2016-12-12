@@ -91,9 +91,8 @@ def initialize():
 
     # TODO: Refresh duration(AKA replace old one) or make stacking ones that allow this.....)
 
-    player.apply_status('Rage')
-    player.apply_status('Blessed')
-    player.apply_status('Poisoned')
+    player.status.add_status('Wet')
+    player.status.add_status('Regen')
 
     player.level = 1
     player.action_points = 100

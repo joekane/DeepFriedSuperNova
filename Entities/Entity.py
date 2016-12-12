@@ -12,6 +12,7 @@ import math
 import GameState
 import Components
 import libtcodpy as libtcod
+import Status
 
 class Entity:
     # this is a generic object: the player, a monster, an item, the stairs...
@@ -37,7 +38,7 @@ class Entity:
         self.color = color
         self.always_visible = always_visible
         self.path = None
-        self.status = []
+        self.status = Status.StatusList()
 
         # Optional Components
         self.fighter = fighter
@@ -66,37 +67,13 @@ class Entity:
     @property
     def speed(self):
         spd = self.base_speed
-        for st in self.status:
-            if 'speed' in st.keys():
-                spd += st['speed']
+        spd += self.status.get_bonus('SPD', spd)
         return spd
 
-    def apply_status(self, effect):
-        import Status
-        for st in self.status:
-            if st['name'] == effect:
-                #effect exists. ignore, warn, etc
-                print "Dbl Effect"
-                return
-        try:
-            self.status.append(Status.new_status(effect))
-        except:
-            return
 
-    def pass_time(self):
+    def pass_time(self, time_units):
         ''' PASSES TIME AT END OF EACH TURN, REGARDLESS OF ACTION (Non-Zero)'''
-        for st in self.status:
-            st['duration'] -= 1
-
-            if 'HP' in st.keys() and self.fighter is not None:
-                amount = st['HP']
-                if amount < 0:
-                    self.fighter.take_damage(amount)
-                elif amount > 0:
-                    self.fighter.heal(abs(amount))
-
-            if st['duration'] < 0:
-                self.status.remove(st)
+        self.status.pass_time(time_units)
 
     def send_to_back(self):
         # make this object be drawn first, so all others appear above it if they're in the same tile.

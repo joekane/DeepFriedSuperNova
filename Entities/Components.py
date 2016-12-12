@@ -302,12 +302,11 @@ class Fighter:
 
     @property
     def power(self):
+        # TODO: Revise ho STATS > Dice rolls
         #bonus = sum(equipment.power_bonus for equipment in GameState.get_all_equipped(self.owner))
-        bonus = 0
-        for st in self.owner.status:
-            if 'damage_bonus' in st.keys():
-                bonus += st['damage_bonus']
-        return self.base_power + "+" + str(bonus)
+        _str = self.base_str
+        _str += self.status.get_bonus('STR', _str)
+        return str(_str)
 
     @property
     def defense(self):  # return actual defense, by summing up the bonuses from all equipped items
