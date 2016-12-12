@@ -4,27 +4,9 @@
     <bookmark url="file://$PROJECT_DIR$/Engine/Animation_System.py" description="    'Flame': {&#10;        'color_list': Utils.gradien..." line="13" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb33376c-63f2-42e6-a28a-24381cd017f6" name="Default" comment="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;Entities/Status.py&#10;">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Fonts/cp437_16x16_alpha_plus.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Objects/_items.list" afterPath="$PROJECT_DIR$/Assets/Objects/_items.list" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Objects/_npcs.list" afterPath="$PROJECT_DIR$/Assets/Objects/_npcs.list" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Constants.py" afterPath="$PROJECT_DIR$/Constants.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DeepFried.py" afterPath="$PROJECT_DIR$/DeepFried.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Engine/Animation_System.py" afterPath="$PROJECT_DIR$/Engine/Animation_System.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Engine/Schedule.py" afterPath="$PROJECT_DIR$/Engine/Schedule.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Engine/Tracery/__init__.py" afterPath="$PROJECT_DIR$/Engine/Tracery/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Engine/UI.py" afterPath="$PROJECT_DIR$/Engine/UI.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Combat.py" afterPath="$PROJECT_DIR$/Entities/Combat.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Components.py" afterPath="$PROJECT_DIR$/Entities/Components.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Entity.py" afterPath="$PROJECT_DIR$/Entities/Entity.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Pathing.py" afterPath="$PROJECT_DIR$/Entities/Pathing.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Spells.py" afterPath="$PROJECT_DIR$/Entities/Spells.py" />
+    <list default="true" id="eb33376c-63f2-42e6-a28a-24381cd017f6" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Entities/Status.py" afterPath="$PROJECT_DIR$/Entities/Status.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameState.py" afterPath="$PROJECT_DIR$/GameState.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MapGen/WorldGen.py" afterPath="$PROJECT_DIR$/MapGen/WorldGen.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Render.py" afterPath="$PROJECT_DIR$/Render.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Utils.py" afterPath="$PROJECT_DIR$/Utils.py" />
     </list>
     <ignored path="DeepFriedSuperNova.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -77,11 +59,9 @@
       <file leaf-file-name="Status.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Entities/Status.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="155" column="35" selection-start-line="155" selection-start-column="35" selection-end-line="155" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="0">
+              <caret line="0" column="6" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="6" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -496,6 +476,14 @@
       <option name="presentableId" value="Default" />
       <updated>1471435648057</updated>
     </task>
+    <task id="LOCAL-00001" summary="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;Entities/Status.py&#10;">
+      <created>1481570240855</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1481570240855</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -775,11 +763,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Entities/Status.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="155" column="35" selection-start-line="155" selection-start-column="35" selection-end-line="155" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="0">
+          <caret line="0" column="6" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
