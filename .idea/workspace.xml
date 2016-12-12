@@ -59,9 +59,11 @@
       <file leaf-file-name="Status.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Entities/Status.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="6" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="6" />
-              <folding />
+            <state relative-caret-position="697">
+              <caret line="180" column="0" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
+              <folding>
+                <element signature="e#34#45#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -483,7 +485,14 @@
       <option name="project" value="LOCAL" />
       <updated>1481570240855</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Fix">
+      <created>1481570294714</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1481570294714</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -556,7 +565,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;Entities/Status.py&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;Entities/Status.py&#10;" />
+    <MESSAGE value="Fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -763,9 +773,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Entities/Status.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="6" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="6" />
-          <folding />
+        <state relative-caret-position="697">
+          <caret line="180" column="0" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
+          <folding>
+            <element signature="e#34#45#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
