@@ -215,42 +215,23 @@ class Level:
         # print(choice)
         return choice
 
-    def target_tile(self, max_range=None):
-        # TODO: This goes somewhere else (This should be oart of independatnt Targetin (see Ranged)
-        # return the position of a tile left-clicked in player's FOV (optionally in a range), or (None,None) if right-clicked.
-        mouse = libtcod.Mouse()
-        key = libtcod.Key()
-
-        while True:
-            # render the screen. this erases the inventory and shows the names of objects under the mouse.
-            libtcod.console_flush()
-            libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
-
-            (x, y) = (mouse.cx, mouse.cy)
-
-            # accept the target if the player clicked in FOV, and in case a range is specified, if it's in that range
-            if (mouse.lbutton_pressed and self.is_visible(x, y) and
-                    (max_range is None or GameState.get_player().distance(x, y) <= max_range)):
-                return (x, y)
-            if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
-                return (None, None)  # cancel if the player right-clicked or pressed Escape
-
-    def target_monster(self, max_range=None):
-        # returns a clicked monster inside FOV up to a range, or None if right-clicked
-        while True:
-            (x, y) = self.target_tile(max_range)
-            if x is None:  # player cancelled
-                return None
-
-            # return the first clicked monster, otherwise continue looping
-            for obj in self.get_visible_objects():
-                if obj.x == x and obj.y == y and obj.fighter and obj != GameState.get_player():
-                    return obj
-
     def get_monster_at(self, pos):
         for obj in self.visible_objects:
             if obj.x == pos[0] and obj.y == pos[1] and obj.fighter is not None:
                 return obj
+
+    def get_monsters_in_range_at(self, pos, range):
+        targets = []
+        circle = Utils.get_circle_points(pos[0], pos[1], range)
+        circle = list(set(circle))
+        for target in circle:
+            # target = Map.to_map_coordinates(target[0], target[1])
+            monster = GameState.current_level.get_monster_at((target[0], target[1]))
+            if monster is not None:
+                #print "Monster: " + str(monster) + " at " + str(target)
+                targets.append(monster)
+
+        return targets
 
     def get_stairs(self):
         return self.stairs_down
@@ -378,6 +359,8 @@ class Level:
                             tile.explored = True
 
 
+# TODO: Add terrain description to tile. Present to player only upon terrain change / inspection
+
 class Tile:
     # a tile of the map and its properties
     def __init__(self, blocked, block_sight=None, char=' ', f_color=Themes.ground_color(), b_color=libtcod.black,
@@ -458,7 +441,7 @@ class Rect:
 
 
 def new_map(solid=True):
-    # TODO: Create craible sized maps
+    # TODO: Create variable sized maps
     level_map = []
 
     if solid:

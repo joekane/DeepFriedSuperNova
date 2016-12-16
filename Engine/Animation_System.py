@@ -27,6 +27,7 @@ animations = {
         'max_size': 6,
         'density': 20,
         'angle_range': 22.5,
+        'target_angle': 0,
         'loop': True,
         'delay_avg': 0.4,
         'delay_sd': 0.1,
@@ -43,6 +44,7 @@ animations = {
         'max_size': 0,
         'density': 5,
         'angle_range': 360,
+        'target_angle': 0,
         'loop': 3,
         'delay_avg': 0.3,
         'delay_sd': 0.3,
@@ -68,6 +70,7 @@ animations = {
         'max_size': 0,
         'density': 1,
         'angle_range': 360,
+        'target_angle': 0,
         'loop': True,
         'delay_avg': 0.0,
         'delay_sd': 0.0,
@@ -93,6 +96,7 @@ animations = {
         'max_size': 3,
         'density': 250,
         'angle_range': 360,
+        'target_angle': 0,
         'loop': False,
         'delay_avg': 1.5,
         'delay_sd': 0.75,
@@ -118,6 +122,7 @@ animations = {
         'max_size': 3,
         'density': 250,
         'angle_range': 360,
+        'target_angle': 0,
         'loop': False,
         'delay_avg': 1.5,
         'delay_sd': 0.75,
@@ -134,6 +139,7 @@ animations = {
         'max_size': 5,
         'density': 50,
         'angle_range': 360,
+        'target_angle': 0,
         'loop': True,
         'delay_avg': 1.0,
         'delay_sd': 0.5,
@@ -149,6 +155,7 @@ animations = {
         'max_size': 1,
         'density': 1,
         'angle_range': 0,
+        'target_angle': 0,
         'loop': False,
         'delay_avg': 0.3,
         'delay_sd': 0.0,
@@ -165,6 +172,7 @@ animations = {
         'max_size': 1,
         'density': 1,
         'angle_range': 0,
+        'target_angle': 0,
         'loop': 6,
         'delay_avg': 0.3,
         'delay_sd': 0.0,
@@ -182,6 +190,7 @@ animations = {
         'density': 1,
         'angle_range': 1,
         'target_angle': 270,
+        'target_angle': 0,
         'loop': 10,
         'delay_avg': 1.0,
         'delay_sd': 0.0,
@@ -198,6 +207,7 @@ animations = {
         'max_size': 10,
         'density': 1,
         'angle_range': 45,
+        'target_angle': 0,
         'loop': False,
         'delay_avg': 0.0,
         'delay_sd': 0.0,
@@ -393,9 +403,14 @@ class Cell:
         if self.frame:
             for cell in self.frame:
                 cam_x, cam_y = Utils.to_camera_coordinates(cell[0], cell[1])
-                if not GameState.current_level.is_blocked(cell[0], cell[1], ignore_mobs=True)\
+                # Determine where we should draw
+
+
+                always_draw = True
+
+                if (not GameState.current_level.is_blocked(cell[0], cell[1], ignore_mobs=True)\
                         and GameState.current_level.is_visible(pos=(cell[0], cell[1]))\
-                        and cell != (GameState.player.x , GameState.player.y):
+                        and cell != (GameState.player.x , GameState.player.y)) or always_draw == True:
 
                     if not self.random_chr:
                         # TEMP

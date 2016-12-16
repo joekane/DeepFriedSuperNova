@@ -75,8 +75,6 @@ class PlayeControlled:
 
                 self.owner.x, self.owner.y = Utils.to_map_coordinates(mouse.cx, mouse.cy)
 
-                # TODO: set target Angle to 0 in base animations
-
                 animation_params = {}
                 animation_params['origin'] = (self.owner.x, self.owner.y)
                 animation_params['target'] = (self.owner.x, self.owner.y)
@@ -129,6 +127,7 @@ class PlayeControlled:
             """
             Auto-Walking
             """
+            # TODO: Make autowalk pathing calculate paths based on NO monsters. Otherwise you can tell when paths are blocked. Stop when encounter...
             if GameState.continue_walking:
                 self.owner.walk_path()
                 # print "Auto-Walking"
@@ -139,6 +138,12 @@ class PlayeControlled:
             """
             Basic User Input
             """
+
+            # TODO: Make movement cost relative to terrain. (add terrain cost to TILE)  WATER / TAR / OIL / SAND = Slower, Road / Trail = Fsater
+            # TODO: Make turns not pass as you bumb into walls.
+
+            # TODO: Add 'Auto-Explore' --- Search for Not self.Explored, path to it as if you right clicked.
+
             if key == terminal.TK_KP_8 or key == terminal.TK_UP:
                 GameState.player_move_or_interact(0, -1)
                 return self.end_turn(Constants.TURN_COST)
@@ -412,7 +417,13 @@ class Fighter:
         '''
         dmg = Combat.damage_calc(self, target)
         if dmg is not False:
-            Utils.message(self.owner.name + " does " + str(dmg) + " damage to " + target.name, libtcod.light_red)
+            #Utils.message(self.owner.name + " does " + str(dmg) + " damage to " + target.name, libtcod.light_red)
+            Utils.message('[color={1}]{2} [color={0}]takes [color={3}]{4} damage[color={0}].'
+                          ''.format(Constants.COMBAT_MESSAGE_DEFAULT_COLOR,
+                                    Constants.COMBAT_MESSAGE_MONSTER_NAME_COLOR,
+                                    target.name,
+                                    Constants.COMBAT_MESSAGE_DAMAGE_COLOR,
+                                    dmg))
             target.fighter.take_damage(dmg)
         else:
             Utils.message(target.name + " evads your attack!", libtcod.light_yellow)
@@ -867,7 +878,14 @@ class Equipment:
 
 
 class Ranged:
-    def __init__(self, max_range, ammo_type=0, ammo_consumed=0, aoe=1, animation=None, animation_params={'none': None}, owner=None):
+    def __init__(self,
+                 max_range,
+                 ammo_type=0,
+                 ammo_consumed=0,
+                 aoe=1,
+                 animation=None,
+                 animation_params={'None': None},
+                 owner=None):
         self.max_range = max_range
         self.ammo_type = ammo_type
         self.ammo_consumed = ammo_consumed
@@ -877,133 +895,7 @@ class Ranged:
         self.animation_params = animation_params
 
     def fire(self, source=None, target=None):
-
-        # TODO: Break tareting code out into universal method. (get initial coords, return targets)
-
-        """ Reset Params """
-        targets = []
-        target_x = 0
-        target_y = 0
-        if source is None:
-            source = GameState.get_player()
-
-        """ If no target supplied, Enter Targeting mode """
-        if target is None:
-            tile_effected = None
-            Utils.message('Choose Target. Left Click/Space to execute. Right Click/ESC to cancel.', libtcod.gold)
-
-            ''' Get list of visible enemies to cycle through '''
-            target_list = GameState.current_level.closest_monsters(self.max_range)
-            if target_list:
-                target_list = cycle(target_list)
-                target = next(target_list)[0]
-
-            ''' Used to detect mouse movement '''
-            mouse = Input.mouse
-            mouse_last_x, mouse_last_y = mouse.cx, mouse.cy
-            mouse_moved = False
-
-            while True:
-                ''' Clear Screen '''
-                Render.clear_layer(5)
-
-
-                ''' Get Inputs '''
-                Input.update()
-                key = Input.key
-
-                ''' determine if mouse moved, otherwise use auto-target '''
-                if mouse.cx != mouse_last_x or mouse.cy != mouse_last_y:
-                    mouse_moved = True
-                    moues_last_x, mouse_last_y = mouse.cx, mouse.cy
-                if mouse_moved:
-                    target_x, target_y = Utils.to_map_coordinates(mouse.cx, mouse.cy)
-                elif target:
-                    target_x, target_y = target.x, target.y
-                else:
-                    target_x, target_y = source.x, source.y
-
-                ''' determine line of fire (You may not be able to hit every enemy you see) '''
-                line = Utils.get_line((source.x, source.y),
-                                      (target_x, target_y),
-                                      walkable=True,
-                                      ignore_mobs=True,
-                                      max_length=self.max_range)
-                for point in line:
-                    if point == (None, None):
-                        break
-                    point = Utils.to_camera_coordinates(point[0], point[1])
-                    libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
-                    Render.draw_char(5, point[0], point[1], 0x2588, terminal.color_from_argb(128, 64, 64, 255),
-                                     libtcod.BKGND_SET)
-
-
-
-                if len(line) > 0:
-                    index = Utils.find_element_in_list((None, None), line)
-
-                    if index is None:
-                        point = line[-1]
-                    else:
-                        point = line[index-1]
-
-                    circle = Utils.get_circle_points(point[0], point[1], self.aoe)
-                    if circle:
-                        tile_effected = set(circle)
-
-                        for points in circle:
-                            points = Utils.to_camera_coordinates(points[0], points[1])
-                            Render.draw_char(5, points[0], points[1], 0x2588, terminal.color_from_argb(128, 200, 32, 32),
-                                             libtcod.BKGND_SET)
-                            Render.draw_char(5, points[0], points[1], 0xE000, terminal.color_from_argb(128, 255, 0, 0),
-                                             libtcod.BKGND_SET)
-
-                if mouse.lbutton_pressed or key == terminal.TK_SPACE:
-                    # target_tile = (target_x, target_y)
-                    #print tile_effected
-                    for target in tile_effected:
-                        #target = Map.to_map_coordinates(target[0], target[1])
-                        monster = GameState.current_level.get_monster_at((target[0], target[1]))
-                        if monster is not None:
-                            print "Monster: " + str(monster) + " at " + str(target)
-                            targets.append(monster)
-                    break
-
-
-                if mouse.rbutton_pressed or key == terminal.TK_ESCAPE:
-                    break
-
-                if key == terminal.TK_F:
-                    if target_list:
-                        target = next(target_list)[0]
-
-                GameState.render_ui()
-
-
-
-            if not targets:  # no enemy found within maximum range
-                Utils.message('Cancelled.', libtcod.red)
-                Render.clear_layer(5)
-                return 'cancelled'
-
-
-        # TODO: Allow targeting Empty tiles
-
-        # zap it!
-        if self.animation:
-            self.animation_params['origin'] = (source.x, source.y)
-            self.animation_params['target'] = (target_x, target_y)
-            self.animation_params['target_angle'] = Utils.get_angle(source.x, source.y, target_x, target_y)
-
-            GameState.add_animation(self.animation, self.animation_params)
-
-        for target in targets:
-            if target.fighter:
-                Utils.message('{0} takes {1} damage.'.format(target.name, self.owner.equipment.power_bonus),
-                              libtcod.light_blue)
-                target.fighter.take_damage(self.owner.equipment.power_bonus)
-        Render.clear_layer(5)
-        return 'fired'
+        return UI.target_mode(source, target, self)
 
 
 def player_death(player):
@@ -1017,8 +909,17 @@ def player_death(player):
 def monster_death(monster):
     # transform it into a nasty corpse! it doesn't block, can't be
     # attacked and doesn't move
-    Utils.message('The ' + monster.name + ' is dead! You gain ' + str(monster.fighter.xp) + ' experience points.',
-                  libtcod.orange)
+    '''
+    Utils.message('[color={0}]The [color={1}]{2} [color={0}]is dead! You gain [color={3}]{4} [color={0}]experience points.'.format(Constants.COMBAT_MESSAGE_DEFAULT_COLOR,
+                                                                                                                                 Constants.COMBAT_MESSAGE_MONSTER_NAME_COLOR,
+                                                                                                                                 monster.name,
+                                                                                                                                 Constants.COMBAT_MESSAGE_XP_COLOR,
+                                                                                                                                 monster.fighter.xp))
+    '''
+    GameState.add_animation('FadeText', {'origin': (monster.x, monster.y),
+                                         'target': (monster.x, monster.y - 1),
+                                         'char_list': ["+{0}".format(monster.fighter.xp)],
+                                         'color_list': [libtcod.dark_yellow]})
     monster.char = '%'
     monster.color = libtcod.dark_red
     monster.blocks = False
@@ -1048,12 +949,13 @@ def explosive_death(monster):
     animation_params = {}
     animation_params['origin'] = (monster.x, monster.y)
     animation_params['target'] = (monster.x, monster.y)
-    animation_params['target_angle'] = Utils.get_angle(monster.x, monster.y, monster.x, monster.y)
     GameState.add_animation('Burst', animation_params)
 
     # TODO: Damage surrounding things.....
 
-    # Schedule.pq
+    ranged_component = Ranged(0, aoe=3)
+    # TODO: BORKED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    UI.target_mode(monster, target=monster.pos, ranged_componenet=ranged_component)
 
     monster.send_to_back()
 

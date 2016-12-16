@@ -1,4 +1,5 @@
 from bearlibterminal import terminal
+from itertools import cycle
 
 import collections
 import Constants
@@ -6,6 +7,7 @@ import GameState
 import Input
 import Render
 import Utils
+
 import Engine.Animate as Animate
 import libtcodpy as libtcod
 
@@ -140,6 +142,147 @@ class Palette:
 
             GameState.render_ui()
 
+
+def target_mode(source, target=None, ranged_componenet=None):
+
+    """ Reset Params """
+    targets = []
+    target_x = 0
+    target_y = 0
+    if source is None:
+        source = GameState.get_player()
+
+
+
+    """ If no target supplied, Enter Targeting mode """
+    if target is None:
+        tile_effected = set([])
+        # Utils.message('Choose Target. Left Click/Space to execute. Right Click/ESC to cancel.', libtcod.gold)
+
+        ''' Get list of visible enemies to cycle through '''
+        target_list = GameState.current_level.closest_monsters(ranged_componenet.max_range)
+        if target_list:
+            target_list = cycle(target_list)
+            target = next(target_list)[0]
+
+        ''' Used to detect mouse movement '''
+        mouse = Input.mouse
+        mouse_last_x, mouse_last_y = mouse.cx, mouse.cy
+        mouse_moved = False
+
+        while True:
+            ''' Clear Screen '''
+            Render.clear_layer(layers['overlay_console'])
+
+            """
+            Render.draw_rect(layers['overlay_console'], 0, 0,
+                             Constants.MAP_CONSOLE_WIDTH,
+                             Constants.MAP_CONSOLE_HEIGHT,
+                             frame=True,
+                             f_color=terminal.color_from_argb(255, 255, 100, 100),
+                             bk_color=terminal.color_from_name('transparent'),
+                             title="Targeting Mode - Right Click/ESC to Cancel")
+            # """
+
+            ''' Get Inputs '''
+            Input.update()
+            key = Input.key
+
+            ''' determine if mouse moved, otherwise use auto-target '''
+            if mouse.cx != mouse_last_x or mouse.cy != mouse_last_y:
+                mouse_moved = True
+                moues_last_x, mouse_last_y = mouse.cx, mouse.cy
+            if mouse_moved:
+                target_x, target_y = Utils.to_map_coordinates(mouse.cx, mouse.cy)
+            elif target:
+                target_x, target_y = target.x, target.y
+            else:
+                target_x, target_y = source.x, source.y
+
+            ''' determine line of fire (You may not be able to hit every enemy you see) '''
+            line = Utils.get_line((source.x, source.y),
+                                  (target_x, target_y),
+                                  walkable=True,
+                                  ignore_mobs=True,
+                                  max_length=ranged_componenet.max_range)
+            for point in line:
+                if point == (None, None):
+                    break
+                point = Utils.to_camera_coordinates(point[0], point[1])
+                libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
+                Render.draw_char(layers['overlay_console'], point[0], point[1], 0x2588, terminal.color_from_argb(128, 64, 64, 255),
+                                 libtcod.BKGND_SET)
+
+            if len(line) > 0:
+                index = Utils.find_element_in_list((None, None), line)
+
+                if index is None:
+                    point = line[-1]
+                else:
+                    point = line[index - 1]
+
+                circle = Utils.get_circle_points(point[0], point[1], ranged_componenet.aoe)
+                if circle:
+                    tile_effected = set(circle)
+
+                    for points in circle:
+                        points = Utils.to_camera_coordinates(points[0], points[1])
+                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0x2588, terminal.color_from_argb(128, 200, 32, 32),
+                                         libtcod.BKGND_SET)
+                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0xE000, terminal.color_from_argb(128, 255, 0, 0),
+                                         libtcod.BKGND_SET)
+
+            if mouse.lbutton_pressed or key == terminal.TK_SPACE:
+                # target_tile = (target_x, target_y)
+                # print tile_effected
+                for target in tile_effected:
+                    # target = Map.to_map_coordinates(target[0], target[1])
+                    monster = GameState.current_level.get_monster_at((target[0], target[1]))
+                    if monster is not None:
+                        print "Monster: " + str(monster) + " at " + str(target)
+                        targets.append(monster)
+                break
+
+            if mouse.rbutton_pressed or key == terminal.TK_ESCAPE:
+                break
+
+            if key == terminal.TK_F:
+                if target_list:
+                    target = next(target_list)[0]
+
+            GameState.render_ui()
+
+        if not targets:  # no enemy found within maximum range
+            Utils.message('Cancelled.', libtcod.red)
+            Render.clear_layer(layers['overlay_console'])
+            return 'cancelled'
+        else:
+            targets = GameState.current_level.get_monsters_in_range_at(target, ranged_componenet.aoe)
+    Render.clear_layer(layers['overlay_console'])
+
+    # TODO: Allow targeting Empty tiles
+
+    # zap it!
+    if ranged_componenet.animation:
+        ranged_componenet.animation_params['origin'] = (source.x, source.y)
+        ranged_componenet.animation_params['target'] = (target_x, target_y)
+        ranged_componenet.animation_params['target_angle'] = Utils.get_angle(source.x, source.y, target_x, target_y)
+
+        GameState.add_animation(ranged_componenet.animation, ranged_componenet.animation_params)
+
+    for target in targets:
+        if target.fighter:
+            # TODO: Combat should handle all messages......
+
+            Utils.message('[color={1}]{2} [color={0}]takes [color={3}]{4} damage[color={0}].'
+                          ''.format(Constants.COMBAT_MESSAGE_DEFAULT_COLOR,
+                                    Constants.COMBAT_MESSAGE_MONSTER_NAME_COLOR,
+                                    target.name,
+                                    Constants.COMBAT_MESSAGE_DAMAGE_COLOR,
+                                    ranged_componenet.owner.equipment.power_bonus))
+            target.fighter.take_damage(ranged_componenet.owner.equipment.power_bonus)
+    Render.clear_layer(5)
+    return 'fired'
 
 
 def initilize_hud():

@@ -32,15 +32,24 @@ def remove_tags(text):
     return re.sub('<[^>]*>', '', text)
 
 
+def remove_codes(text):
+    return re.sub('\[[^\]]*\]', '', text)
+
+
 def get_tags(text):
     return re.findall("[<].*?[>]", text)
 
 
-def message(new_msg, coloe):
-    # TODO: Make Color unnessasary
+def message(new_msg, color=None):
     import textwrap
     # split the message if necessary, among multiple lines
-    new_msg_lines = textwrap.wrap(new_msg, Constants.MSG_WIDTH)
+
+    if len(GameState.get_msg_queue()) == Constants.MSG_HEIGHT:
+        GameState.del_msg(0)
+    GameState.add_msg(new_msg)
+
+    '''
+    new_msg_lines = textwrap.wrap(remove_codes(new_msg), Constants.MSG_WIDTH)
 
     for line in new_msg_lines:
         # if the buffer is full, remove the first line to make room for the new one
@@ -49,6 +58,7 @@ def message(new_msg, coloe):
 
         # add the new line as a tuple, with the text and the color
         GameState.add_msg(line)
+    '''
 
 
 def distance_to(self, other):

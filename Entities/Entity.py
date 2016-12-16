@@ -67,6 +67,10 @@ class Entity:
 
 
     @property
+    def pos(self):
+        return self.x, self.y
+
+    @property
     def speed(self):
         spd = self.base_speed
         spd += self.status.get_bonus('SPD', spd)

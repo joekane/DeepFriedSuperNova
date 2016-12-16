@@ -28,6 +28,7 @@ imported_items_list = {}
 imported_npc_list = {}
 imported_quest_list = {}
 current_quests = []
+current_level = None
 player = None
 inventory = []
 game_msgs = []
