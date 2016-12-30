@@ -56,7 +56,6 @@ def update():
         key = None
 
 
-
 def read_key_chr():
     return terminal.state(terminal.TK_CHAR)
 

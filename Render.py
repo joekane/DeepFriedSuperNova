@@ -88,7 +88,11 @@ def draw_rect(dest, x, y, w, h, frame=False, f_color=None, bk_color=None, title=
     terminal.layer(dest)
 
     if title:
-        offset_x1 = ((w - len(title)) / 2) + 1
+        if len(title) % 2 == 0:
+            adj = 1
+        else:
+            adj = 2
+        offset_x1 = ((w - len(title)) / 2) + adj
         offset_x2 = (w - len(title)) - (offset_x1 - 2)
     else:
         offset_x1 = w

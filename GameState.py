@@ -360,6 +360,7 @@ def play_game():
     while not libtcod.console_is_window_closed():
         # print animation_queue
         # print not animation_queue
+
         schedule.process()
 
 
