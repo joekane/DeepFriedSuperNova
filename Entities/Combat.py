@@ -29,10 +29,8 @@ def dice(s):
 
 
 # TODO: Move all Damage incoming / outgoing to this class. Make classes recive messages from here. Only classes that acctually NEED the info should be contacted
-
-# TODO: Perhaps tareting should be there as well............most tarety things will be combat related.
-
-# TODO: Combat should alwasy use PROPERTY based stats. Therefore all manipuylation of stats is done inside each enitity.
+# TODO: Perhaps targeting should be there as well............most targety things will be combat related.
+# TODO: Combat should always use PROPERTY based stats. Therefore all manipulation of stats is done inside each enitity.
 
 def damage_calc(attacker, target):
     if target.fighter.save:
@@ -40,3 +38,23 @@ def damage_calc(attacker, target):
     else:
         dmg = attacker.damage - target.fighter.damage_reduction
         return dmg
+
+
+# TESTING
+class Stat:
+    def __init__(self, base_max, base_threshold, base_regen, base_bonus_max):
+        self.base_max = base_max
+        self.current_value = base_max
+        self.current_bonus = 0
+        self. base_threshold = base_threshold
+        self.base_regen = base_regen
+        self.base_bonus_max = base_bonus_max
+
+    @property
+    def value(self):
+        result = self.current_value + self.current_bonus
+        max = self.base_bonus_max * self.base_max
+        return min(result, max)
+
+
+

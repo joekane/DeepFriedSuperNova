@@ -317,10 +317,10 @@ def next_level():
     print "SHOULD NOT BE HERE....."
 
     # advance to the next level
-    add_msg('You take a moment to rest, and recover your strength.', libtcod.light_violet)
+    add_msg('You take a moment to rest, and recover your strength.')
     get_player().fighter.heal(get_player().fighter.max_hp / 2)  # heal the player by 50%
     get_player().action_points = 0
-    add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
+    add_msg('After a rare moment of peace, you descend deeper into the heart of the dungeon...')
     dungeon_level += 1
 
     # TODO: eventually set theme and other stats based on tags generated HERE.
