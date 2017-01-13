@@ -20,6 +20,7 @@ import GameState
 import Utils
 import libtcodpy as libtcod
 import xp_loader
+from bltColor import bltColor as Color
 from MapGen import CaveGen, SpanningTree, Prefabs, Noise, Themes
 
 level_map = []
@@ -327,12 +328,12 @@ class Level:
                             if tile.explored:
                                 if tile.blocked:
                                     char = tile.char
-                                    f_color = libtcod.Color(50, 50, 50)
-                                    b_color = libtcod.Color(10, 10, 10)
+                                    f_color = Color('50, 50, 50')
+                                    b_color = Color('10, 10, 10')
                                 else:
                                     char = '.'
-                                    f_color = libtcod.Color(50, 50, 50)
-                                    b_color = libtcod.Color(0, 0, 0)
+                                    f_color = Color('50, 50, 50')
+                                    b_color = Color('0, 0, 0')
 
                                 Render.draw_char(Render.layers['map_console'], x, y, char,
                                                  f_color, libtcod.BKGND_SET)
@@ -371,8 +372,8 @@ class Tile:
         self.blocked = blocked
         self.explored = False
         self.char = char
-        self.f_color = f_color
-        self.b_color = b_color
+        self.f_color = Color(f_color)
+        self.b_color = Color(b_color)
 
         # by default, if a tile is blocked, it also blocks sight
         if block_sight is None:
@@ -1588,7 +1589,7 @@ def spawn_npc_at(level, x, y, npc):
     monster = Entities.Entity.Entity(x, y,
                             GameState.imported_npc_list[npc]['char'],
                             GameState.imported_npc_list[npc]['name'],
-                            eval(GameState.imported_npc_list[npc]['color']),
+                            GameState.imported_npc_list[npc]['color'],
                             always_visible=vis,
                             speed=int(GameState.imported_npc_list[npc]['speed']),
                             blocks=True,
@@ -1652,7 +1653,7 @@ def spawn_item_at(level, x,y, item_name):
                                  power_bonus=int(GameState.imported_items_list[item_name]['power_bonus']))
     item = Entity.Entity(x, y, GameState.imported_items_list[item_name]['char'],
                          GameState.imported_items_list[item_name]['name'],
-                         eval(GameState.imported_items_list[item_name]['color']),
+                         GameState.imported_items_list[item_name]['color'],
                          item=item_component,
                          equipment=equipment_component)
     level.objects.append(item)

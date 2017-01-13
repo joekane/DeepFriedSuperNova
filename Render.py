@@ -14,10 +14,19 @@ import GameState
 import Constants
 import Utils
 import libtcodpy as libtcod
+from bltColor import bltColor as Color
 
 Pos = collections.namedtuple('Pos', 'x y')
 layers = {}
 
+lorem_ipsum = \
+    "[c=orange]Lorem[/c] ipsum dolor sit amet, consectetur adipisicing elit, " \
+    "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " \
+    "[c=orange]Ut[/c] enim ad minim veniam, quis nostrud exercitation ullamco " \
+    "laboris nisi ut aliquip ex ea commodo consequat. [c=orange]Duis[/c] aute " \
+    "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu " \
+    "fugiat nulla pariatur. [c=orange]Excepteur[/c] sint occaecat cupidatat " \
+    "non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 # def initialize(map_console, entity_console, panel_console, side_panel_console, animation_console):
 def initialize():
@@ -48,8 +57,13 @@ def set_foreground(dest, color):
     # libtcod.console_set_default_foreground(dest, color)
     # BEARLIB
     # TODO: Replace / Obsolete?
-    color = Utils.convert_color(color)
-    terminal.color(color)
+    #color = Utils.convert_color(color)
+    #print color
+    try:
+        terminal.color(color)
+    except:
+        print "ERROR!"
+        print color
 
 
 def set_background(dest, color):
@@ -57,7 +71,7 @@ def set_background(dest, color):
     # libtcod.console_set_default_background(dest, color)
     # BEARLIB
     # TODO: Replace / Obsolete?
-    color = Utils.convert_color(color)
+    #color = Utils.convert_color(color)
     terminal.bkcolor(color)
 
 
@@ -72,7 +86,7 @@ def print_line(dest, x, y, text, f_color=None): # bottom-right for BEARLIB
 
     terminal.layer(dest)
 
-    terminal.print_(x, y, text)
+    terminal.puts(x, y, text)
 
 
 def print_rect(dest, x, y, w, h, text):
@@ -114,10 +128,11 @@ def draw_rect(dest, x, y, w, h, frame=False, f_color=None, bk_color=None, title=
                     draw_char(dest, x1 + x, y1 + y, Constants.BOX_SE)
                 elif x1 == 0 or x1 == w - 1:
                     draw_char(dest, x1 + x, y1 + y, Constants.BOX_E)
-                elif (y1 == 0 and (offset_x1-1 > x1 or x1 > w - offset_x2)) or y1 == h - 1:
+                elif  y1 == h - 1:
                     draw_char(dest, x1 + x, y1 + y, Constants.BOX_N)
     if title:
-        print_line(dest, x + (w / 2), y, "[wrap={0}x{1}][align=center-center]{2}".format(w, h, title))
+        print_line(dest, x, y, " " )
+        print_line(dest, x, y, "{0}".format(title).center(w, ' '))
 
 
 def draw_vert_line(x, y, length, color, target):
@@ -162,12 +177,12 @@ def draw_object(obj, visible=True):
                 char = 0x03A6
             else:
                 char = 0x0398
-            draw_char(layers['entity_console'], x, y, char, libtcod.green)
+            draw_char(layers['entity_console'], x, y, char, 'green')
 
         draw_char(layers['entity_console'], x, y, obj.char, obj.color,
                   libtcod.BKGND_NONE)
     else:
-        draw_char(layers['entity_console'], x, y, obj.char, libtcod.darker_gray,
+        draw_char(layers['entity_console'], x, y, obj.char, 'darker gray',
                   libtcod.BKGND_NONE)
 
 
@@ -177,14 +192,14 @@ def draw_stat_bars():
 
     # SHOW PLAYER STAT BARS
     draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                 libtcod.Color(178, 0, 45),
-                 libtcod.Color(64, 0, 16), layers['side_panel_console'])
+                 Color("178, 0, 45"),
+                 Color("64, 0, 16"), layers['side_panel_console'])
     draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                 libtcod.Color(0, 30, 255),
-                 libtcod.Color(0, 10, 64), layers['side_panel_console'])
+                 Color("0, 30, 255"),
+                 Color("0, 10, 64"), layers['side_panel_console'])
     draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
-                   libtcod.Color(255, 255, 0),
-                 libtcod.Color(65, 65, 0), layers['side_panel_console'])
+                   Color("255, 255, 0"),
+                 Color("65, 65, 0"), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
@@ -192,8 +207,8 @@ def draw_stat_bars():
         if object.fighter and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
                 draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                             libtcod.Color(0, 255, 0),
-                             libtcod.Color(0, 64, 0),
+                             Color("0, 255, 0"),
+                             Color("0, 64, 0"),
                              layers['side_panel_console'])
                 temp_y += 2
 
@@ -206,14 +221,18 @@ def draw_box_bar(x, y, total_width, name, value, maximum, bar_color, back_color,
     bar_width = int(float(value) / maximum * total_width)
     og_y = y
     height = 1
-    offset_color = libtcod.Color(128, 128, 128)
+    offset_color = Color("128, 128, 128")
 
     if name != '':
         set_background(target, libtcod.black)
-        set_foreground(target, libtcod.Color(51, 51, 51))
+        set_foreground(target, Color("51, 51, 51"))
         print_line(target, x, y, name)
         y += 1
         height += 1
+
+    #print "Bar Colors"
+    #print bar_color
+    #print back_color
 
     ''' render MAX value '''
     # set_background(target, back_color-offset_color)
@@ -265,7 +284,8 @@ def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
     terminal.layer(dest)
     # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
     if color is not None:
-        color = Utils.convert_color(color, alpha)
+        #color = Utils.convert_color(color, alpha)
+        #print "Color: {0}".format(color)
         terminal.color(color)
     terminal.put(x, y, char)
 

@@ -13,6 +13,7 @@ import GameState
 import Components
 import libtcodpy as libtcod
 import Status
+from bltColor import bltColor as Color
 
 # TODO: Need "Inanimate AI" for barrels and the like. They still need fighter component, but should prevent them from being time_travelers.
 
@@ -37,7 +38,7 @@ class Entity:
         self.delay = delay
         self.base_speed = speed
         self.char = char
-        self.color = color
+        self.color = Color(color)
         self.always_visible = always_visible
         self.path = None
         self.status = Status.StatusList()

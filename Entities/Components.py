@@ -772,7 +772,7 @@ class SpawningMonster:
 
             monster = Entity.Entity(loc[0], loc[1], GameState.imported_npc_list[self.new_monster]['char'],
                                     GameState.imported_npc_list[self.new_monster]['name'],
-                                    eval(GameState.imported_npc_list[self.new_monster]['color']),
+                                    GameState.imported_npc_list[self.new_monster]['color'],
                                     blocks=True,
                                     fighter=fighter_component,
                                     ai=ai_component)
@@ -903,7 +903,7 @@ def player_death(player):
 
     # for added effect, transform the player into a corpse!
     player.char = '%'
-    player.color = libtcod.dark_red
+    player.color = 'dark red'
 
 
 def monster_death(monster):
@@ -921,7 +921,7 @@ def monster_death(monster):
                                          'char_list': ["+{0}".format(monster.fighter.xp)],
                                          'color_list': [libtcod.dark_yellow]})
     monster.char = '%'
-    monster.color = libtcod.dark_red
+    monster.color = 'dark red'
     monster.blocks = False
     monster.fighter = None
     monster.ai = None

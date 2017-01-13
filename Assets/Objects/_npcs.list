@@ -2,7 +2,7 @@
 ai_component = Door(door_status='open')
 char = +
 name = door
-color = libtcod.darker_yellow
+color = darker yellow
 always_visible=False
 speed = 0
 freq = 0:0
@@ -11,7 +11,7 @@ freq = 0:0
 ai_component = Door()
 char = +
 name = door
-color = libtcod.darker_yellow
+color = darker yellow
 always_visible=False
 speed = 0
 freq = 0:0
@@ -20,7 +20,7 @@ freq = 0:0
 ai_component = Door(door_status='closed')
 char = +
 name = door
-color = libtcod.darker_yellow
+color = darker yellow
 always_visible=False
 speed = 0
 freq = 0:0
@@ -30,7 +30,7 @@ freq = 0:0
 ai_component = QuestNpc()
 char = Q
 name = Gris
-color = libtcod.dark_red
+color = dark red
 speed = 0
 freq = 0:0
 
@@ -47,7 +47,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = a
 name = auto-stalker
-color = libtcod.dark_red
+color = dark red
 lore='This is lore!!!'
 freq = 80:1
 
@@ -63,7 +63,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = n
 name = nano-moth
-color = libtcod.dark_amber
+color = dark amber
 lore='This is lore!!!'
 freq = 80:1
 
@@ -79,7 +79,7 @@ death_function = monster_death
 ai_component = RangedTurretMonster()
 char = t
 name = alpha turret
-color = libtcod.yellow
+color = yellow
 lore='This is lore!!!'
 freq = 30:1
 
@@ -96,7 +96,7 @@ death_function = explosive_death
 ai_component = MeleeMonster()
 char = B
 name = barrel
-color = libtcod.sepia
+color = sepia
 lore='This is lore!!!'
 freq = 70:1
 
@@ -113,7 +113,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = r
 name = data roach
-color = libtcod.light_blue
+color = light blue
 lore='This is lore!!!'
 freq = 30:1
 
@@ -129,7 +129,7 @@ death_function = monster_death
 ai_component = RangedMonster()
 char = A
 name = augmented rover
-color = libtcod.dark_yellow
+color = dark yellow
 lore='This is lore!!!'
 freq = 30:1
 
@@ -146,7 +146,7 @@ death_function = monster_death
 ai_component = SentinelMonster()
 char = w
 name = cipher warden
-color = libtcod.pink
+color = pink
 lore='This is lore!!!'
 freq = 30:2
 
@@ -164,7 +164,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = j
 name = jammer
-color = libtcod.dark_azure
+color = dark azure
 lore='This is lore!!!'
 freq = 30:2
 
@@ -181,7 +181,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = e
 name = electrodyne
-color = libtcod.light_yellow
+color = light yellow
 lore='This is lore!!!'
 freq = 30:2
 
@@ -198,7 +198,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = J
 name = tera-jock
-color = libtcod.purple
+color = purple
 lore='This is lore!!!'
 freq = 30:2
 
@@ -215,7 +215,7 @@ death_function = monster_death
 ai_component = MeleeMonster()
 char = G
 name = librarian gigas
-color = libtcod.light_crimson
+color = light crimson
 lore='This is lore!!!'
 freq = 30:2
 

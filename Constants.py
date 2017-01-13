@@ -70,12 +70,12 @@ HEALTH_BARS = False
 
 
 # COLORS
-UI_Fore = libtcod.Color(0, 50, 90)
-UI_Back = libtcod.Color(0, 10, 25)
-UI_Button_Fore = libtcod.light_red
-UI_Button_Back = libtcod.dark_azure
-UI_PopFore = libtcod.azure
-UI_PopBack = libtcod.darkest_azure
+UI_Fore = "0, 50, 90"
+UI_Back = "0, 10, 25"
+UI_Button_Fore = 'light red'
+UI_Button_Back = 'dark azure'
+UI_PopFore = 'azure'
+UI_PopBack = 'darkest azure'
 
 COMBAT_MESSAGE_MONSTER_NAME_COLOR = 'grey'
 COMBAT_MESSAGE_DAMAGE_COLOR = 'red'

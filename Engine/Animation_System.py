@@ -12,11 +12,11 @@ import math
 
 animations = {
     'Flame': {
-        'color_list': Utils.gradient([libtcod.yellow,
-                                      libtcod.flame,
-                                      libtcod.darker_flame,
-                                      libtcod.darkest_flame,
-                                      libtcod.darkest_grey],
+        'color_list': Utils.gradient(['yellow',
+                                      'flame',
+                                      'darker flame',
+                                      'darkest flame',
+                                      'darkest grey'],
                                      [0,
                                       5,
                                       10,
@@ -38,7 +38,7 @@ animations = {
         'random_color': False
     },
     'Teleport': {
-        'color_list': [libtcod.blue, libtcod.light_blue, libtcod.azure],
+        'color_list': ['blue', 'light blue', 'azure'],
         'char_list': ['@', 'X', '|', 'O'],
         'min_size': 0,
         'max_size': 0,
@@ -55,11 +55,11 @@ animations = {
         'random_color': True
     },
     'TinyFire': {
-        'color_list': Utils.gradient([libtcod.yellow,
-                                      libtcod.flame,
-                                      libtcod.darker_flame,
-                                      libtcod.darkest_flame,
-                                      libtcod.darkest_grey],
+        'color_list': Utils.gradient(['yellow',
+                                      'flame',
+                                      'darker flame',
+                                      'darkest flame',
+                                      'darkest grey'],
                                      [0,
                                       5,
                                       10,
@@ -81,11 +81,11 @@ animations = {
         'random_color': False
     },
     'Burst': {
-        'color_list': Utils.gradient([libtcod.yellow,
-                                      libtcod.dark_flame,
-                                      libtcod.darker_flame,
-                                      libtcod.darkest_flame,
-                                      libtcod.darkest_flame],
+        'color_list': Utils.gradient(['yellow',
+                                      'flame',
+                                      'darker flame',
+                                      'darkest flame',
+                                      'darkest grey'],
                                      [0,
                                       4,
                                       8,
@@ -107,11 +107,11 @@ animations = {
         'random_color': False
     },
     'TestBurst': {
-        'color_list': Utils.gradient([libtcod.yellow,
-                                      libtcod.dark_flame,
-                                      libtcod.darker_flame,
-                                      libtcod.darkest_flame,
-                                      libtcod.darkest_flame],
+        'color_list': Utils.gradient(['yellow',
+                                      'flame',
+                                      'darker flame',
+                                      'darkest flame',
+                                      'darkest grey'],
                                      [0,
                                       4,
                                       8,
@@ -133,7 +133,7 @@ animations = {
         'random_color': False
     },
     'Xmas': {
-        'color_list': [libtcod.red, libtcod.green],
+        'color_list': ['red', 'green'],
         'char_list': [0x2022, 0x25CB, 'o', 'O'],
         'min_size': 5,
         'max_size': 5,
@@ -149,7 +149,7 @@ animations = {
         'random_color': False
     },
     'Shot': {
-        'color_list': [libtcod.light_grey],
+        'color_list': ['light grey'],
         'char_list': [0x2022],
         'min_size': 1,
         'max_size': 1,
@@ -166,7 +166,7 @@ animations = {
         'random_color': False
     },
     'Beam': {
-        'color_list': [libtcod.light_blue, libtcod.lighter_blue, libtcod.blue ],
+        'color_list': ['light_blue', 'lighter blue', 'blue' ],
         'char_list': [Utils.get_unicode(219),0x2022, 0x25CB, 'o', 'O' ],
         'min_size': 1,
         'max_size': 1,
@@ -183,7 +183,7 @@ animations = {
         'random_color': True
     },
     'FadeText': {
-        'color_list': [libtcod.yellow],
+        'color_list': ['yellow'],
         'char_list': ["+1000"],
         'min_size': 1,
         'max_size': 1,
@@ -201,7 +201,7 @@ animations = {
         'random_color': False
     },
     'SweepBeam': {
-        'color_list': [libtcod.light_green, libtcod.lighter_green, libtcod.green ],
+        'color_list': ['light green', 'lighter green', 'green' ],
         'char_list': [Utils.get_unicode(219),0x2022, 0x25CB, 'o', 'O' ],
         'min_size': 1,
         'max_size': 10,
@@ -218,11 +218,11 @@ animations = {
         'random_color': True
     },
     'Breath': {
-        'color_list':  Utils.gradient([libtcod.light_blue,
-                                      libtcod.azure,
-                                      libtcod.blue,
-                                      libtcod.darkest_azure,
-                                      libtcod.darkest_blue],
+        'color_list':  Utils.gradient(['light blue',
+                                      'azure',
+                                      'blue',
+                                      'darkest azure',
+                                      'darkest blue'],
                                       [0,
                                        4,
                                        8,

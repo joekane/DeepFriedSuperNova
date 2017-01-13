@@ -18,6 +18,7 @@ import Utils
 import libtcodpy as libtcod
 import Render
 import GameState
+from bltColor import bltColor as Color
 
 
 def follow_line(source, target, projectile='-', end_tile='*', color=libtcod.yellow):
@@ -125,9 +126,9 @@ def large_button(x, y, text, hover, length=None, target=0):
     animation_console = target
 
     if hover:
-        color = libtcod.light_azure
+        color = Color('light azure')
     else:
-        color = libtcod.azure
+        color = Color('azure')
 
     if length is None:
         length = len(text)
@@ -136,7 +137,7 @@ def large_button(x, y, text, hover, length=None, target=0):
     x = x - ((length + 2) / 2)
     base_color = color
     value = 40
-    adj = libtcod.Color(value, value, value)
+    adj = Color("{0}, {0}, {0}".format(value))
     color1 = base_color - adj - adj
     color2 = base_color - adj
     color3 = base_color

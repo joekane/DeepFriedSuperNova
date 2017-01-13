@@ -558,7 +558,7 @@ def add_item_to_player(item_name):
                                                    power_bonus=int(item['power_bonus']))
     item = Entity.Entity(0, 0, item['char'],
                          item['name'],
-                         eval(item['color']),
+                         item['color'],
                          item=item_component,
                          equipment=equipment_component,
                          ranged=rannged_componenet)

@@ -5,7 +5,7 @@ slot = hand
 attack_dice = 1d3
 char = /
 name = hand axe
-color = libtcod.grey
+color = grey
 desc = basically just a sharp rock
 freq = 80:1
 
@@ -16,7 +16,7 @@ slot = hand
 attack_dice = 1d5
 char = /
 name = tomahawk
-color = libtcod.grey
+color = grey
 desc = stone axe with red feathers
 freq = 80:1
 
@@ -27,7 +27,7 @@ slot = hand
 attack_dice = 1d6
 char = !
 name = bone club
-color = libtcod.white
+color = white
 desc = war club carved from the bone of an unknown beast
 freq = 80:1
 
@@ -39,7 +39,7 @@ attack_dice = 2d4
 attack_bonus = 1
 char = /
 name = jagged maul
-color = libtcod.sepia
+color = sepia
 desc = massive spikey bashy thing
 freq = 80:1
 
@@ -52,7 +52,7 @@ attack_bonus = 0
 range = 3
 char = Y
 name = leather sling
-color = libtcod.sepia
+color = sepia
 desc = slingshot made from soft animal skin
 freq = 80:1
 
@@ -64,7 +64,7 @@ attack_dice = 1d6
 range = 5
 char = }
 name = hunter's bow
-color = libtcod.sepia
+color = sepia
 desc = medium sized bow made from yew
 freq = 80:1
 

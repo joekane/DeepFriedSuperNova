@@ -5,7 +5,7 @@ power_bonus = 3
 defense_bonus = 0
 char = /
 name = sword
-color = libtcod.sky
+color = sky
 freq = 20:1,40:2
 
 [QuestSword]
@@ -15,14 +15,14 @@ power_bonus = 2
 defense_bonus = 0
 char = /
 name = kitchen knife
-color = libtcod.gold
+color = gold
 freq = 0:0
 
 [GrisKeyRing]
 item_component = True
 char = +
 name = Gris's keyring
-color = libtcod.gold
+color = gold
 freq = 0:0
 
 [Shield]
@@ -32,7 +32,7 @@ defense_bonus = 1
 power_bonus = 0
 char = [
 name = shield
-color = libtcod.darker_orange
+color = darker orange
 freq = 20:1
 
 [HealingPotion]
@@ -40,7 +40,7 @@ item_component = True
 use_function = cast_heal
 char = !
 name = healing potion
-color = libtcod.purple
+color = purple
 freq = 60:1,40:4
 
 
@@ -49,7 +49,7 @@ item_component = True
 use_function = cast_lightning
 char = #
 name = scroll of lightning bolt
-color = libtcod.light_yellow
+color = light yellow
 freq = 25:4
 
 
@@ -58,7 +58,7 @@ item_component = True
 use_function = cast_fireball
 char = #
 name = scroll of fireball
-color = libtcod.light_yellow
+color = light yellow
 freq = 25:6
 
 
@@ -67,7 +67,7 @@ item_component = True
 use_function = cast_confuse
 char = #
 name = scroll of confusion
-color = libtcod.light_yellow
+color = light yellow
 freq = 10:2
 
 
@@ -82,7 +82,7 @@ power_bonus = 2
 defense_bonus = 0
 char = ~
 name = pistol
-color = libtcod.sky
+color = sky
 freq = 0:0
 
 [Laser]
@@ -96,7 +96,7 @@ power_bonus = 5
 defense_bonus = 0
 char = ~
 name = laser
-color = libtcod.sky
+color = sky
 freq = 0:0
 
 [RPG]
@@ -110,7 +110,7 @@ power_bonus = 30
 defense_bonus = 0
 char = ~
 name = rpg
-color = libtcod.sky
+color = sky
 freq = 0:0
 
 [Ice Wand]
@@ -124,5 +124,5 @@ power_bonus = 4
 defense_bonus = 0
 char = ~
 name = ice wand
-color = libtcod.sky
+color = sky
 freq = 0:0

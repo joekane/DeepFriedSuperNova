@@ -14,6 +14,7 @@ import time
 from timeit import default_timer as timer
 
 from bearlibterminal import terminal
+from bltColor import bltColor as Color
 
 import Constants
 # import Engine.Fov
@@ -513,7 +514,7 @@ def get_offset_color(map_x, map_y, source_x, source_y):
         dist = 0
     offset_value = int((float(dist) / Constants.TORCH_RADIUS) * 255)
     offset_value = max(0, min(offset_value, 255)) / 2
-    offset_color = libtcod.Color(offset_value, offset_value, offset_value)
+    offset_color = Color('{0},{1},{2}'.format(offset_value, offset_value, offset_value))
     return offset_color
 
 
@@ -540,9 +541,10 @@ def to_map_coordinates(x, y):
 
 
 def gradient(color_list, color_keys):
-    return libtcod.color_gen_map(color_list, color_keys)
+    #return libtcod.color_gen_map(color_list, color_keys)
+    return Color.color_map(color_list, color_keys )
 
-
+6
 def segment_number(number, times):
     num_list = []
     for x in range(1,times+1):

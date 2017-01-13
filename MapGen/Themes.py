@@ -9,27 +9,27 @@ Color = libtcod.Color
 LEVEL_STYLE = ['Fixed']
 
 GROUND_CHAR = [libtcod.CHAR_SUBP_DIAG]
-GROUND_COLOR = [libtcod.lighter_gray]
-GROUND_BCOLOR = [libtcod.black]
+GROUND_COLOR = ['lighter gray']
+GROUND_BCOLOR = ['black']
 
 WALL_CHAR = [libtcod.CHAR_BLOCK3]
-WALL_COLOR = [libtcod.red]
-WALL_BCOLOR = [libtcod.black]
+WALL_COLOR = ['red']
+WALL_BCOLOR = ['black']
 
 DOOR_CLOSED_CHAR = [213]
 DOOR_OPEN_CHAR = [214]
-DOOR_COLOR = [libtcod.lighter_grey]
-DOOR_BCOLOR = [libtcod.black]
+DOOR_COLOR = ['lighter grey']
+DOOR_BCOLOR = ['black']
 
 GLASS_CHAR = [libtcod.CHAR_BLOCK1]
-GLASS_COLOR = [libtcod.lightest_blue]
-GLASS_BCOLOR = [libtcod.black]
+GLASS_COLOR = ['lightest blue']
+GLASS_BCOLOR = ['black']
 
 SHROUD_CHAR = [libtcod.CHAR_BLOCK1]
-SHROUD_COLOR = [libtcod.lightest_blue]
-SHROUD_BCOLOR = [libtcod.black]
+SHROUD_COLOR = ['lightest blue']
+SHROUD_BCOLOR = ['black']
 
-OUT_OF_FOV_COLOR = [libtcod.darker_gray]
+OUT_OF_FOV_COLOR = ['darker gray']
 
 theme_list = {}
 
@@ -56,27 +56,27 @@ def set_theme(theme):
     LEVEL_STYLE = theme_list[theme]['level_style'].split(' ')
 
     GROUND_CHAR = theme_list[theme]['ground_char'].split(' ')
-    GROUND_COLOR = theme_list[theme]['ground_color'].split(' ')
-    GROUND_BCOLOR = theme_list[theme]['ground_bcolor'].split(' ')
+    GROUND_COLOR = theme_list[theme]['ground_color'].split(',')
+    GROUND_BCOLOR = theme_list[theme]['ground_bcolor'].split(',')
 
     WALL_CHAR = theme_list[theme]['wall_char'].split(' ')
-    WALL_COLOR = theme_list[theme]['wall_color'].split(' ')
-    WALL_BCOLOR = theme_list[theme]['wall_bcolor'].split(' ')
+    WALL_COLOR = theme_list[theme]['wall_color'].split(',')
+    WALL_BCOLOR = theme_list[theme]['wall_bcolor'].split(',')
 
     DOOR_CLOSED_CHAR = theme_list[theme]['door_closed_char'].split(' ')
     DOOR_OPEN_CHAR = theme_list[theme]['door_open_char'].split(' ')
-    DOOR_COLOR = theme_list[theme]['door_color'].split(' ')
-    DOOR_BCOLOR = theme_list[theme]['door_bcolor'].split(' ')
+    DOOR_COLOR = theme_list[theme]['door_color'].split(',')
+    DOOR_BCOLOR = theme_list[theme]['door_bcolor'].split(',')
 
     GLASS_CHAR = theme_list[theme]['glass_char'].split(' ')
-    GLASS_COLOR = theme_list[theme]['glass_color'].split(' ')
-    GLASS_BCOLOR = theme_list[theme]['glass_bcolor'].split(' ')
+    GLASS_COLOR = theme_list[theme]['glass_color'].split(',')
+    GLASS_BCOLOR = theme_list[theme]['glass_bcolor'].split(',')
 
     SHROUD_CHAR = theme_list[theme]['shroud_char'].split(' ')
-    SHROUD_COLOR = theme_list[theme]['shroud_color'].split(' ')
-    SHROUD_BCOLOR = theme_list[theme]['shroud_bcolor'].split(' ')
+    SHROUD_COLOR = theme_list[theme]['shroud_color'].split(',')
+    SHROUD_BCOLOR = theme_list[theme]['shroud_bcolor'].split(',')
 
-    OUT_OF_FOV_COLOR = eval(theme_list[theme]['out_of_fov_color'])
+    OUT_OF_FOV_COLOR = theme_list[theme]['out_of_fov_color']
 
 
 def ground_char():
@@ -84,13 +84,15 @@ def ground_char():
 
 
 def ground_color():
+    print GROUND_COLOR
     color = random.choice(GROUND_COLOR)
-    return eval(str(color))
+    return color
 
 
 def ground_bcolor():
     color = random.choice(GROUND_BCOLOR)
-    return eval(str(color))
+    # print "Background: {0}".format(color)
+    return color
 
 
 def wall_char():
@@ -99,12 +101,12 @@ def wall_char():
 
 def wall_color():
     color = random.choice(WALL_COLOR)
-    return eval(str(color))
+    return color
 
 
 def wall_bcolor():
     color = random.choice(WALL_BCOLOR)
-    return eval(str(color))
+    return color
 
 
 def glass_char():
@@ -113,12 +115,12 @@ def glass_char():
 
 def glass_color():
     color = random.choice(GLASS_COLOR)
-    return eval(str(color))
+    return color
 
 
 def glass_bcolor():
     color = random.choice(GLASS_BCOLOR)
-    return eval(str(color))
+    return color
 
 
 def shroud_char():
@@ -127,12 +129,12 @@ def shroud_char():
 
 def shroud_color():
     color = random.choice(SHROUD_COLOR)
-    return eval(str(color))
+    return color
 
 
 def shroud_bcolor():
     color = random.choice(SHROUD_BCOLOR)
-    return eval(str(color))
+    return color
 
 
 

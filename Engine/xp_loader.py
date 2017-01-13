@@ -1,6 +1,7 @@
 import Render
 import Utils
-import libtcodpy as libtcod
+#import libtcodpy as libtcod
+from bltColor import bltColor as Color
 # from MapGen import Themes, Map
 
 ##################################
@@ -52,18 +53,17 @@ poskey_tile_character = 219
 # some or all of the below may appear in libtcod's color definitions; and in fact, you can use libtcod colors as you please for position keys.
 # These are merely the colors provided in the accompanying palette.
 
-poskey_color_red = libtcod.Color(255, 0, 0)
-poskey_color_lightpurple = libtcod.Color(254, 0,
-                                         255)  # specifically 254 as 255, 0, 255 is considered a transparent key color in REXPaint
-poskey_color_orange = libtcod.Color(255, 128, 0)
-poskey_color_pink = libtcod.Color(255, 0, 128)
-poskey_color_green = libtcod.Color(0, 255, 0)
-poskey_color_teal = libtcod.Color(0, 255, 255)
-poskey_color_yellow = libtcod.Color(255, 255, 0)
-poskey_color_blue = libtcod.Color(0, 0, 255)
-poskey_color_lightblue = libtcod.Color(0, 128, 255)
-poskey_color_purple = libtcod.Color(128, 0, 255)
-poskey_color_white = libtcod.Color(255, 255, 255)
+poskey_color_red = Color('255, 0, 0')
+poskey_color_lightpurple = Color('254, 0, 255')  # specifically 254 as 255, 0, 255 is considered a transparent key color in REXPaint
+poskey_color_orange = Color('255, 128, 0')
+poskey_color_pink = Color('255, 0, 128')
+poskey_color_green = Color('0, 255, 0')
+poskey_color_teal = Color('0, 255, 255')
+poskey_color_yellow = Color('255, 255, 0')
+poskey_color_blue = Color('0, 0, 255')
+poskey_color_lightblue = Color('0, 128, 255')
+poskey_color_purple = Color('128, 0, 255')
+poskey_color_white = Color('255, 255, 255')
 
 id = 1
 
@@ -81,8 +81,8 @@ def load_layer_to_console(console, xp_file_layer):
     for x in range(xp_file_layer['width']):
         for y in range(xp_file_layer['height']):
             cell_data = xp_file_layer['cells'][x][y]
-            fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
-            back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
+            fore_color = Color('{0},{1},{2}'.format(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b']))
+            back_color = Color('{0},{1},{2}'.format(cell_data['back_r'], cell_data['back_g'], cell_data['back_b']))
             Render.draw_char(console, x, y, cell_data['keycode'], fore_color, back_color)
 
 
@@ -96,8 +96,8 @@ def load_layer_to_layer(layer, x, y, xp_file_layer):
     for x in range(xp_file_layer['width']):
         for y in range(xp_file_layer['height']):
             cell_data = xp_file_layer['cells'][x][y]
-            fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
-            back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
+            fore_color = Color('{0},{1},{2}'.format(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b']))
+            back_color = Color('{0},{1},{2}'.format(cell_data['back_r'], cell_data['back_g'], cell_data['back_b']))
 
             Render.draw_char(layer, x + offset_x, y + offset_y, Utils.get_unicode(219), back_color,
                              back_color)
@@ -214,8 +214,8 @@ def load_layer_to_map_cosmetic(map, x1, y1, xp_file_layer, rotation='None'):
     for x in range(1, width + 1):
         for y in range(1, height + 1):
             cell_data = xp_file_layer['cells'][x][y]
-            fore_color = libtcod.Color(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b'])
-            back_color = libtcod.Color(cell_data['back_r'], cell_data['back_g'], cell_data['back_b'])
+            fore_color = Color('{0},{1},{2}'.format(cell_data['fore_r'], cell_data['fore_g'], cell_data['fore_b']))
+            back_color = Color('{0},{1},{2}'.format(cell_data['back_r'], cell_data['back_g'], cell_data['back_b']))
             # libtcod.console_put_char_ex(console, x, y, cell_data['keycode'], fore_color, back_color)
             char = cell_data['keycode']
             # print char

@@ -1,157 +1,130 @@
 [Diner]
 LEVEL_STYLE = Fixed
 GROUND_CHAR =  0x2518
-GROUND_COLOR = libtcod.lighter_gray
-GROUND_BCOLOR = libtcod.black
+GROUND_COLOR = lighter gray
+GROUND_BCOLOR = black
 
 WALL_CHAR = 0x00A2
-WALL_COLOR = libtcod.red
-WALL_BCOLOR = libtcod.black
+WALL_COLOR = red
+WALL_BCOLOR = black
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 214
-DOOR_COLOR = libtcod.lighter_grey
-DOOR_BCOLOR = libtcod.black
+DOOR_COLOR = lighter gray
+DOOR_BCOLOR = black
 
 GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = libtcod.lightest_blue
-GLASS_BCOLOR = libtcod.black
+GLASS_COLOR = lighter blue
+GLASS_BCOLOR = black
 
 SHROUD_CHAR = libtcod.CHAR_BLOCK1
-SHROUD_COLOR = libtcod.lightest_blue
-SHROUD_BCOLOR = libtcod.black
+SHROUD_COLOR = lighter blue
+SHROUD_BCOLOR = black
 
-OUT_OF_FOV_COLOR = libtcod.darker_gray
-
-
-[Shadow State Archive_BEAR]
-LEVEL_STYLE = BSP
-GROUND_CHAR =  0x2518
-GROUND_COLOR = 'grey'
-GROUND_BCOLOR = 'dark grey'
-
-WALL_CHAR = 0x00A0
-WALL_COLOR = 'darker flame'
-WALL_BCOLOR = 'dark red'
-
-DOOR_CLOSED_CHAR = 213
-DOOR_OPEN_CHAR = 213
-DOOR_COLOR = 'lighter grey'
-DOOR_BCOLOR = 'black'
-
-GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = 'lightest blue'
-GLASS_BCOLOR = 'black'
-
-SHROUD_CHAR = 37
-SHROUD_COLOR = 'lightest blue'
-SHROUD_BCOLOR = 'black'
-
-OUT_OF_FOV_COLOR = 'darker gray'
+OUT_OF_FOV_COLOR = darker gray
 
 
 [Shadow State Archive]
 LEVEL_STYLE = BSP
 GROUND_CHAR =  0x2518
-GROUND_COLOR = libtcod.grey
-GROUND_BCOLOR = libtcod.dark_grey
+GROUND_COLOR = grey
+GROUND_BCOLOR = dark grey
 
 WALL_CHAR = 0x00A0
-WALL_COLOR = libtcod.darker_flame
-WALL_BCOLOR = libtcod.dark_red
+WALL_COLOR = darker flame
+WALL_BCOLOR = dark red
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 213
-DOOR_COLOR = libtcod.lighter_grey
-DOOR_BCOLOR = libtcod.black
+DOOR_COLOR = lighter grey
+DOOR_BCOLOR = black
 
 GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = libtcod.lightest_blue
-GLASS_BCOLOR = libtcod.black
+GLASS_COLOR = lightest blue
+GLASS_BCOLOR = black
 
 SHROUD_CHAR = 37
-SHROUD_COLOR = libtcod.lightest_blue
-SHROUD_BCOLOR = libtcod.black
+SHROUD_COLOR = lightest blue
+SHROUD_BCOLOR = black
 
-OUT_OF_FOV_COLOR = libtcod.darker_gray
-
+OUT_OF_FOV_COLOR = darker gray
 
 
 [Valley of Devils]
 LEVEL_STYLE = CAVE_TIGHT
 GROUND_CHAR = 056 054 047
-GROUND_COLOR = libtcod.dark_green
-GROUND_BCOLOR = libtcod.darker_sepia
+GROUND_COLOR = dark green
+GROUND_BCOLOR = darker sepia
 
 WALL_CHAR = libtcod.CHAR_ARROW2_N
-WALL_COLOR = libtcod.sepia
-WALL_BCOLOR = libtcod.darkest_green
+WALL_COLOR = sepia
+WALL_BCOLOR = darkest green
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 213
-DOOR_COLOR = libtcod.darkest_yellow
-DOOR_BCOLOR = libtcod.dark_sepia
+DOOR_COLOR = darkest yellow
+DOOR_BCOLOR = dark sepia
 
 GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = libtcod.lightest_blue
-GLASS_BCOLOR = libtcod.black
+GLASS_COLOR = lighter blue
+GLASS_BCOLOR = black
 
 SHROUD_CHAR = libtcod.CHAR_BLOCK1
-SHROUD_COLOR = libtcod.lightest_blue
-SHROUD_BCOLOR = libtcod.black
+SHROUD_COLOR = lighter blue
+SHROUD_BCOLOR = black
 
-OUT_OF_FOV_COLOR = libtcod.darker_sepia
+OUT_OF_FOV_COLOR = darker sepia
 
 
 
 [Forest]
 LEVEL_STYLE = CAVE_OPEN
 GROUND_CHAR = 056 054 047
-GROUND_COLOR = libtcod.light_green
-GROUND_BCOLOR = libtcod.darker_green
+GROUND_COLOR = light green
+GROUND_BCOLOR = darker green
 
 WALL_CHAR = 006
-WALL_COLOR = libtcod.green
-WALL_BCOLOR = libtcod.dark_green
+WALL_COLOR = green
+WALL_BCOLOR = dark green
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 213
-DOOR_COLOR = libtcod.darkest_yellow
-DOOR_BCOLOR = libtcod.dark_sepia
+DOOR_COLOR = darkest yellow
+DOOR_BCOLOR = dark sepia
 
 GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = libtcod.lightest_blue
-GLASS_BCOLOR = libtcod.black
+GLASS_COLOR = lighter blue
+GLASS_BCOLOR = black
 
 SHROUD_CHAR = libtcod.CHAR_BLOCK1
-SHROUD_COLOR = libtcod.lightest_blue
-SHROUD_BCOLOR = libtcod.black
+SHROUD_COLOR = lighter blue
+SHROUD_BCOLOR = black
 
-OUT_OF_FOV_COLOR = libtcod.darker_sepia
+OUT_OF_FOV_COLOR = darker sepia
 
 
 
 [Abyss of the Fish Men]
 LEVEL_STYLE = CAVE_TIGHT
 GROUND_CHAR = 056
-GROUND_COLOR = libtcod.dark_grey
-GROUND_BCOLOR = libtcod.black
+GROUND_COLOR = dark grey
+GROUND_BCOLOR = black
 
 WALL_CHAR = 176
-WALL_COLOR = libtcod.dark_sepia
-WALL_BCOLOR = libtcod.black
+WALL_COLOR = dark sepia
+WALL_BCOLOR = black
 
 DOOR_CLOSED_CHAR = 213
 DOOR_OPEN_CHAR = 213
-DOOR_COLOR = libtcod.darkest_yellow
-DOOR_BCOLOR = libtcod.dark_sepia
+DOOR_COLOR = darkest yellow
+DOOR_BCOLOR = dark sepia
 
 GLASS_CHAR = libtcod.CHAR_BLOCK1
-GLASS_COLOR = libtcod.lightest_blue
-GLASS_BCOLOR = libtcod.black
+GLASS_COLOR = lighter blue
+GLASS_BCOLOR = black
 
 SHROUD_CHAR = libtcod.CHAR_BLOCK1
-SHROUD_COLOR = libtcod.lightest_blue
-SHROUD_BCOLOR = libtcod.black
+SHROUD_COLOR = lighter blue
+SHROUD_BCOLOR = black
 
-OUT_OF_FOV_COLOR = libtcod.darker_grey
+OUT_OF_FOV_COLOR = darker grey

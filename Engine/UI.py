@@ -8,6 +8,8 @@ import Input
 import Render
 import Utils
 
+from bltColor import bltColor as Color
+
 import Engine.Animate as Animate
 import libtcodpy as libtcod
 
@@ -209,9 +211,8 @@ def target_mode(source, target=None, ranged_componenet=None):
                 if point == (None, None):
                     break
                 point = Utils.to_camera_coordinates(point[0], point[1])
-                libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
-                Render.draw_char(layers['overlay_console'], point[0], point[1], 0x2588, terminal.color_from_argb(128, 64, 64, 255),
-                                 libtcod.BKGND_SET)
+                #libtcod.console_set_char_background(0, point[0], point[1], libtcod.lighter_blue, libtcod.BKGND_SET)
+                Render.draw_char(layers['overlay_console'], point[0], point[1], 0x2588, terminal.color_from_argb(128, 64, 64, 255))
 
             if len(line) > 0:
                 index = Utils.find_element_in_list((None, None), line)
@@ -227,10 +228,8 @@ def target_mode(source, target=None, ranged_componenet=None):
 
                     for points in circle:
                         points = Utils.to_camera_coordinates(points[0], points[1])
-                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0x2588, terminal.color_from_argb(128, 200, 32, 32),
-                                         libtcod.BKGND_SET)
-                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0xE000, terminal.color_from_argb(128, 255, 0, 0),
-                                         libtcod.BKGND_SET)
+                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0x2588, terminal.color_from_argb(128, 200, 32, 32))
+                        Render.draw_char(layers['overlay_console'], points[0], points[1], 0xE000, terminal.color_from_argb(128, 255, 0, 0))
 
             if mouse.lbutton_pressed or key == terminal.TK_SPACE:
                 # target_tile = (target_x, target_y)
@@ -253,7 +252,7 @@ def target_mode(source, target=None, ranged_componenet=None):
             GameState.render_ui()
 
         if not targets:  # no enemy found within maximum range
-            Utils.message('Cancelled.', libtcod.red)
+            Utils.message('Cancelled.', Color('red'))
             Render.clear_layer(layers['overlay_console'])
             return 'cancelled'
         else:
@@ -306,7 +305,8 @@ def render_common():
 
     pos = Pos(Constants.MAP_CONSOLE_WIDTH, 0)
 
-    Render.set_foreground(layers['side_panel_console'], libtcod.Color(0, 70, 140))
+    # ERRORS
+    Render.set_foreground(layers['side_panel_console'], Color("0, 70, 140"))
 
     """ LEVEL NUMBER """
     Render.print_rect(layers['side_panel_console'], pos.x + 1, pos.y + 1, 17, 1, "Level 1".center(17, ' '))
@@ -316,7 +316,12 @@ def render_common():
                                "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
 
     """ STATS """
-    Render.set_foreground(layers['panel_console'], libtcod.Color(175, 175, 255))
+    color = Color("175, 175, 255")
+    #print color
+    Render.set_foreground(layers['panel_console'], color)
+    #terminal.color('green')
+
+
     player = GameState.player
 
     Render.print_line(layers['side_panel_console'], Constants.MAP_CONSOLE_WIDTH + 5, 18, str(player.fighter.base_str).rjust(3))
@@ -380,7 +385,7 @@ def render_status():
     for st in GameState.player.status.status_list:
         if num_of_status == 9:
             Render.set_background(layers['side_panel_console'], libtcod.black)
-            Render.set_foreground(layers['side_panel_console'], libtcod.Color(51, 51, 51))
+            Render.set_foreground(layers['side_panel_console'], Color(51, 51, 51))
             Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + inc,
                               "...             ")  # + " (" + str(st[1]) + ")")
             return
@@ -401,14 +406,14 @@ def render_stat_bars():
 
     # SHOW PLAYER STAT BARS
     Render.draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                        libtcod.Color(178, 0, 45),
-                        libtcod.Color(64, 0, 16), layers['side_panel_console'])
+                        Color("178, 0, 45"),
+                        Color("64, 0, 16"), layers['side_panel_console'])
     Render.draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                        libtcod.Color(0, 30, 255),
-                        libtcod.Color(0, 10, 64), layers['side_panel_console'])
+                        Color("0, 30, 255"),
+                        Color("0, 10, 64"), layers['side_panel_console'])
     Render.draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
-                   libtcod.Color(255, 255, 0),
-                        libtcod.Color(65, 65, 0), layers['side_panel_console'])
+                   Color("255, 255, 0"),
+                        Color("65, 65, 0"), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
@@ -416,8 +421,8 @@ def render_stat_bars():
         if object.fighter and object.base_speed != 0 and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
                 Render.draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                                    libtcod.Color(0, 255, 0),
-                                    libtcod.Color(0, 64, 0),
+                                    Color("0, 255, 0"),
+                                    Color("0, 64, 0"),
                                     layers['side_panel_console'])
                 temp_y += 2
 
@@ -518,8 +523,8 @@ def display_mainMenu():
 
     Render.draw_rect(10, 0, 0, width, height,
                      frame=True,
-                     f_color=terminal.color_from_name('dark azure'),
-                     bk_color=terminal.color_from_name('darkest azure'),
+                     f_color=Color('dark azure'),
+                     bk_color=Color('darkest azure'),
                      title="DEEP FRIED SUPERNOVA v0.01")
 
     Render.print_rect(10, 4, 4, width, height, 'Welcome to Deep Fried Supernova')
@@ -555,7 +560,7 @@ def display_mainMenu():
                        target=10)
 
     img = libtcod.image_load('diner_logo_sm.png')
-    # libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
+    # libtcod.image_set_key_color(img, Color(0, 0, 0))
 
     # show the background image, at twice the regular console resolution
     #libtcod.image_blit_2x(img, mm, 37, 2)
@@ -657,7 +662,7 @@ def beastiary(width=10, height=10, title=None, text=None):
                     function=close_window)
 
     img = libtcod.image_load('Images//cipher_warden_80x80_test_01.png')
-    libtcod.image_set_key_color(img, libtcod.Color(0, 0, 0))
+    libtcod.image_set_key_color(img, Color(0, 0, 0))
     # show the background image, at twice the regular console resolution
     libtcod.image_blit_2x(img, pop, 9, 2)
 
@@ -814,12 +819,12 @@ def skill_tree():
             for x in range(Constants.MAP_CONSOLE_WIDTH):
                 # print skills
                 if selected_x == x and selected_y == y:
-                    color = libtcod.purple
+                    color = Color('purple')
                 else:
                     if skills[x][y].purchased:
-                        color = libtcod.green
+                        color = Color('green')
                     else:
-                        color = libtcod.white
+                        color = Color('white')
 
                 char = skills[x][y].char
                 if char == "|":
@@ -827,7 +832,7 @@ def skill_tree():
                 elif char == "-":
                     Render.draw_char(st, x + x + offset[0], y + y + offset[1], libtcod.CHAR_HLINE, libtcod.white, Constants.UI_PopBack)
                 elif char == ".":
-                    if color == libtcod.purple:
+                    if color == Color('purple'):
                         Render.draw_char(st, x + x + offset[0] + 1, y + y + offset[1] - 1, libtcod.CHAR_DNE,
                                          color, Constants.UI_PopBack)
                         Render.draw_char(st, x + x + offset[0], y + y + offset[1] - 1, libtcod.CHAR_DHLINE,
