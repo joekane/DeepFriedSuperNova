@@ -276,7 +276,7 @@ def draw_bar(x, y, total_width, name, value, maximum, bar_color, back_color, tar
         print_line(target, x + total_width / 2, y, name + ': ' + str(value) + '/' + str(maximum))
 
 
-def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
+def draw_char(dest, x, y, char, color=None, flag=None, alpha=255, verbose=False):
     # LIBTCOD
     # libtcod.console_put_char_ex(dest, x, y, char, color, flag)
 
@@ -284,8 +284,13 @@ def draw_char(dest, x, y, char, color=None, flag=None, alpha=255):
     terminal.layer(dest)
     # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
     if color is not None:
+        if verbose:
+            print color
+            print int(color)
+            print color.getRGB()
         #color = Utils.convert_color(color, alpha)
         #print "Color: {0}".format(color)
+        #print "In DrawChar Color: {0}".format(color)
         terminal.color(color)
     terminal.put(x, y, char)
 
@@ -298,17 +303,19 @@ def draw_char_ex(dest, x, y, dx, dy, char, color=None, flag=None, alpha=255):
     terminal.layer(dest)
     # TODO: CONVERT COLORS ON THEME IMPORT, INSTEAD OF INLINE (all render func)
     if color is not None:
-        color = Utils.convert_color(color, alpha)
+        #color = Utils.convert_color(color, alpha)
         terminal.color(color)
     terminal.put_ext(x, y, dx, dy, char, None)
 
 
-def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET):
+def draw_background(dest, x, y, color, flag=libtcod.BKGND_SET, verbose=False):
     # LIBTCOD
     # libtcod.console_set_char_background(dest, x, y, color, flag)
     # BEARLIB
     # TODO: Replace / Obsolete?
-    color = Utils.convert_color(color)
+    #color = Utils.convert_color(color)
+    if verbose:
+        print color.getRGB()
     terminal.bkcolor(color)
     terminal.put(x, y, terminal.pick(x,y, 0))
 

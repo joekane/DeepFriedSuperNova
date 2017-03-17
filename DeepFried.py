@@ -17,6 +17,7 @@ import GameState
 import Render
 from Engine import SoundEffects
 from MapGen import Themes
+import Engine.Animation_System
 
 terminal.open()
 # terminal.set("window: size=80x25, cellsize=auto, title='Omni: menu'; font: default")
@@ -35,6 +36,11 @@ terminal.refresh()
 Sound Init
 """
 SoundEffects.initilize()
+
+""""
+Animation Init
+"""
+Engine.Animation_System.initilize()
 
 """
 Load Themes from file & set default theme.

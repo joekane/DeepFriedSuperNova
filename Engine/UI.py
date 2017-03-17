@@ -306,7 +306,7 @@ def render_common():
     pos = Pos(Constants.MAP_CONSOLE_WIDTH, 0)
 
     # ERRORS
-    Render.set_foreground(layers['side_panel_console'], Color("0, 70, 140"))
+    Render.set_foreground(layers['side_panel_console'], Color("0,70,140"))
 
     """ LEVEL NUMBER """
     Render.print_rect(layers['side_panel_console'], pos.x + 1, pos.y + 1, 17, 1, "Level 1".center(17, ' '))
@@ -316,7 +316,7 @@ def render_common():
                                "X: " + str(Input.mouse.cx) + "  \nY: " + str(Input.mouse.cy) + "  ")
 
     """ STATS """
-    color = Color("175, 175, 255")
+    color = Color("175,175,255")
     #print color
     Render.set_foreground(layers['panel_console'], color)
     #terminal.color('green')
@@ -360,8 +360,8 @@ def render_status():
     # RENDER HEALTH BARS
     pos = Pos(Constants.MAP_CONSOLE_WIDTH + 1, 25)
     # CLEAR HP AREA / Status Area
-    Render.set_foreground(layers['side_panel_console'], libtcod.black)
-    Render.set_background(layers['side_panel_console'], libtcod.black)
+    #Render.set_foreground(layers['side_panel_console'], libtcod.black)
+    #Render.set_background(layers['side_panel_console'], libtcod.black)
     # draw_rect(layers['side_panel_console'], 1, 3, 17, 14, True, libtcod.BKGND_SET)
     # draw_rect(layers['side_panel_console'], pos.x, pos.y, 10, 9, True, libtcod.BKGND_SET)
 
@@ -374,7 +374,7 @@ def render_status():
     count = 1
     for status in GameState.player.status.summary():
         if Utils.is_mouse_in(pos.x, pos.y - 1 + count, 17, 1):
-            Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + count, str(status[1]/100) + " Turns", f_color='green')
+            Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + count, str(status[1]/100) + " Turns", f_color='light green')
         else:
             Render.print_line(layers['side_panel_console'], pos.x, pos.y - 1 + count, status[0], f_color='green')
 
@@ -406,14 +406,14 @@ def render_stat_bars():
 
     # SHOW PLAYER STAT BARS
     Render.draw_box_bar(pos.x, pos.y, 14, '', GameState.get_player().fighter.hp, GameState.get_player().fighter.base_max_hp,
-                        Color("178, 0, 45"),
-                        Color("64, 0, 16"), layers['side_panel_console'])
+                        Color("178,0,45"),
+                        Color("64,0,16"), layers['side_panel_console'])
     Render.draw_box_bar(pos.x, pos.y + 1, 14, '', GameState.get_player().fighter.sp, GameState.get_player().fighter.base_max_sp,
-                        Color("0, 30, 255"),
-                        Color("0, 10, 64"), layers['side_panel_console'])
+                        Color("0,30,255"),
+                        Color("0,10,64"), layers['side_panel_console'])
     Render.draw_box_bar(pos.x, pos.y + 2, 14, '', GameState.get_player().fighter.xp, 1000,  # TODO: will be NEXT_LVL_XP
-                   Color("255, 255, 0"),
-                        Color("65, 65, 0"), layers['side_panel_console'])
+                   Color("255,255,0"),
+                        Color("65,65,0"), layers['side_panel_console'])
 
     # RENDER MONSTER HEALTH BARS
     temp_y = 3
@@ -421,8 +421,8 @@ def render_stat_bars():
         if object.fighter and object.base_speed != 0 and (object is not GameState.get_player()):  # and Fov.is_visible(obj=object)
             if temp_y < 17: # TODO: Make constant to scale UI
                 Render.draw_box_bar(Constants.MAP_CONSOLE_WIDTH + 1, temp_y, 17, object.name, object.fighter.hp, object.fighter.max_hp,
-                                    Color("0, 255, 0"),
-                                    Color("0, 64, 0"),
+                                    Color("0,255,0"),
+                                    Color("0,64,0"),
                                     layers['side_panel_console'])
                 temp_y += 2
 

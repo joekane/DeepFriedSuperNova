@@ -76,7 +76,7 @@ def set_theme(theme):
     SHROUD_COLOR = theme_list[theme]['shroud_color'].split(',')
     SHROUD_BCOLOR = theme_list[theme]['shroud_bcolor'].split(',')
 
-    OUT_OF_FOV_COLOR = theme_list[theme]['out_of_fov_color']
+    OUT_OF_FOV_COLOR = theme_list[theme]['out_of_fov_color'].split(',')
 
 
 def ground_char():
@@ -84,7 +84,7 @@ def ground_char():
 
 
 def ground_color():
-    print GROUND_COLOR
+    #print GROUND_COLOR
     color = random.choice(GROUND_COLOR)
     return color
 
@@ -124,7 +124,7 @@ def glass_bcolor():
 
 
 def shroud_char():
-    return eval(str(random.choice(SHROUD_CHAR)))
+    return random.choice(SHROUD_CHAR)
 
 
 def shroud_color():

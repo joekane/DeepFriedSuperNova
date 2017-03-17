@@ -96,7 +96,7 @@ death_function = explosive_death
 ai_component = MeleeMonster()
 char = B
 name = barrel
-color = sepia
+color = green
 lore='This is lore!!!'
 freq = 70:1
 

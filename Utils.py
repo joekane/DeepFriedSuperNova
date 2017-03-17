@@ -387,7 +387,7 @@ def find_element_in_list(element, list_element):
         return None
 
 
-def convert_color(color, alpha=255):
+def OBS_convert_color(color, alpha=255):
 
     if type(color) is libtcod.Color:
         return terminal.color_from_argb(alpha, color[0], color[1], color[2])
@@ -544,7 +544,7 @@ def gradient(color_list, color_keys):
     #return libtcod.color_gen_map(color_list, color_keys)
     return Color.color_map(color_list, color_keys )
 
-6
+
 def segment_number(number, times):
     num_list = []
     for x in range(1,times+1):

@@ -915,11 +915,12 @@ def monster_death(monster):
                                                                                                                                  monster.name,
                                                                                                                                  Constants.COMBAT_MESSAGE_XP_COLOR,
                                                                                                                                  monster.fighter.xp))
-    '''
+
     GameState.add_animation('FadeText', {'origin': (monster.x, monster.y),
                                          'target': (monster.x, monster.y - 1),
                                          'char_list': ["+{0}".format(monster.fighter.xp)],
                                          'color_list': [libtcod.dark_yellow]})
+                                         '''
     monster.char = '%'
     monster.color = 'dark red'
     monster.blocks = False

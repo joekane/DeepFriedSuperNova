@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # *******************************************************
 # * Copyright (C) 2016-2017 Joe Kane
 # *
@@ -276,7 +277,7 @@ class Level:
 
         monsters.sort(key=lambda tup: tup[1])
 
-        print "Monsters: {0}".format(monsters)
+        #print "Monsters: {0}".format(monsters)
         return monsters
 
     def draw_map(self):
@@ -289,6 +290,8 @@ class Level:
             player = self.player
             GameState.move_camera(player.x, player.y)
             camera_x, camera_y = GameState.get_camera()
+            f_color = None
+            b_oolor = None
 
             # Map.d_map[player.x][player.y] = 0
 
@@ -326,19 +329,22 @@ class Level:
                         # print "ELSE - Should be Drawing!!!"
                         if not visible:
                             if tile.explored:
+
                                 if tile.blocked:
                                     char = tile.char
-                                    f_color = Color('50, 50, 50')
-                                    b_color = Color('10, 10, 10')
-                                else:
-                                    char = '.'
-                                    f_color = Color('50, 50, 50')
-                                    b_color = Color('0, 0, 0')
 
-                                Render.draw_char(Render.layers['map_console'], x, y, char,
-                                                 f_color, libtcod.BKGND_SET)
-                                Render.draw_background(Render.layers['map_console'], x, y,
-                                                       b_color, flag=libtcod.BKGND_SET)
+                                    f_color = Color("50, 50, 50")
+                                    b_color = Color("20, 20, 20")
+                                else:
+                                    char = ' '
+                                    f_color = Color("50, 50, 50")
+                                    b_color = Color("20, 20, 20")
+
+                                f_color = Color("16744448")
+
+
+                                Render.draw_char(Render.layers['map_console'], x, y, char, color=f_color)
+                                Render.draw_background(Render.layers['map_console'], x, y, b_color)
                                 # libtcod.console_put_char_ex(consoles['map_console'], x, y, char,
                                 #                            Themes.OUT_OF_FOV_COLOR, libtcod.BKGND_SET)
                             #print "Invis....."

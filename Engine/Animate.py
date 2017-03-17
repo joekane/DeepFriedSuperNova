@@ -137,7 +137,7 @@ def large_button(x, y, text, hover, length=None, target=0):
     x = x - ((length + 2) / 2)
     base_color = color
     value = 40
-    adj = Color("{0}, {0}, {0}".format(value))
+    adj = Color("{0},{0},{0}".format(value))
     color1 = base_color - adj - adj
     color2 = base_color - adj
     color3 = base_color
