@@ -58,7 +58,12 @@ Render.initialize()
 """
 Launch Menu
 """
-GameState.main_menu()
+# ECS Hijack
+import ECS.ECS
+ECS.ECS.game_loop()
+
+# Normal Entry Point
+#GameState.main_menu()
 
 """
 Close Window in Exit
