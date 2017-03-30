@@ -1,5 +1,5 @@
 """
-# Pyqtree
+# QuadTRee: Based on Pyqtree
 
 Pyqtree is a pure Python spatial index for GIS or rendering usage.
 It stores and quickly retrieves items from a 2x2 rectangular grid area,
@@ -9,60 +9,6 @@ The actual quad tree implementation is adapted from
 and extended for geospatial use.
 
 
-## Platforms
-
-Python 2 and 3.
-
-
-## Dependencies
-
-Pyqtree is written in pure Python and has no dependencies.
-
-
-## Installing It
-
-Installing Pyqtree can be done by opening your terminal or commandline and typing:
-
-    pip install pyqtree
-
-Alternatively, you can simply download the "pyqtree.py" file and place
-it anywhere Python can import it, such as the Python site-packages folder.
-
-
-## Example Usage
-
-Start your script by importing the module.
-
-    import pyqtree
-
-Setup the spatial index, giving it a bounding box area to keep track of.
-The bounding box being in a four-tuple: (xmin,ymin,xmax,ymax).
-
-    spindex = pyqtree.Index(bbox=[0,0,100,100])
-
-Populate the index with items that you want to be retrieved at a later point,
-along with each item's geographic bbox.
-
-    # this example assumes you have a list of items with bbox attribute
-    for item in items:
-        spindex.insert(item=item, bbox=item.bbox)
-
-Then when you have a region of interest and you wish to retrieve items from that region,
-just use the index's intersect method. This quickly gives you a list of the stored items
-whose bboxes intersects your region of interests.
-
-    overlapbbox = (51,51,86,86)
-    matches = spindex.intersect(overlapbbox)
-
-There are other things that can be done as well, but that's it for the main usage!
-
-
-## More Information:
-
-- [Home Page](http://github.com/karimbahgat/Pyqtree)
-- [API Documentation](http://pythonhosted.org/Pyqtree)
-
-
 ## License:
 
 This code is free to share, use, reuse, and modify according to the MIT license, see LICENSE.txt.
@@ -70,12 +16,9 @@ This code is free to share, use, reuse, and modify according to the MIT license,
 
 ## Credits:
 
-Karim Bahgat (2015)
+PyTree: Karim Bahgat (2015)
+QuadTree: Modified by, Joe Kane (2017)
 
-"""
-
-"""
-Modified by Joe Kane with remove functions and working membercounts.
 """
 
 __version__ = "0.30"
@@ -124,7 +67,7 @@ class _QuadTree:
         How far from the ycenter that the quadtree should look when keeping track
     """
 
-    def __init__(self, x, y, width, height, depth=0, maxitems=10, maxdepth=20):
+    def __init__(self, x, y, width, height, depth=0, maxitems=10000, maxdepth=20000):
         self.nodes = []
         self.children = []
         self.center = [x, y]

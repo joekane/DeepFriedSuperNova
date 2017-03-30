@@ -27,16 +27,16 @@ def render_map(id):
     return Event('render_map', {'id': id, 'layer': 0})
 
 
-def attack(target):
-    return Event('attack', {'power': 0, 'type': '', 'target': target})
+def attack():
+    return Event('attack', {'power': 0, 'type': ''})
 
 
 def take_damage(power, type):
     return Event('take_damage', {'power': power, 'type': type})
 
 
-def search(pos, owner):
-    return Event('search', {'position': pos, 'owner': owner})
+def search(pos):
+    return Event('search', {'position': pos})
 
 
 def position():

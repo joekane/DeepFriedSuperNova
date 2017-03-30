@@ -10,17 +10,20 @@ import time
 from bearlibterminal import terminal
 import random
 
-SPAWNS = 25
+SPAWNS = 1000
 
 Position = namedtuple('Positon', 'x y')
 
 import Systems
+
 player = None
+
 
 class Component(object):
     def __init__(self):
         self.priority = 100
         self.owner = None
+        self.name = ''
 
     def fire_event(self, event):
         return event
@@ -41,54 +44,39 @@ class Component(object):
         return hash(self.__repr__())
 
 
-class Entity(dict):
-    def __init__(self, *arg, **kwargs):
-        super(Entity, self).__init__(*arg, **kwargs)
-        self.name = kwargs.get('name')
-
-    def __repr__(self):
-        return self.name + "\r\n" + str(self.keys())
-
-    def getComponent(self, key):
-        if key in self.keys():
-            return self[key]
-        else:
-            return None
-
-    def removeComponent(self, component):
-        pass
-
-
-
-class GameObject(object):
-    def __init__(self, name, component_list):
+class Entity(object):
+    def __init__(self, name, components):
         self.name = name
-        self.component_list = component_list
-        for c in self.component_list:
+        self.components = components
+        for c in self.components:
             c.owner = self
 
-    @property
-    def position(self):
-        return self.fire_event(Events.position()).params['position']
+    def __repr__(self):
+        return "\r\n" + self.name + "\r\n" + str([e.name for e in self.components])
 
+    def get_component(self, name):
+        for c in self.components:
+            if c.name == name:
+                return c
+        return False
+
+    def remove_component(self, component):
+        return self.components.remove(component)
 
     def fire_event(self, event):
-        for c in sorted(self.component_list): # Needs to be a priority list
+        for c in sorted(self.components):
             event = c.fire_event(event)
         return event
 
-    def __repr__(self):
-        return '<GameObject name={0}>'.format(self.name).encode('utf-8')
 
-
-class GameObjectFactory(object):
+class EntityFactory(object):
     root = xml.etree.ElementTree.parse(r'./ECS/objects.xml').getroot()
     blueprints = root.getchildren()
 
     @staticmethod
     def CreateObject(object_name):
         #return GameObjectFactory.ParseXMLComponents(object_name, GameObjectFactory.get_blueprint(object_name))
-        return GameObjectFactory.ParseXMLComponentsForEntity(object_name, GameObjectFactory.get_blueprint(object_name))
+        return EntityFactory.ParseXMLComponents(object_name, EntityFactory.get_blueprint(object_name))
 
 
     @staticmethod
@@ -109,12 +97,12 @@ class GameObjectFactory(object):
                     component_list.append(component_type(**component.attrib))
 
         print "List: ", component_list
-        return GameObject(name, component_list)
+        return Entity(name, component_list)
 
     @staticmethod
     def ParseXMLComponentsForEntity(name, bp_list):
-        entity = Entity()
-        entity.name = name
+        entity = Entity(name)
+
         added_components = []
         #print "Parse_List: ", bp_list
         bp_list = deepcopy(bp_list)
@@ -123,7 +111,7 @@ class GameObjectFactory(object):
                 component_name = component.attrib.pop('name')
                 if component_name not in added_components:
                     added_components.append(component_name)
-                    entity[component_name] = component.attrib
+                    entity.components[component_name] = component.attrib
                     #component_list.append(component_type(**component.attrib))
         return entity
 
@@ -133,7 +121,7 @@ class GameObjectFactory(object):
             #print "Cleared"
             bp_list = []
 
-        for bp in GameObjectFactory.blueprints:
+        for bp in EntityFactory.blueprints:
             if bp.get('name') == name:
                 bp_list.append(bp)
                 #print name
@@ -141,7 +129,7 @@ class GameObjectFactory(object):
                     i_name = bp.get('inherits')
                     #print "Inherits ", i_name
                     #print "Before: ", bp_list
-                    bp_list = GameObjectFactory.get_blueprint(i_name, bp_list)
+                    bp_list = EntityFactory.get_blueprint(i_name, bp_list)
 #                    print "After: ", bp_list
             else:
                 #rint 'No ', name, " Found"
@@ -149,116 +137,96 @@ class GameObjectFactory(object):
         return bp_list
 
 
-object_list = []
-
-
-def send_global_event(event, key=None, value=None):
-    for o in object_list:
-        result = o.fire_event(copy(event))
-        if key and value and result:
-            if result.params[key] == value:
-                return result
-    return False
-    #print event
-
-
-def remove_object(obj):
-    global object_list
-    object_list.remove(obj)
-
 
 def game_loop():
-    test()
+    initialize_objects()
     print "###########################################"
-    #print object_list
 
-    Systems.RenderWorldSystem.UpdateCache(object_list)
-    Systems.InputSystem().UpdateCache(object_list)
-    Systems.AISystem().UpdateCache(object_list)
-    #Systems.MapSystem().UpdateCache(object_list)
-    Systems.PhysicsSystem().UpdateCache(object_list)
-
-    #print "Draw Map"
-    Systems.MapSystem.Event(Events.render_map('main'))
-    #send_global_event(Events.draw('map'))
-    #send_global_event(Events.draw('objects'))
+    Systems.EntityManager.UpdateSystems()
+    Systems.MapSystem.render_map()
 
     while True:
-        #terminal.layer(1)
-        #terminal.clear_area(0, 0, 80, 25)
         Input.update()
         mouse = Input.mouse
         key = Input.key
 
-        #print "Draw Objects"
-        #send_global_event(Events.draw('objects'))
-
-        #print "players turn"
-        #if send_global_event(Events.input(key, mouse), 'status', 'charging'):
-        #    send_global_event(Events.AI())
         status = Systems.InputSystem().OnTurn()
         if status == 'waiting':
             pass
         elif status == 'charging':
             Systems.AISystem().OnTurn()
         elif status == 'turn_end':
+            #print Systems.PhysicsSystem.entity_count()
             pass
         Systems.PhysicsSystem().OnTurn()
         Systems.RenderWorldSystem.OnTurn()
 
 
-        #if player.fire_event(Events.input(key, mouse)).params['status'] == 'charging':
-        #    send_global_event(Events.AI())
 
+
+        """ testing """
+        #terminal.composition(False)
+
+        terminal.layer(10)
+        terminal.clear_area(0,0,100,50)
+        unit_test = Systems.PhysicsSystem.is_blocked(Position(mouse.cx, mouse.cy))
+        if unit_test[0]:
+            terminal.puts(0,30, "{0}|{1} => {2}".format(mouse.cx, mouse.cy, unit_test[1][0].name))
+        else:
+            terminal.puts(0, 30, "{0}|{1}".format(mouse.cx, mouse.cy))
+        terminal.puts(0,31, "{0}".format(Systems.PhysicsSystem.entity_count()))
+
+        """ ------- """
+
+
+        Systems.EntityManager.OnUpdate()
         terminal.refresh()
 
 
 
-def test():
+def initialize_objects():
     global object_list, player
 
     #terminal.composition(False)
 
-    map = GameObjectFactory.CreateObject('map')
+    map = EntityFactory.CreateObject('map')
 
-    r = GameObjectFactory.CreateObject('rat')
+    r = EntityFactory.CreateObject('rat')
 
-    player = GameObjectFactory.CreateObject('player')
+    player = EntityFactory.CreateObject('player')
 
-    things = ['rat', 'kobold', 'sword']
+    things = [ 'kobold', 'rat', 'sword']
 
     for thing in range(SPAWNS):
         obj_name = random.choice(things)
-        obj = GameObjectFactory.CreateObject(obj_name)
+        obj = EntityFactory.CreateObject(obj_name)
 
         #obj.fire_event(Events.move_to(Position(random.randint(1, 79), random.randint(1, 24))))
-        obj.getComponent('Physics')['position'] = Position(random.randint(1, 79), random.randint(1, 24))
+        obj.get_component('Physics').position = Position(random.randint(1, 79), random.randint(1, 24))
         #obj.getComponent('Physics')['position'] = Position(8, 10)
-        obj.getComponent('Physics')['last_position'] = Position(-1, -1)
+        obj.get_component('Physics').last_position = Position(-1, -1)
 
-        obj.getComponent('Render')['layer'] = 2
+        Systems.EntityManager.entity_list.append(obj)
+        #object_list.append(obj)
 
-
-        object_list.append(obj)
-
-    print player
-    print player['Container']
+    #print player
+    #print player['Container']
 
 
 
 
 
     #p.fire_event(Events.add_item(s))
-    player['Physics']['position'] = Position(20, 8)
-    player['Physics']['last_position'] = Position(-1, -1)
-    player['Render']['layer'] = 2
-    object_list.append(player)
+    player.get_component('Physics').position = Position(22, 8)
+    player.get_component('Physics').last_position = Position(-1, -1)
+    player.get_component('Render').layer = 2
+    Systems.EntityManager.entity_list.append(player)
 
-    map['Map']['map'] = [c for c in
+    map.get_component('Map').map = [c for c in
                     '######.........#.#.......#.....#...#.....#.........#.#...#.#.......#.......###########.#.###.#.#.#.#######.#.#####.#.###.#.#.#####.#.###.#.#.#######.###########.....#.#.#...#.#.........#.#.#.....#.###...#.#.....#.......#.......#.....#######.#.#.###.#.#####.#.#.#######.#.#.#.#.#####################.#.###.#######.#######.#.#.#...#...#...#.#...#.#.#.#.#.#.#.........#.....#...........#.#.............#####.#.#######.#######.#.#.#.#.#.#######.#.#.#.#.#.#.#######.#######.#######.#.###...#...#####.#.#####.#...#...#.#...#.#.#.#...#.#...###...#.#.......#.......#.#####.###.#####.#.#####.#.###.#.###.###.#.#.###.#########.#####.###.#############.........###.#.....###.#...#.#.#.#.......#.#...#...#.#.#.#.......#.###...#.....#########.###.#.#.#.###.#.#.###.#.#.#####.#.###.#.###.#.#.#.#.###.#####.###.#.###.......#.....#.#.#.#...#.#...........#...#.#.....#.......#.#...#.#.........#...#####.#.#.#####.#.###.#######.#######.###.#.#.###.#.#####.#.#####.#.#.#####.#####...#.#.#.......#...#.....#.....#.#...#####.#...#.......#.#...#.....#...#.#.....###.###.#.#.#.###.#####.#.#####.#.#.#######.#####.#####.#.###.#.###.#####.#####.###...#...#.#.#.......#.#.....#...#.......#...#...#.....#.....#...#...........#.#####.#.###########.###.#.###.#####.#######.###.###########.###.###.#####.###.#######...###.....#...#.#.#...#...........###...#.###...#.###.###...#.....#.#.....#####.#####.#######.#.###.###.#.#####.#.#############.#.###.#####.#####.#.###.#######.........#.#...#.....#.#.#.#.....#.###.#...#.............#...#####.#...#...#######.#.#####.#.###.#.#.#.###.#######.###.#.#####.###.#################.#############.#...#.#.....#.#.#.#...#...###...###.....#...#.......#########...#.......#######.###.#.#####.#####.#.###.#.###.#.###.#.###.###.#####.#########.#########.#######.#.#.#...###...#...#.#.#.#...#.#.....#.#.#...#.###...#########...#.......#########.#.###.#######.#.#.#.###.#######.###.#.#####.###############.#.###.#############...###.........#.#.......#######.#.....#####.......#########.#.........#'
                     ]
 
-    object_list.append(map)
+    Systems.EntityManager.entity_list.append(map)
 
 
 
